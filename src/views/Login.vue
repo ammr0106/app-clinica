@@ -1,8 +1,7 @@
 <template>
-  
   <div class="auth-wrapper">
     <h1 class="title">Multispecialty Clinic</h1>
-    <form class="auth-form" @submit.prevent="handleLogin">
+    <form class="auth-form" @submit.prevent>
       <h2>Iniciar Sesión</h2>
       <input type="email" placeholder="Correo electrónico" />
       <input type="password" placeholder="Contraseña" />
@@ -10,7 +9,10 @@
         <input type="checkbox" id="remember" />
         <label for="remember">Recordarme</label>
       </div>
-      <button type="submit">Entrar</button>
+      <div class="button-group">
+        <button type="button" @click="handleLogin('superadmin')">Entrar como SuperAdmin</button>
+        <button type="button" @click="handleLogin('coordinador')">Entrar como Coordinador</button>
+      </div>
     </form>
   </div>
 </template>
@@ -20,19 +22,24 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-function handleLogin() {
-  // Simulamos login como superadmin  --- SOLO PARA PRUEBAS DE MAQUETACION !
-  const fakeUser = { 
-    email: 'super@admin.com',
-    role: 'superadmin'
+function handleLogin(role) {
+  // Simulación de usuario para pruebas de maquetación
+  const fakeUser = {
+    email: role === 'superadmin' ? 'super@admin.com' : 'coordinador@gmail.com',
+    role: role
   }
 
   localStorage.setItem('user', JSON.stringify(fakeUser))
 
-  // Redirigir a vista SuperAdmin
-  router.push('/superadmin')
+  if (role === 'superadmin') {
+    router.push('/superadmin')
+  } else if (role === 'coordinador') {
+    router.push('/coordinador')
+  }
 }
 </script>
+
+
 <style>
 :root {
   --azul-profesional: #1565C0;
@@ -191,4 +198,14 @@ function handleLogin() {
     transform: translateY(0);
   }
 }
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button-group button {
+  flex: 1;
+}
+
 </style>
