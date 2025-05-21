@@ -5,23 +5,14 @@
 
     <!-- Contenido principal -->
     <main class="content">
-      <!-- Barra superior -->
-      <div class="top-bar">
-        <input
-          v-model="search"
-          type="text"
-          placeholder="Buscar sede..."
-          class="search-input"
-        />
-        <button class="create-button" @click="abrirModal">Crear sede</button>
-      </div>
+      <!-- Barra de busqueda  -->
+    <div class="top-bar">
+     <Searchbar v-model="search" />
+      <button class="create-button" @click="abrirModal">Crear sede</button>
+        </div>
 
       <!-- Grid de sedes -->
-      <div class="grid">
-        <div class="sede-card" v-for="n in 9" :key="n">
-          Sede {{ n }}
-        </div>
-      </div>
+        <GridSedes :search="search" />
     </main>
 
     <!-- Modal -->
@@ -36,8 +27,11 @@
 
 <script setup>
 import Header from '@/components/Header.vue'
+import ModalSede from '@/components/ModalSede.vue'
+import Searchbar from '@/components/Searchbar.vue'
+import GridSedes from '@/components/GridSedes.vue'
 import { ref } from 'vue'
-import ModalSede from '../components/ModalSede.vue';
+
 const search = ref('')
 const mostrarModal = ref(false)
 
@@ -53,6 +47,7 @@ const guardarSede = (datos) => {
   console.log('Sede guardada:', datos)
   cerrarModal()
 }
+
 </script>
 
 <style scoped>
@@ -72,6 +67,7 @@ const guardarSede = (datos) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   gap: 1rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
