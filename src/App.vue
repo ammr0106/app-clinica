@@ -1,7 +1,7 @@
 <template>
 
-<Header />
 
+<router-view />
 
 
 
@@ -9,7 +9,7 @@
 
 
 <script setup>
-import Header from '@/components/Header.vue'
+
 </script>
 
 <style>

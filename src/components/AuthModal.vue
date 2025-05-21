@@ -8,12 +8,7 @@
         >
           Iniciar Sesión
         </button>
-        <button
-          :class="{ active: currentTab === 'register' }"
-          @click="currentTab = 'register'"
-        >
-          Registrarse
-        </button>
+        
       </div>
       <transition name="fade" mode="out-in">
         <component :is="currentTabComponent" :key="currentTab" />
@@ -24,8 +19,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import Login from './Login.vue'
-import Register from './Register.vue'
+import Login from '../views/Login.vue'
 
 const currentTab = ref('login')
 

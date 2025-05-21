@@ -7,10 +7,7 @@
     </div>
 
     <div class="header-right">
-      <!-- Menú de usuario -->
-      <div class="user-menu" @click="showAuth = true">
-  <font-awesome-icon :icon="['fas', 'user-circle']" class="user-icon" />
-</div>
+  
 
       <!-- Menú hamburguesa -->
       <MenuBurger />
@@ -21,7 +18,6 @@
 
 <script setup>
 import MenuBurger from './MenuBurger.vue'
-import AuthModal from './AuthModal.vue'
 import { ref } from 'vue'
 const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
 </script>
