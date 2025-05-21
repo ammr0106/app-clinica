@@ -19,6 +19,7 @@ import { supabase } from "./DatabaseConnection";
  * Obtiene todas las citas con datos relacionados.
  * @returns {Promise<AppointmentDB[]>}
  */
+
 export async function fetchAppointments() {
   const { data, error } = await supabase.from("appointment").select(`
       id,

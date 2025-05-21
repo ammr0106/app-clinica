@@ -9,6 +9,7 @@ import { supabase } from "./DatabaseConnection";
  * @property {string} DNI
  * @property {string} email
  * @property {string} phone
+ * @property {string} address
  * @property {string} id_headquarters
  */
 
@@ -24,7 +25,10 @@ export async function fetchClients() {
       phone,
       email,
       DNI,
-      id_headquarters
+      address,
+      headquarters (
+        name
+      )
     `);
 
 

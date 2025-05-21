@@ -8,6 +8,7 @@ import { fetchClients } from "@/services/ClientService";
  * @property {string} DNI
  * @property {string} email
  * @property {string} phone
+ * @property {string} address
  * @property {string} headquarters_name
  */
 
@@ -35,6 +36,7 @@ export function useClient() {
         DNI: client.DNI,
         email: client.email,
         phone: client.phone,
+        address: client.address,
         headquarters_name: client.headquarters?.name || "Sin sede",
       });
     });
