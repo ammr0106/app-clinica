@@ -31,6 +31,8 @@ import ModalSede from '@/components/ModalSede.vue'
 import Searchbar from '@/components/Searchbar.vue'
 import GridSedes from '@/components/GridSedes.vue'
 import { ref } from 'vue'
+import AppForm from '../components/common/AppForm.vue'
+import AppInput from '../components/common/AppInput.vue'
 
 const search = ref('')
 const mostrarModal = ref(false)

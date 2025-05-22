@@ -3,35 +3,25 @@
     <div class="modal">
       <button class="close-button" @click="close">×</button>
       <h2>Crear nueva sede</h2>
-      <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label>Nombre</label>
-          <input v-model="nombre" type="text" required />
-        </div>
-        <div class="form-group">
-          <label>Ciudad</label>
-          <input v-model="ciudad" type="text" required />
-        </div>
-        <div class="form-group">
-          <label>Dirección</label>
-          <input v-model="direccion" type="text" required />
-        </div>
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input v-model="telefono" type="tel" required />
-        </div>
-        <div class="form-group">
-          <label>Coordinadores</label>
-          <input v-model="coordinadores" type="text" required />
-        </div>
-        <button type="submit" class="submit-button">Guardar Sede</button>
-      </form>
+
+      <AppForm @submit="submitForm">
+        <AppInput v-model="nombre" label="Ciudad" type="text" :required="true" />
+        <AppInput v-model="ciudad" label="Nombre" type="text" :required="true" />
+        <AppInput v-model="direccion" label="Dirección" type="text" :required="true" />
+        <AppInput v-model="telefono" label="Teléfono" type="text" :required="true" />
+        <AppInput v-model="coordinadores" label="Coordinadores" type="text" :required="true" />
+        <AppButton type="submit" variant="green">Guardar Sede</AppButton>
+      </AppForm>
+
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import AppForm from './common/AppForm.vue'
+import AppInput from './common/AppInput.vue'
+import AppButton from './common/AppButton.vue'
 const emit = defineEmits(['close', 'enviar'])
 
 const nombre = ref('')

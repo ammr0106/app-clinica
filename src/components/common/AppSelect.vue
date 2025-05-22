@@ -1,0 +1,81 @@
+<template>
+  <div class="app-select">
+    <label v-if="label" :for="id" class="app-select__label">{{ label }}</label>
+    <select
+      :id="id"
+      v-model="model"
+      :disabled="disabled"
+      class="app-select__field"
+    >
+      <option v-if="placeholder" disabled value="">{{ placeholder }}</option>
+      <option
+        v-for="option in options"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
+    <p v-if="error" class="app-select__error">{{ error }}</p>
+  </div>
+</template>
+
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  modelValue: [String, Number],
+  label: String,
+  placeholder: String,
+  error: String,
+  disabled: Boolean,
+  id: String,
+  options: {
+    type: Array,
+    required: true,
+    validator: (arr) =>
+      arr.every(
+        (opt) => typeof opt === "object" && "label" in opt && "value" in opt
+      ),
+  },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const model = computed({
+  get: () => props.modelValue,
+  set: (val) => emit("update:modelValue", val),
+});
+</script>
+
+<style scoped>
+.app-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.app-select__label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.app-select__field {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+.app-select__field:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+.app-select__error {
+  color: red;
+  font-size: 0.85rem;
+}
+</style>
