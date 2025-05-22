@@ -3,49 +3,34 @@
     <Header />
 
     <main class="main-content">
-      
-      <!-- Panel para crear clientes -->
-      <div class="crear-cliente-panel">
-        <h2>Crear Nuevo Cliente</h2>
-        <form @submit.prevent="crearCliente">
-          <div class="form-group">
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" v-model="nuevoCliente.name" required>
-          </div>
-          <div class="form-group">
-            <label for="first_surname">Primer Apellido:</label>
-            <input type="text" id="first_surname" v-model="nuevoCliente.first_surname" required>
-          </div>
-          <div class="form-group">
-            <label for="second_surname">Segundo Apellido:</label>
-            <input type="text" id="second_surname" v-model="nuevoCliente.second_surname" required>
-          </div>
-          <div class="form-group">
-            <label for="DNI">DNI:</label>
-            <input type="text" id="DNI" v-model="nuevoCliente.DNI" required>
-          </div>
-           <div class="form-group">
-            <label for="phone">Teléfono:</label>
-            <input type="tel" id="phone" v-model="nuevoCliente.phone" required>
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" v-model="nuevoCliente.email" required>
-          </div>
-           <div class="form-group">
-            <label for="address">Dirección:</label>
-            <input type="text" id="address" v-model="nuevoCliente.address" required>
-          </div>
-          <button type="submit" class="btn">Guardar Cliente</button>
-        </form>
+      <div class="search-and-buttons">
+        <Searchbar v-model="searchTerm" class="searchbar"/>
+        <div class="buttons">
+          <AppButton @click="openCreateClientForm">Agregar Cliente</AppButton>
+          <AppButton @click="openEditClientForm" :disabled="!selectedClient">Editar Cliente</AppButton>
+        </div>
       </div>
+
+      <ClientsTable :clients="filteredClients" @select-client="selectClient" />
+
+      <ClientsForm
+        v-if="showClientForm"
+        :client="selectedClient"
+        @close="closeClientForm"
+        @submit="handleClientSubmit"
+      />
     </main>
   </div>
 </template>
 
 <script setup>
 import Header from '@/components/Header.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import Searchbar from '@/components/Searchbar.vue';
+import ClientsTable from '@/components/Clients/ClientsTable.vue';
+import ClientsForm from '@/components/Clients/ClientsForm.vue';
+import AppButton from '@/components/common/AppButton.vue';
+import { fetchClients } from '@/services/ClientService'; 
 
 // Datos del nuevo cliente
 const nuevoCliente = ref({
@@ -55,12 +40,15 @@ const nuevoCliente = ref({
   DNI: '',
   phone: '',
   email: '',
-  address:'',
+  address: '',
   id_headquarters: null
-})
+});
 
 // Lista de clientes
-const clientes = ref([])
+const clientes = ref([]);
+const searchTerm = ref('');
+const showClientForm = ref(false);
+const selectedClient = ref(null);
 
 // Función para crear el cliente
 const crearCliente = async () => {
@@ -85,7 +73,7 @@ const crearCliente = async () => {
       DNI: '',
       phone: '',
       email: '',
-      address:'',
+      address: '',
       id_headquarters: null
     }
     getClientes()
@@ -95,21 +83,50 @@ const crearCliente = async () => {
 
 // Función para obtener la lista de clientes
 const getClientes = async () => {
-  const { data, error } = await supabase
-    .from('client')
-    .select('*')
-
-  if (error) {
-    console.error('Error al obtener clientes:', error)
-  } else {
-    clientes.value = data
+  try {
+    const data = await fetchClients();
+    clientes.value = data;
+  } catch (error) {
+    console.error('Error al obtener clientes:', error);
   }
-}
+};
 
 // Obtener la lista de clientes al montar el componente
 onMounted(() => {
   getClientes()
 })
+
+const filteredClients = computed(() => {
+  return clientes.value.filter(client => {
+    return client.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+           client.first_surname.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+           client.second_surname.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+           client.DNI.toLowerCase().includes(searchTerm.value.toLowerCase());
+  });
+});
+
+const openCreateClientForm = () => {
+  selectedClient.value = null;
+  showClientForm.value = true;
+};
+
+const openEditClientForm = () => {
+  showClientForm.value = true;
+};
+
+const closeClientForm = () => {
+  showClientForm.value = false;
+  selectedClient.value = null;
+};
+
+const selectClient = (client) => {
+  selectedClient.value = client;
+};
+
+const handleClientSubmit = () => {
+  getClientes();
+  closeClientForm();
+};
 </script>
 
 <style scoped>
@@ -125,9 +142,24 @@ onMounted(() => {
   width: 100%;
   flex: 1;
   display: flex;
-  justify-content: center; /* Centra el panel del formulario */
+  flex-direction: column;
+  align-items: center; /* Centra horizontalmente */
 }
 
+.search-and-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%; /* Ajusta el ancho */
+  margin-bottom: 1rem;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Estilos existentes */
 .crear-cliente-panel {
   background-color: #fff;
   border-radius: 10px;
@@ -172,5 +204,9 @@ onMounted(() => {
   font-weight: bold;
   cursor: pointer;
   width: 100%;
+}
+
+.searchbar {
+  width: 70%; /* Ajusta el ancho de la barra de búsqueda */
 }
 </style>
