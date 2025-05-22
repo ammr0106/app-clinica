@@ -4,7 +4,7 @@
     <nav class="menu">
       <a href="#">Dashboard</a>
       <a href="#">Citas</a>
-      <a href="#">Clientes</a>
+      <router-link to="/clients">Clientes</router-link>
       <a href="#">Especialidades</a>
       <a href="#">Usuarios</a>
       <a href="#">Ajustes</a>
