@@ -3,6 +3,7 @@
     :type="type"
     :disabled="isDisabled"
     :class="['app-button', variantClass]"
+    @click="$emit('click')"
   >
     <span v-if="formLoading && type === 'submit' && showLoader">⏳</span>
     <slot v-else />
@@ -42,6 +43,8 @@ const isDisabled = computed(() => {
 });
 
 const variantClass = computed(() => `app-button--${props.variant}`);
+
+defineEmits(["click"]);
 </script>
 
 <style scoped>

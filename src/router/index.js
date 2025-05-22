@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
 import SuperAdmin from "@/views/SuperAdmin.vue";
 import Coordinador from "@/views/Coordinador.vue";
-
 const routes = [
   {
     path: "/",
