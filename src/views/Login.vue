@@ -1,0 +1,211 @@
+<template>
+  <div class="auth-wrapper">
+    <h1 class="title">Multispecialty Clinic</h1>
+    <form class="auth-form" @submit.prevent>
+      <h2>Iniciar Sesión</h2>
+      <input type="email" placeholder="Correo electrónico" />
+      <input type="password" placeholder="Contraseña" />
+      <div class="checkbox-group">
+        <input type="checkbox" id="remember" />
+        <label for="remember">Recordarme</label>
+      </div>
+      <div class="button-group">
+        <button type="button" @click="handleLogin('superadmin')">Entrar como SuperAdmin</button>
+        <button type="button" @click="handleLogin('coordinador')">Entrar como Coordinador</button>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function handleLogin(role) {
+  // Simulación de usuario para pruebas de maquetación
+  const fakeUser = {
+    email: role === 'superadmin' ? 'super@admin.com' : 'coordinador@gmail.com',
+    role: role
+  }
+
+  localStorage.setItem('user', JSON.stringify(fakeUser))
+
+  if (role === 'superadmin') {
+    router.push('/superadmin')
+  } else if (role === 'coordinador') {
+    router.push('/coordinador')
+  }
+}
+</script>
+
+
+<style>
+:root {
+  --azul-profesional: #1565C0;
+  --verde-confianza: #43A047;
+  --gris-claro: #F5F5F5;
+  --blanco-puro: #FFFFFF;
+  --rojo-controlado: #EF5350;
+  --texto: #263238;
+  --gris-interactivo: #d1d1d1;
+}
+.title{
+  font-size: 2.5rem;
+  color: var(--azul-profesional);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+}
+.auth-wrapper {
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #e3f2fd, #f1f8e9);
+  padding: 2rem;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 620px;
+  padding: 3rem;
+  background-color: var(--blanco-puro);
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.4s ease-in;
+}
+
+.auth-form h2 {
+  margin-bottom: 1rem;
+  color: var(--azul-profesional);
+  font-size: 2rem;
+  text-align: center;
+}
+
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--azul-profesional);
+  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.2);
+}
+
+.auth-form input::placeholder {
+  color: #999;
+}
+
+
+.custom-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  user-select: none;
+  color: var(--texto);
+  padding-left: 2rem;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+ 
+}
+
+.custom-checkbox .checkmark {
+  position: absolute;
+  left: 0;
+  top: 60%;
+  transform: translateY(-50%);
+  height: 20px;
+  width: 20px;
+  background-color: var(--gris-claro);
+  border: 2px solid var(--gris-interactivo);
+  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: var(--verde-confianza);
+  border-color: var(--verde-confianza);
+}
+
+.custom-checkbox .checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 2px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox input:checked ~ .checkmark::after {
+  display: block;
+}
+
+.auth-form button {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--verde-confianza);
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.auth-form button:hover {
+  background-color: #388e3c;
+}
+
+.auth-form button:active {
+  transform: scale(0.97);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button-group button {
+  flex: 1;
+}
+
+</style>
