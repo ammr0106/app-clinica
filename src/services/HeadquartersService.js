@@ -10,9 +10,16 @@ import { supabase } from './DatabaseConnection'
  */
 
 /**
- * @returns {Promise<Headquarters[]>}
+ * @typedef {Object} HeadquartersInput
+ * @property {string} name
+ * @property {string} city
+ * @property {string} address
+ * @property {string} phone
  */
 
+/**
+ * @returns {Promise<Headquarters[]>}
+ */
 export async function fetchHeadquarters() {
   const { data, error } = await supabase
     .from('headquarters')
@@ -20,4 +27,38 @@ export async function fetchHeadquarters() {
 
   if (error) throw error
   return data
+}
+
+/**
+ * @param {HeadquartersInput} headquartersData
+ * @returns {Promise<{ error: any }>}
+ */
+export async function createHeadquarters(headquartersData) {
+  const { error } = await supabase.from('headquarters').insert([headquartersData])
+  return { error }
+}
+
+/**
+ * @param {string} id
+ * @param {Partial<HeadquartersInput>} headquartersData
+ * @returns {Promise<{ error: any }>}
+ */
+export async function updateHeadquarters(id, headquartersData) {
+  const { error } = await supabase
+    .from('headquarters')
+    .update(headquartersData)
+    .eq('id', id)
+  return { error }
+}
+
+/**
+ * @param {string} id
+ * @returns {Promise<{ error: any }>}
+ */
+export async function deleteHeadquarters(id) {
+  const { error } = await supabase
+    .from('headquarters')
+    .delete()
+    .eq('id', id)
+  return { error }
 }
