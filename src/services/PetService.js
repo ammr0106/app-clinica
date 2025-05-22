@@ -1,4 +1,4 @@
-import { supabase } from "./DatabaseConnection"
+import { supabase } from "./DatabaseConnection";
 
 /**
  * @typedef {Object} Client
@@ -24,13 +24,22 @@ import { supabase } from "./DatabaseConnection"
  */
 
 /**
- * Obtiene todas las mascotas con nombre del cliente y sede si tienen.
+ * @typedef {Object} PetInput
+ * @property {string} name
+ * @property {string} kind
+ * @property {string} birthdate
+ * @property {number} chip_number
+ * @property {string} observations
+ * @property {string} breed
+ * @property {string} client_id
+ * @property {string} headquarters_id
+ */
+
+/**
  * @returns {Promise<Pet[]>}
  */
 export async function fetchPets() {
-  const { data, error } = await supabase
-    .from("pets")
-    .select(`
+  const { data, error } = await supabase.from("pets").select(`
       id,
       name,
       kind,
@@ -38,14 +47,38 @@ export async function fetchPets() {
       chip_number,
       observations,
       breed,
-      client (
-        name
-      ),
-      headquarters (
-        name
-      )
-    `)
+      client ( name ),
+      headquarters ( name )
+    `);
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * @param {PetInput} petData
+ * @returns {Promise<{ error: any }>}
+ */
+export async function createPet(petData) {
+  const { error } = await supabase.from("pets").insert([petData]);
+  return { error };
+}
+
+/**
+ * @param {string} id
+ * @param {Partial<PetInput>} petData
+ * @returns {Promise<{ error: any }>}
+ */
+export async function updatePet(id, petData) {
+  const { error } = await supabase.from("pets").update(petData).eq("id", id);
+  return { error };
+}
+
+/**
+ * @param {string} id
+ * @returns {Promise<{ error: any }>}
+ */
+export async function deletePet(id) {
+  const { error } = await supabase.from("pets").delete().eq("id", id);
+  return { error };
 }
