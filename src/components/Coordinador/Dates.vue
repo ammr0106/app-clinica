@@ -1,27 +1,54 @@
 <template>
   <div class="citas-container">
+    <!-- Título con la fecha -->
     <h3>Citas para <span class="fecha">{{ fecha }}</span>:</h3>
 
+    <!-- Lista de citas con animación al añadir/quitar -->
     <transition-group name="fade" tag="ul" class="citas-list">
+      <!-- Iteramos sobre el array citas, mostrando cada cita -->
       <li
         v-for="(cita, i) in citas"
         :key="i"
         class="cita-card"
+        @click="openOptions(cita, i)"
       >
         <div class="cita-info">
           <span class="cita-nombre">{{ cita.nombre }}</span>
           <span class="cita-hora">{{ cita.hora }}</span>
         </div>
       </li>
+      
+      <!-- Si no hay citas, mostramos un mensaje -->
       <li v-if="citas.length === 0" key="no-citas" class="cita-vacia">
         No hay citas para este día.
       </li>
     </transition-group>
+
+    <!-- Modal para editar cita -->
+    <EditDateModal
+      v-if="showEditModal"
+      :cita="selectedCita"
+      @save="handleSaveEdit"
+      @delete="handleDeleteCita"
+      @close="closeModals"
+    />
+
+    <!-- Modal para confirmar eliminación -->
+    <DeleteDateModal
+      v-if="showDeleteModal"
+      :cita="selectedCita"
+      @confirm="handleDelete"
+      @close="closeModals"
+    />
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue'
+import EditDateModal from './EditDateModal.vue'
+import DeleteDateModal from './DeleteDateModal.vue'
+
+const props = defineProps({
   fecha: {
     type: String,
     required: true,
@@ -31,7 +58,38 @@ defineProps({
     default: () => [],
   },
 })
+
+const emit = defineEmits(['update-cita', 'delete-cita'])
+
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+const selectedCita = ref(null)
+const selectedIndex = ref(null)
+
+function openOptions(cita, index) {
+  selectedCita.value = { ...cita }
+  selectedIndex.value = index
+  showEditModal.value = true
+}
+
+function closeModals() {
+  showEditModal.value = false
+  showDeleteModal.value = false
+  selectedCita.value = null
+  selectedIndex.value = null
+}
+
+function handleSaveEdit(editedCita) {
+  emit('update-cita', { editedCita, index: selectedIndex.value })
+  closeModals()
+}
+
+function handleDeleteCita(id) {
+  emit('delete-cita', id)
+  closeModals()
+}
 </script>
+
 
 <style scoped>
 .citas-container {
@@ -75,6 +133,7 @@ h3 {
   align-items: center;
   backdrop-filter: blur(4px);
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .cita-card:hover {
