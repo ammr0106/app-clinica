@@ -3,12 +3,12 @@
     <AppButton @click="toggleSearchBarTableClick"
       >Buscador + Tabla falsa</AppButton
     >
-    <AppButton @click="openModalForm">Modal + Formulario</AppButton>
+    <AppButton @click="modalForm = true">Modal + Formulario</AppButton>
     <AppButton @click="toggleNotificationsClick">Notificaciones</AppButton>
   </div>
   <SearchBarTable v-if="openSearchBarTable" />
-  <Modal v-if="modalForm" @close="closeModalForm">
-    <FormTest @close="closeModalForm" @succes="showSuccess" />
+  <Modal v-if="modalForm" title="Formulario de prueba" @close="modalForm = false">
+    <FormTest @close="modalForm = false" @succes="showSuccess" />
   </Modal>
 
   <div class="buttons-container" v-if="openNotificationsButtons">
@@ -18,9 +18,7 @@
     <AppButton @click="showError" variant="secondary"
       >Click aquí - Notificación "error"</AppButton
     >
-    <AppButton @click="showInfo"
-      >Click aquí - Notificación "info"</AppButton
-    >
+    <AppButton @click="showInfo">Click aquí - Notificación "info"</AppButton>
     <AppButton @click="showWarning" variant="orange"
       >Click aquí - Notificación "warning"</AppButton
     >
@@ -72,33 +70,33 @@ const notification = ref({
 function showSuccess() {
   notification.value = {
     show: true,
-    message: 'Guardado correctamente.',
-    type: 'success'
-  }
+    message: "Guardado correctamente.",
+    type: "success",
+  };
 }
 
 function showError() {
   notification.value = {
     show: true,
-    message: 'Error al guardar los datos.',
-    type: 'error'
-  }
+    message: "Error al guardar los datos.",
+    type: "error",
+  };
 }
 
 function showInfo() {
   notification.value = {
     show: true,
-    message: 'Tiene una cita en 20 minutos.',
-    type: 'info'
-  }
+    message: "Tiene una cita en 20 minutos.",
+    type: "info",
+  };
 }
 
 function showWarning() {
   notification.value = {
     show: true,
-    message: 'Tiene 5 citas pendiente de confirmación.',
-    type: 'warning'
-  }
+    message: "Tiene 5 citas pendiente de confirmación.",
+    type: "warning",
+  };
 }
 </script>
 

@@ -1,7 +1,13 @@
 <template>
   <div class="modal-backdrop" @mousedown.self="closeModal">
     <div class="modal">
-      <button class="close-button" @click="closeModal" aria-label="Cerrar modal">×</button>
+      <button
+        class="close-button"
+        @click="closeModal"
+        aria-label="Cerrar modal"
+      >
+        ×
+      </button>
       <h2>{{ title }}</h2>
       <main class="modal-content">
         <slot />
@@ -16,21 +22,10 @@ import { ref } from "vue";
 const emit = defineEmits(["close"]);
 const props = defineProps({ title: String });
 
-const isVisible = ref(false);
-
-const openModal = () => {
-  isVisible.value = true;
-};
-
 const closeModal = () => {
-  isVisible.value = false;
   emit("close");
 };
 
-defineExpose({
-  openModal,
-  closeModal,
-});
 </script>
 
 <style scoped>
@@ -52,11 +47,11 @@ defineExpose({
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 500px;
-  max-height: calc(100vh - 2rem); 
+  max-height: calc(100vh - 2rem);
   display: flex;
   flex-direction: column;
   padding: 2rem;
-  padding-right: .8rem;
+  padding-right: 0.8rem;
   position: relative;
   animation: slideUp 0.4s ease-out;
   overflow: hidden;
@@ -94,8 +89,12 @@ defineExpose({
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
