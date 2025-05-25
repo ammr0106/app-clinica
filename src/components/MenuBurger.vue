@@ -41,7 +41,7 @@ function toggleSidebar() {
   border: none;
   cursor: pointer;
   padding: 0;
-  z-index: 1000;
+  z-index: 1;
 }
 
 .burger-line {

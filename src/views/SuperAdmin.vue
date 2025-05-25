@@ -6,50 +6,45 @@
     <!-- Contenido principal -->
     <main class="content">
       <!-- Barra de busqueda  -->
-    <div class="top-bar">
-     <Searchbar v-model="search" />
-      <button class="create-button" @click="abrirModal">Crear sede</button>
-        </div>
+      <div class="top-bar">
+        <AppSearchbar v-model="search" />
+        <button class="create-button" @click="openModal">Crear sede</button>
+      </div>
 
       <!-- Grid de sedes -->
-        <GridSedes :search="search" />
+      <GridSedes :search="search" />
     </main>
 
     <!-- Modal -->
-    <ModalSede
-      v-if="mostrarModal"
-      @close="cerrarModal"
-      @enviar="guardarSede"
-    />
+    <Modal v-if="mostrarModal" title="Crear una sede" @close="closeModal">
+      <CreateHeadquarterForm @enviar="guardarSede" />
+    </Modal>
   </div>
 </template>
 
-
 <script setup>
-import Header from '@/components/Header.vue'
-import ModalSede from '@/components/ModalSede.vue'
-import Searchbar from '@/components/Searchbar.vue'
-import GridSedes from '@/components/GridSedes.vue'
-import { ref } from 'vue'
-import AppForm from '../components/common/AppForm.vue'
-import AppInput from '../components/common/AppInput.vue'
+import Header from "@/components/Header.vue";
+import AppSearchbar from "@/components/common/AppSearchbar.vue";
+import GridSedes from "@/components/GridSedes.vue";
+import { ref } from "vue";
+import Modal from "../components/common/Modal.vue";
+import CreateHeadquarterForm from "../components/CreateHeadquarterForm.vue";
 
-const search = ref('')
-const mostrarModal = ref(false)
+const search = ref("");
+const mostrarModal = ref(false);
 
-const abrirModal = () => {
-  mostrarModal.value = true
-}
+const openModal = () => {
+  mostrarModal.value = true;
+};
 
-const cerrarModal = () => {
-  mostrarModal.value = false
-}
+const closeModal = () => {
+  mostrarModal.value = false;
+};
 
 const guardarSede = (datos) => {
-  console.log('Sede guardada:', datos)
-  cerrarModal()
-}
-
+  console.log("Sede guardada:", datos);
+  cerrarModal();
+};
 </script>
 
 <style scoped>
@@ -113,7 +108,7 @@ const guardarSede = (datos) => {
 }
 
 .sede-card {
-    max-width: 500px;
+  max-width: 500px;
   background-color: white;
   padding: 5rem;
   margin: 50px;
