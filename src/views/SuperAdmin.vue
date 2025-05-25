@@ -1,7 +1,7 @@
 <template>
   <div class="superadmin-container">
     <!-- Header -->
-    <Header />
+    <Header :menu-items="menuItems" />
 
     <!-- Contenido principal -->
     <main class="content">
@@ -17,18 +17,18 @@
 
     <!-- Modal -->
     <Modal v-if="mostrarModal" title="Crear una sede" @close="closeModal">
-      <CreateHeadquarterForm @enviar="guardarSede" />
+      <CreateHeadquarterForm />
     </Modal>
   </div>
 </template>
 
 <script setup>
-import Header from "@/components/Header.vue";
+import Header from "@/components/common/Header.vue";
 import AppSearchbar from "@/components/common/AppSearchbar.vue";
 import GridSedes from "@/components/GridSedes.vue";
 import { ref } from "vue";
-import Modal from "../components/common/Modal.vue";
-import CreateHeadquarterForm from "../components/CreateHeadquarterForm.vue";
+import Modal from "@/components/common/Modal.vue";
+import CreateHeadquarterForm from "@/components/CreateHeadquarterForm.vue";
 
 const search = ref("");
 const mostrarModal = ref(false);
@@ -41,10 +41,12 @@ const closeModal = () => {
   mostrarModal.value = false;
 };
 
-const guardarSede = (datos) => {
-  console.log("Sede guardada:", datos);
-  cerrarModal();
-};
+
+const menuItems = [
+  { label: "Sedes", path: "#" },
+  { label: "Trabajadores", path: "#" },
+  { label: "Ajustes", path: "#" },
+];
 </script>
 
 <style scoped>

@@ -30,7 +30,7 @@ const props = defineProps({
   variant: {
     type: String,
     default: "primary",
-    validator: (val) => ["primary", "secondary", "green"].includes(val),
+    validator: (val) => ["primary", "red", "green", "orange"].includes(val),
   },
 });
 
@@ -79,23 +79,20 @@ function handleClick(e) {
   background-color: #388e3c;
 }
 
-.app-button:disabled {
-  background-color: #ccc ; 
-  color: #666 ; 
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
 .app-button--secondary {
   margin-top: 1rem;
   padding: 0.9rem;
-  background-color: var(--gris-claro, #f5f5f5);
-  color: #333;
+  background-color: var(--rojo-controlado);
+  color: white;
   border-radius: 12px;
   font-weight: bold;
   cursor: pointer;
   width: 100%;
   transition: background-color 0.3s ease;
+}
+
+.app-button--secondary:hover {
+  background-color: #C62828;
 }
 
 .app-button--primary {
@@ -108,5 +105,32 @@ function handleClick(e) {
   cursor: pointer;
   width: 100%;
   transition: background-color 0.3s ease;
+}
+
+.app-button--primary:hover {
+  background-color: #0d47a1;
+}
+
+.app-button--orange {
+    margin-top: 1rem;
+  padding: 0.9rem;
+  background-color: #ff9800;
+  color: white;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.app-button--orange:hover {
+  background-color: #ef6c00;
+}
+
+.app-button:disabled {
+  background-color: #ccc ; 
+  color: #666 ; 
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 </style>

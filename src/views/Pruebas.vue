@@ -1,115 +1,112 @@
 <template>
-  <div>
-    <!-- Barra de busqueda y tabla de datos-->
-    <AppSearchBar
-      v-model="busqueda"
-      v-model:modelFiltro="filtroActivo"
-      :filtros="filtrosDisponibles"
-      placeholder="Buscar sede..."
-    />
-
-    <table class="tabla">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Ciudad</th>
-          <th>Especialidad</th>
-          <th>Dirección</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="sede in sedesFiltradas" :key="sede.id">
-          <td>{{ sede.nombre }}</td>
-          <td>{{ sede.ciudad }}</td>
-          <td>{{ sede.especialidad }}</td>
-          <td>{{ sede.direccion }}</td>
-        </tr>
-        <tr v-if="sedesFiltradas.length === 0">
-          <td colspan="4">No se encontraron resultados.</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="buttons-container">
+    <AppButton @click="toggleSearchBarTableClick"
+      >Buscador + Tabla falsa</AppButton
+    >
+    <AppButton @click="openModalForm">Modal + Formulario</AppButton>
+    <AppButton @click="toggleNotificationsClick">Notificaciones</AppButton>
   </div>
+  <SearchBarTable v-if="openSearchBarTable" />
+  <Modal v-if="modalForm" @close="closeModalForm">
+    <FormTest @close="closeModalForm" @succes="showSuccess" />
+  </Modal>
+
+  <div class="buttons-container" v-if="openNotificationsButtons">
+    <AppButton @click="showSuccess" variant="green"
+      >Click aquí - Notificación "success"</AppButton
+    >
+    <AppButton @click="showError" variant="secondary"
+      >Click aquí - Notificación "error"</AppButton
+    >
+    <AppButton @click="showInfo"
+      >Click aquí - Notificación "info"</AppButton
+    >
+    <AppButton @click="showWarning" variant="orange"
+      >Click aquí - Notificación "warning"</AppButton
+    >
+  </div>
+
+  <AppNotification
+    v-if="notification.show"
+    :message="notification.message"
+    :type="notification.type"
+    :duration="3000"
+    @hidden="notification.show = false"
+  />
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import AppSearchBar from "../components/common/AppSearchbar.vue";
+import { ref } from "vue";
+import AppButton from "@/components/common/AppButton.vue";
+import SearchBarTable from "@/components/pruebas-badel/SearchBarTable.vue";
+import Modal from "@/components/common/Modal.vue";
+import FormTest from "@/components/pruebas-badel/FormTest.vue";
+import AppNotification from "@/components/common/AppNotification.vue";
 
-const busqueda = ref("");
-const filtroActivo = ref("nombre");
+const openSearchBarTable = ref(false);
+const modalForm = ref(false);
+const openNotificationsButtons = ref(false);
 
-const filtrosDisponibles = [
-  { label: "Nombre", value: "nombre" },
-  { label: "Ciudad", value: "ciudad" },
-  { label: "Especialidad", value: "especialidad" },
-  { label: "Dirección", value: "direccion" },
-];
+function toggleSearchBarTableClick() {
+  openSearchBarTable.value = !openSearchBarTable.value;
+}
 
-const sedes = ref([
-  {
-    id: 1,
-    nombre: "Clínica Centro",
-    ciudad: "Madrid",
-    especialidad: "Cardiología",
-    direccion: "Calle Mayor 12",
-  },
-  {
-    id: 2,
-    nombre: "Salud Norte",
-    ciudad: "Barcelona",
-    especialidad: "Dermatología",
-    direccion: "Av. Diagonal 45",
-  },
-  {
-    id: 3,
-    nombre: "Vida Sana",
-    ciudad: "Valencia",
-    especialidad: "Pediatría",
-    direccion: "Calle Colón 89",
-  },
-  {
-    id: 4,
-    nombre: "Bienestar Sur",
-    ciudad: "Sevilla",
-    especialidad: "Neurología",
-    direccion: "Paseo de las Delicias 101",
-  },
-]);
+function toggleNotificationsClick() {
+  openNotificationsButtons.value = !openNotificationsButtons.value;
+}
 
-const sedesFiltradas = computed(() => {
-  if (!busqueda.value.trim()) return sedes.value;
+function openModalForm() {
+  modalForm.value = true;
+}
 
-  function normalizar(texto) {
-    return texto
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-  }
+function closeModalForm() {
+  modalForm.value = false;
+}
 
-  return sedes.value.filter((sede) => {
-    const campo = filtroActivo.value;
-    const valorCampo = sede[campo];
-    if (!valorCampo) return false;
-    return normalizar(valorCampo).includes(busqueda.value);
-  });
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
 });
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: 'Guardado correctamente.',
+    type: 'success'
+  }
+}
+
+function showError() {
+  notification.value = {
+    show: true,
+    message: 'Error al guardar los datos.',
+    type: 'error'
+  }
+}
+
+function showInfo() {
+  notification.value = {
+    show: true,
+    message: 'Tiene una cita en 20 minutos.',
+    type: 'info'
+  }
+}
+
+function showWarning() {
+  notification.value = {
+    show: true,
+    message: 'Tiene 5 citas pendiente de confirmación.',
+    type: 'warning'
+  }
+}
 </script>
 
 <style scoped>
-.tabla {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-th,
-td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-thead {
-  background-color: #f0f0f0;
+.buttons-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin: 16px;
 }
 </style>

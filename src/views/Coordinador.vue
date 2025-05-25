@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import Header from '@/components/Header.vue'
+import Header from '@/components/common/Header.vue'
 import Dates from '@/components/Coordinador/Dates.vue'
 import Calendar from '@/components/Coordinador/Calendar.vue' 
 </script>
