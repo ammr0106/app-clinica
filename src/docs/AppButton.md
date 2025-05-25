@@ -85,7 +85,7 @@ Función que se ejecuta cuando se envía el formulario.
 - Si onSubmit lanza un error, lo captura en consola y termina el loading.
 
 ### Ejemplo completo
-
+``` vue
 <AppForm :onSubmit="guardarDatos">
   <AppInput v-model="form.nombre" label="Nombre" required />
   <AppButton type="submit" variant="green">Guardar</AppButton>
@@ -97,6 +97,7 @@ const guardarDatos = async () => {
   alert("Guardado con éxito ✅")
 }
 </script>
+```
 
 # AppInput
 Componente de input con soporte para label, validación visual y binding reactivo mediante v-model.
