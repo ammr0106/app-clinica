@@ -31,35 +31,35 @@ Botón reutilizable con variantes de estilo y soporte para estado de carga autom
 
 ### Props
 
-- type: string
-    Tipo de botón HTML. Valores permitidos: "button" (por defecto), "submit", "reset".
+- type: string  
+Tipo de botón HTML. Valores permitidos: "button" (por defecto), "submit", "reset".
 
-variant: string
+- variant: string  
 Estilo visual del botón. Valores permitidos: "primary" (por defecto), "green", "red", "orange".
 
-disabled: boolean
+- disabled: boolean  
 Deshabilita el botón. Por defecto: false.
 
-showLoader: boolean
+- showLoader: boolean  
 Muestra el texto "Cargando..." cuando el formulario está en carga y el tipo es "submit". Por defecto: true.
 
 ### Slots
 
-default: Contenido interno del botón (texto, iconos, etc.).
+- default: Contenido interno del botón (texto, iconos, etc.).
 
 ### Eventos
 
-click: Se emite cuando se hace clic en el botón, solo si el tipo no es "submit".
+- click: Se emite cuando se hace clic en el botón, solo si el tipo no es "submit".
 
 ### Estilos disponibles
 
-primary: azul profesional (#1565c0)
+- primary: azul profesional (#1565c0)
 
-green: verde confianza (#43a047)
+- green: verde confianza (#43a047)
 
-red: rojo controlado (#ef5350)
+- red: rojo controlado (#ef5350)
 
-orange: naranja (#ff9800)
+- orange: naranja (#ff9800)
 
 # AppForm
 
@@ -73,16 +73,16 @@ Componente contenedor que maneja envío de formularios con estado de carga (load
 
 ### Props
 
-onSubmit (Function) — Requerido
+- onSubmit (Function) — Requerido  
 Función que se ejecuta cuando se envía el formulario.
 
 ### Comportamiento automático
 
-Provee el estado de carga (formLoading) a los hijos mediante provide().
+- Provee el estado de carga (formLoading) a los hijos mediante provide().
 
-Si hay un AppButton dentro con type="submit", este mostrará "Cargando..." automáticamente durante el envío.
+- Si hay un AppButton dentro con type="submit", este mostrará "Cargando..." automáticamente durante el envío.
 
-Si onSubmit lanza un error, lo captura en consola y termina el loading.
+- Si onSubmit lanza un error, lo captura en consola y termina el loading.
 
 ### Ejemplo completo
 
@@ -114,28 +114,28 @@ Componente de input con soporte para label, validación visual y binding reactiv
 />
 
 ### Props
-modelValue: String
+- modelValue: String  
 Valor ligado reactivo con v-model.
 
-label: String
+- label: String  
 Texto para la etiqueta del input. Opcional.
 
-error: String
+- error: String  
 Mensaje de error que se muestra debajo del input. Opcional.
-
-type: String
+ 
+- type: String  
 Tipo HTML del input. Por defecto: "text".
 
-placeholder: String
+- placeholder: String  
 Texto de ayuda que aparece dentro del input.
 
-disabled: Boolean
+- disabled: Boolean  
 Deshabilita el input.
 
-id: String
+- id: String  
 Identificador para el input y label.
-
-required: Boolean
+ 
+- required: Boolean  
 Indica que el input es obligatorio.
 
 # AppSelect
@@ -158,25 +158,25 @@ Componente select con soporte para label, placeholder, error y binding reactivo 
 />
 
 ### Props
-modelValue: String | Number
+- modelValue: String | Number  
 Valor ligado reactivo con v-model.
 
-label: String
+- label: String  
 Texto para la etiqueta del select. Opcional.
 
-placeholder: String
+- placeholder: String  
 Texto que aparece como opción deshabilitada para indicar que selecciones algo. Opcional.
 
-error: String
+- error: String  
 Mensaje de error que se muestra debajo del select. Opcional.
 
-disabled: Boolean
+- disabled: Boolean  
 Deshabilita el select.
-
-id: String
+ 
+- id: String  
 Identificador para el select y label.
 
-options: Array (Requerido)
+- options: Array (Requerido)  
 Lista de opciones para el select. Cada opción debe ser un objeto con propiedades label y value.
 
 # AppSelectSearch
@@ -199,20 +199,20 @@ Select con búsqueda integrada, limpieza de selección y soporte para etiquetas 
 
 ### Props
 
-modelValue: String | Number
+- modelValue: String | Number  
 Valor ligado reactivo con v-model.
 
-options: Array (Requerido)
+- options: Array (Requerido)  
 Lista de opciones, cada una con label y value. Opcionalmente puede incluir extra para información adicional.
 
-label: String
+- label: String  
 Etiqueta del input. Opcional.
 
-placeholder: String
+- placeholder: String  
 Texto que aparece en el input cuando está vacío. Opcional.
 
-error: String
+- error: String  
 Mensaje de error mostrado debajo del input. Opcional.
 
-id: String
+- id: String  
 Identificador para el input y label.
