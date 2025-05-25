@@ -31,8 +31,8 @@ Botón reutilizable con variantes de estilo y soporte para estado de carga autom
 
 ### Props
 
-type: string
-Tipo de botón HTML. Valores permitidos: "button" (por defecto), "submit", "reset".
+- type: string
+    Tipo de botón HTML. Valores permitidos: "button" (por defecto), "submit", "reset".
 
 variant: string
 Estilo visual del botón. Valores permitidos: "primary" (por defecto), "green", "red", "orange".
