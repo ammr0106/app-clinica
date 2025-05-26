@@ -6,7 +6,7 @@
       <a href="#">Citas</a>
       <a href="#">Clientes</a>
       <a href="#">Especialidades</a>
-      <a href="#">Usuarios</a>
+      <router-link to="/employees" >Usuarios</router-link>
       <a href="#">Ajustes</a>
     </nav>
   </div>

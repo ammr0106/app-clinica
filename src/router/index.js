@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
 import SuperAdmin from "@/views/SuperAdmin.vue";
 import Coordinador from "@/views/Coordinador.vue";
+import Employees from "@/views/Employees.vue";
 
 const routes = [
   {
@@ -21,6 +22,12 @@ const routes = [
     component: Coordinador,
     meta: { requiresAuth: true, role: "coordinador" },
   },
+  {
+    path: "/employees",
+    name: "Employees",
+    component: Employees,
+    meta: {requiresAuth: true, role:"coordinador"},
+  }
 ];
 
 const router = createRouter({
