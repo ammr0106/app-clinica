@@ -38,7 +38,6 @@ const model = computed({
 });
 </script>
 
-
 <style scoped>
 .form-group {
   margin-bottom: 1rem;
@@ -72,7 +71,7 @@ const model = computed({
 }
 
 .input__error {
-  color: red;
+  color: var(--rojo-controlado);
   font-size: 0.85rem;
 }
 </style>

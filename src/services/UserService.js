@@ -41,8 +41,9 @@ export async function fetchUsers() {
     email,
     rol,
     date,
-    headquarters (
-      name
+    id_headquarters, 
+    headquarters:headquarters (
+      id, name
     )
   `);
 
@@ -50,13 +51,85 @@ export async function fetchUsers() {
   return data;
 }
 
-/**
+/**.
  * @param {UserInput} userData
  * @returns {Promise<{ error: any }>}
  */
 export async function createUser(userData) {
-  const { error } = await supabase.from("users").insert([userData]);
-  return { error };
+  const currentSession = await supabase.auth.getSession();
+
+  const { data, error: authError } = await supabase.auth.signUp({
+    email: userData.email,
+    password: "zapato",
+    options: {
+      data: {
+        name: userData.name,
+        first_surname: userData.first_surname,
+        second_surname: userData.second_surname,
+        rol: userData.rol,
+        id_headquarters: userData.id_headquarters,
+      },
+    },
+  });
+
+  if (authError) {
+    return { error: authError };
+  }
+
+  if (!data?.user?.id) {
+    return { error: "No se pudo obtener el user_id de Supabase Auth" };
+  }
+
+  const authUserId = data.user.id;
+
+  await supabase.auth.setSession(currentSession.data.session);
+
+  const { data: existingUser, error: fetchError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", authUserId)
+    .single();
+
+  if (fetchError && fetchError.code !== "PGRST116") {
+    return { error: fetchError };
+  }
+
+  if (existingUser) {
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({
+        name: userData.name,
+        first_surname: userData.first_surname,
+        second_surname: userData.second_surname,
+        rol: userData.rol,
+        date: userData.date,
+        id_headquarters: userData.id_headquarters,
+      })
+      .eq("id", authUserId);
+
+    if (updateError) {
+      return { error: updateError };
+    }
+  } else {
+    const { error: insertError } = await supabase.from("users").insert([
+      {
+        id: authUserId,
+        name: userData.name,
+        first_surname: userData.first_surname,
+        second_surname: userData.second_surname,
+        email: userData.email,
+        rol: userData.rol,
+        date: userData.date,
+        id_headquarters: userData.id_headquarters,
+      },
+    ]);
+
+    if (insertError) {
+      return { error: insertError };
+    }
+  }
+
+  return { error: null };
 }
 
 /**
@@ -65,13 +138,15 @@ export async function createUser(userData) {
  * @returns {Promise<{ error: any }>}
  */
 export async function updateUser(id, updatedData) {
+  if (!id) return { error: "ID de usuario no válido" };
+
   const { error } = await supabase
     .from("users")
     .update(updatedData)
     .eq("id", id);
-  return { error };
-}
 
+
+}
 /**
  * @param {string} id
  * @returns {Promise<{ error: any }>}

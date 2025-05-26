@@ -29,7 +29,7 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
   width: 250px;
   height: 100vh;
   background-color: var(--azul-profesional);
@@ -45,7 +45,7 @@
 
 @keyframes slideIn {
   from {
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
   to {
     transform: translateX(0);
