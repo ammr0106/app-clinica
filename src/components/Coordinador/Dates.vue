@@ -13,7 +13,7 @@
         @click="openOptions(cita, i)"
       >
         <div class="cita-info">
-          <span class="cita-nombre">{{ cita.nombre }}</span>
+          <span class="cita-nombre">{{ cita.client_name }}</span>
           <span class="cita-hora">{{ cita.hora }}</span>
         </div>
       </li>

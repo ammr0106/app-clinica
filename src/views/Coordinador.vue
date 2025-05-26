@@ -35,6 +35,13 @@
           @update-cita="handleUpdateCita"
           @delete-cita="handleDeleteCita"
         />
+        <!-- Componente que muestra las citas -->
+        <DatesToday
+        :fecha="new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"
+        :citas="citasHoy"
+        @update-cita="handleUpdateCita"
+        @delete-cita="handleDeleteCita"
+        />
       </div>
     </main>
   </div>
@@ -42,38 +49,47 @@
 
 <script setup>
 // Importaciones de Vue
-import { ref, provide, computed, watch } from "vue";
+import { ref, provide, computed, watch, onMounted } from "vue";
 // Importaciones de componentes
 import Header from "@/components/common/Header.vue";
 import Dates from "@/components/Coordinador/Dates.vue";
+import DatesToday from "@/components/Coordinador/DatesToday.vue";
 import Calendar from "@/components/Coordinador/Calendar.vue";
 import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
+// Importamos el store de citas
+import { useAppointmentStore } from "@/stores/useAppointmentStore";
 
+// Inicializamos el store
+const appointmentStore = useAppointmentStore();
 // Estado reactivo para el día seleccionado (inicialmente null)
 const selectedDay = ref(null);
 // Estado reactivo para el mes seleccionado (mes actual por defecto)
 const selectedMonth = ref(new Date().getMonth());
 // Estado reactivo para el año seleccionado (año actual por defecto)
 const selectedYear = ref(new Date().getFullYear());
+// Computed property que filtra las citas del día actual
+const citasHoy = computed(() => {
+  const hoy = new Date();
+  const pad = (n) => n.toString().padStart(2, '0');
+  const fechaHoy = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())}`;
+  return citas.value.filter((c) => c.date === fechaHoy);
+});
 
 // Provee el día seleccionado a componentes hijos
 provide("selectedDay", selectedDay);
 
 // Estado reactivo para almacenar todas las citas
 const citas = ref([]);
-
-// Intenta cargar citas desde localStorage
-const storedCitas = localStorage.getItem("citas");
-// Si hay citas almacenadas
-if (storedCitas) {
-  try {
-    // Parsea las citas desde JSON
-    citas.value = JSON.parse(storedCitas);
-  } catch (e) {
-    // Maneja errores de parsing
-    console.error("Error parsing citas from localStorage", e);
+// Cargamos las citas si el array está vacío
+onMounted(async () => {
+  if (!appointmentStore.appointments.length) {
+    console.log("📥 Cargando citas desde store...");
+    await appointmentStore.loadAppointments();
+    citas.value = appointmentStore.appointments;
+    console.log("Citas cargadas:", citas.value);
   }
-}
+});
+
 
 // Watcher que observa cambios en las citas
 watch(
@@ -126,15 +142,11 @@ const fecha = computed(() => {
 
 // Computed property que filtra las citas del día seleccionado
 const citasDelDia = computed(() => {
-  // Si no hay día seleccionado, retorna array vacío
   if (!selectedDay.value) return [];
-  // Filtra citas que coincidan con día, mes y año seleccionados
-  return citas.value.filter(
-    (c) =>
-      c.day === selectedDay.value &&
-      c.month === selectedMonth.value &&
-      c.year === selectedYear.value
-  );
+  // Construye la fecha seleccionada en formato YYYY-MM-DD sin problemas de zona horaria
+  const pad = (n) => n.toString().padStart(2, '0');
+  const selectedDate = `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(selectedDay.value)}`;
+  return citas.value.filter((c) => c.date === selectedDate);
 });
 
 // Función que maneja la actualización de citas existentes
