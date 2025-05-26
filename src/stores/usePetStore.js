@@ -53,9 +53,23 @@ export const usePetsStore = defineStore('pets', {
     },
 
     async createPet(petData) {
-      const { error } = await createPetService(petData)
-      if (!error) await this.loadPets()
-      return error
+      try {
+        const { error } = await createPetService(petData);
+        console.log("Supabase createPet error:", error); // Agrega este console.log
+        if (error) {
+          console.error("Error al crear la mascota:", error);
+          this.error = error;
+          return error;
+        } else {
+          console.log("Mascota creada correctamente");
+          await this.loadPets(); // Recarga la lista de mascotas
+          return null;
+        }
+      } catch (error) {
+        console.error("Error al crear la mascota:", error);
+        this.error = error;
+        return error;
+      }
     },
 
     async editPet(id, updatedData) {

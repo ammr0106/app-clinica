@@ -19,7 +19,7 @@ import { supabase } from "./DatabaseConnection";
  * @property {number} chip_number
  * @property {string} observations
  * @property {string} breed
- * @property {Client|null} client
+ * @property {Client|null} id_client
  * @property {Headquarters|null} headquarters
  */
 

@@ -13,7 +13,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="client in clients" :key="client.id" @click="selectClient(client)" class="client-row">
+        <tr
+          v-for="client in clients"
+          :key="client.id"
+          @click="selectClient(client)"
+          class="client-row"
+          :class="{ 'selected-row': client.id === selectedClientId }"
+        >
           <td>{{ client.name }}</td>
           <td>{{ client.first_surname }}</td>
           <td>{{ client.second_surname }}</td>
@@ -28,6 +34,8 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
+
 defineProps({
   clients: {
     type: Array,
@@ -37,9 +45,16 @@ defineProps({
 
 const emit = defineEmits(['select-client']);
 
+const selectedClientId = ref(null);
+
 const selectClient = (client) => {
+  selectedClientId.value = client.id;
   emit('select-client', client);
 };
+
+const getFullName = (client) => {
+  return `${client.name} ${client.first_surname} ${client.second_surname}`;
+}
 </script>
 
 <style scoped>
@@ -71,7 +86,6 @@ const selectClient = (client) => {
 }
 
 .clients-table tbody tr:hover {
-  background-color: #f0f7ff;
   cursor: pointer;
 }
 
@@ -80,8 +94,12 @@ const selectClient = (client) => {
   transition: background-color 0.2s ease; /* Transición suave para el hover */
 }
 
-.client-row:hover {
-    background-color: #e3f2fd; /* Color de fondo al pasar el ratón */
+.clients-table tbody .client-row:not(.selected-row):hover {
+    background-color: #43a04842; /* Color de fondo al pasar el ratón */
+}
+
+.selected-row {
+  background-color: #43a048a2
 }
 
 /* Media query para hacer la tabla responsive en pantallas pequeñas */

@@ -53,6 +53,14 @@ import AppForm from "@/components/common/AppForm.vue";
 import AppInput from "@/components/common/AppInput.vue";
 import AppButton from "@/components/common/AppButton.vue";
 import { defineProps, defineEmits, ref } from "vue";
+import { usePetsStore } from "@/stores/usePetStore"; // Importa el store de mascotas
+
+const props = defineProps({
+  clientId: { // Recibe el ID del cliente como prop
+    type: String,
+    required: true
+  }
+});
 
 const emit = defineEmits(["submit", "close"]);
 
@@ -63,10 +71,22 @@ const localPet = ref({
   chip_number: "",
   observations: "",
   breed: "",
+  id_client: props.clientId // Asigna el ID del cliente a la mascota
 });
 
-const handleSubmit = () => {
-  emit("submit", localPet.value);
+const petStore = usePetsStore(); // Inicializa el store de mascotas
+
+const handleSubmit = async () => {
+  // Llama a la acción createPet del store
+  const error = await petStore.createPet(localPet.value);
+
+  if (error) {
+    console.error("Error al crear la mascota:", error);
+    alert("Error al crear la mascota");
+  } else {
+    console.log("Mascota creada correctamente");
+    emit("submit"); // Emite el evento submit para cerrar el formulario
+  }
 };
 
 const close = () => {

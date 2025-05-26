@@ -17,6 +17,10 @@
 
 <script setup>
 import AppSideBar from "@/components/common/AppSideBar.vue";
+import AuthModal from "@/components/AuthModal.vue"; // Importa el componente AuthModal
+import { ref } from 'vue';
+
+const showAuth = ref(false);
 
 const props = defineProps({
   menuItems: {

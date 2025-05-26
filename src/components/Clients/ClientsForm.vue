@@ -114,8 +114,7 @@ watch(
 );
 
 const handleSubmit = (event) => {
-  console.log("handleSubmit en ClientsForm.vue ejecutada");
-  event?.preventDefault?.(); 
+   event?.preventDefault?.(); 
   client.value.id_headquarters = props.headquartersId;
   emit("submit", { ...client.value }, event);
 };
