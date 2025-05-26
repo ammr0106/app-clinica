@@ -9,9 +9,9 @@
       <!-- Sección de acciones -->
       <div class="acciones">
         <!-- Componente para crear nuevas citas -->
-        <MakeDateBtn 
-          :selectedDay="selectedDay"               
-          @create-date="handleCreateDate"          
+        <MakeDateBtn
+          :selectedDay="selectedDay"
+          @create-date="handleCreateDate"
         />
       </div>
 
@@ -20,20 +20,20 @@
         <!-- Contenedor del calendario -->
         <div class="calendario">
           <!-- Componente de calendario -->
-          <Calendar 
-            :selectedDay="selectedDay"             
-            @selectDay="handleDaySelected"       
-            @changeMonth="(newMonth) => selectedMonth.value = newMonth"  
-            @changeYear="(newYear) => selectedYear.value = newYear"      
+          <Calendar
+            :selectedDay="selectedDay"
+            @selectDay="handleDaySelected"
+            @changeMonth="(newMonth) => (selectedMonth.value = newMonth)"
+            @changeYear="(newYear) => (selectedYear.value = newYear)"
           />
         </div>
 
         <!-- Componente que muestra las citas -->
         <Dates
-          :fecha="fecha"                          
-          :citas="citasDelDia"                    
-          @update-cita="handleUpdateCita"          
-          @delete-cita="handleDeleteCita"          
+          :fecha="fecha"
+          :citas="citasDelDia"
+          @update-cita="handleUpdateCita"
+          @delete-cita="handleDeleteCita"
         />
       </div>
     </main>
@@ -42,49 +42,53 @@
 
 <script setup>
 // Importaciones de Vue
-import { ref, provide, computed, watch } from 'vue'
+import { ref, provide, computed, watch } from "vue";
 // Importaciones de componentes
-import Header from '@/components/Header.vue'
-import Dates from '@/components/Coordinador/Dates.vue'
-import Calendar from '@/components/Coordinador/Calendar.vue'
-import MakeDateBtn from '@/components/Coordinador/MakeDateBtn.vue'
+import Header from "@/components/common/Header.vue";
+import Dates from "@/components/Coordinador/Dates.vue";
+import Calendar from "@/components/Coordinador/Calendar.vue";
+import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
 
 // Estado reactivo para el día seleccionado (inicialmente null)
-const selectedDay = ref(null)
+const selectedDay = ref(null);
 // Estado reactivo para el mes seleccionado (mes actual por defecto)
-const selectedMonth = ref(new Date().getMonth())
+const selectedMonth = ref(new Date().getMonth());
 // Estado reactivo para el año seleccionado (año actual por defecto)
-const selectedYear = ref(new Date().getFullYear())
+const selectedYear = ref(new Date().getFullYear());
 
 // Provee el día seleccionado a componentes hijos
-provide('selectedDay', selectedDay)
+provide("selectedDay", selectedDay);
 
 // Estado reactivo para almacenar todas las citas
-const citas = ref([])
+const citas = ref([]);
 
 // Intenta cargar citas desde localStorage
-const storedCitas = localStorage.getItem('citas')
+const storedCitas = localStorage.getItem("citas");
 // Si hay citas almacenadas
 if (storedCitas) {
   try {
     // Parsea las citas desde JSON
-    citas.value = JSON.parse(storedCitas)
+    citas.value = JSON.parse(storedCitas);
   } catch (e) {
     // Maneja errores de parsing
-    console.error('Error parsing citas from localStorage', e)
+    console.error("Error parsing citas from localStorage", e);
   }
 }
 
 // Watcher que observa cambios en las citas
-watch(citas, (newCitas) => {
-  // Guarda las citas en localStorage cuando cambian
-  localStorage.setItem('citas', JSON.stringify(newCitas))
-}, { deep: true }) // Observa cambios profundos en el array
+watch(
+  citas,
+  (newCitas) => {
+    // Guarda las citas en localStorage cuando cambian
+    localStorage.setItem("citas", JSON.stringify(newCitas));
+  },
+  { deep: true }
+); // Observa cambios profundos en el array
 
 // Función que maneja la selección de día desde el calendario
 function handleDaySelected(day) {
   // Actualiza el día seleccionado
-  selectedDay.value = day
+  selectedDay.value = day;
 }
 
 // Función que maneja la creación de nuevas citas
@@ -98,49 +102,53 @@ function handleCreateDate(dateInfo) {
     nombre: dateInfo.patient, // Nombre del paciente
     hora: dateInfo.time, // Hora de la cita
     descripcion: dateInfo.description, // Descripción
-  })
+  });
 }
 
 // Computed property que formatea la fecha seleccionada
 const fecha = computed(() => {
   // Si no hay día seleccionado, retorna string vacío
-  if (!selectedDay.value) return ''
+  if (!selectedDay.value) return "";
   // Crea objeto Date con los valores seleccionados
-  const dateObj = new Date(selectedYear.value, selectedMonth.value, selectedDay.value)
+  const dateObj = new Date(
+    selectedYear.value,
+    selectedMonth.value,
+    selectedDay.value
+  );
   // Retorna fecha formateada
   return dateObj.toLocaleDateString(undefined, {
-    weekday: 'long',   // Nombre completo del día
-    year: 'numeric',   // Año numérico
-    month: 'long',     // Nombre completo del mes
-    day: 'numeric',    // Día numérico
-  })
-})
+    weekday: "long", // Nombre completo del día
+    year: "numeric", // Año numérico
+    month: "long", // Nombre completo del mes
+    day: "numeric", // Día numérico
+  });
+});
 
 // Computed property que filtra las citas del día seleccionado
 const citasDelDia = computed(() => {
   // Si no hay día seleccionado, retorna array vacío
-  if (!selectedDay.value) return []
+  if (!selectedDay.value) return [];
   // Filtra citas que coincidan con día, mes y año seleccionados
   return citas.value.filter(
-    c =>
+    (c) =>
       c.day === selectedDay.value &&
       c.month === selectedMonth.value &&
       c.year === selectedYear.value
-  )
-})
+  );
+});
 
 // Función que maneja la actualización de citas existentes
 function handleUpdateCita({ editedCita, index }) {
   // Reemplaza la cita en el índice especificado
-  citas.value[index] = editedCita
+  citas.value[index] = editedCita;
 }
 
 // Función que maneja la eliminación de citas
 function handleDeleteCita(id) {
   // Filtra el array para eliminar la cita con el ID especificado
-  citas.value = citas.value.filter(cita => cita.id !== id)
+  citas.value = citas.value.filter((cita) => cita.id !== id);
   // Actualiza localStorage con el nuevo array
-  localStorage.setItem('citas', JSON.stringify(citas.value))
+  localStorage.setItem("citas", JSON.stringify(citas.value));
 }
 </script>
 
@@ -182,5 +190,4 @@ function handleDeleteCita(id) {
   padding: 1rem;
   border-radius: 10px;
 }
-
 </style>

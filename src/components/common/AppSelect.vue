@@ -62,11 +62,11 @@ const model = computed({
 }
 
 .app-select__field {
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  padding: 0.8rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  outline: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
 .app-select__field:disabled {
@@ -75,7 +75,7 @@ const model = computed({
 }
 
 .app-select__error {
-  color: red;
+  color: var(--rojo-controlado);
   font-size: 0.85rem;
 }
 </style>
