@@ -24,7 +24,7 @@ import AppButton from '../common/AppButton.vue';
 import AppForm from '../common/AppForm.vue';
 import AppInput from '../common/AppInput.vue';
 import AppSelect from '../common/AppSelect.vue';
-//importación de store de usuario autenticado
+import { useAuthStore } from '@/stores/useAuthStore'
 
 const emit = defineEmits(['close','submit']);
 
@@ -35,6 +35,10 @@ const email = ref('')
 const password = ref('')
 const rol = ref('')
 
+//Accede al id de la sede del usuario logueado
+const authStore = useAuthStore()
+const id_headquarters = authStore.user?.id_headquarters
+
 const roles = [
     {label: 'Coordinador', value:'coordinator'},
     {label: 'Trabajador', value:'employee'}
@@ -44,10 +48,10 @@ const close = () => emit('close')
 
 const submitForm = async () => {
   try{
-    const response = await fetch('',{
+    const response = await fetch('https://bvpcgsajyrjjzsrutgtv.supabase.co/functions/v1/create_user_with_profile',{
       method: 'POST',
       headers: {
-        'Content-Type':''
+        'Content-Type':'application/json'
       },
       body: JSON.stringify({
         email: email.value,
@@ -69,7 +73,6 @@ const submitForm = async () => {
   } catch (err) {
     alert('Error inesperado: '+ err.message)
   }
-  
 }
 </script>
 
