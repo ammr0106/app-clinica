@@ -33,7 +33,9 @@ defineProps({
   background: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 .user-info p {
@@ -42,6 +44,10 @@ defineProps({
 .actions {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
+}
+.actions :deep(button), .actions .app-button {
+  font-size: 0.85em;
+  padding: 4px 10px;
+  height: 28px;
 }
 </style>

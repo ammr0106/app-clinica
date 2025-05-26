@@ -1,8 +1,5 @@
 <template>
-    <div class="modal-backdrop" @click.self="close">
-    <div class="modal">
-      <button class="close-button" @click="close">×</button>
-      <h2>Crear nuevo usuario</h2>
+    <Modal title="Añadir un nuevo usuario" @close="emit('close')">
 
       <AppForm :onSubmit="submitForm">
         <AppInput v-model="nombre" label="Nombre" type="text" :required="true"/>
@@ -14,12 +11,12 @@
         <AppButton type="submit" variant="primary">Añadir</AppButton>
       </AppForm>
 
-    </div>
-  </div>
+    </Modal>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import Modal from '../common/Modal.vue'
 import AppButton from '../common/AppButton.vue';
 import AppForm from '../common/AppForm.vue';
 import AppInput from '../common/AppInput.vue';
