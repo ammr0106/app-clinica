@@ -41,10 +41,8 @@ const id_headquarters = authStore.user?.id_headquarters
 //Establece los roles aceptados para mostrar en el formulario.
 const roles = [
     {label: 'Coordinador', value:'coordinator'},
-    {label: 'Trabajador', value:'employee'}
+    {label: 'Trabajador', value:'worker'}
 ]
-
-const close = () => emit('close')
 
 //Función para manejar el submit del formulario.
 const submitForm = async () => {
@@ -63,49 +61,10 @@ const submitForm = async () => {
       return;
     }
     emit('submit')
-    close()
+    emit('close')
   } catch (err) {
     alert('Error inesperado: '+ err.message)
   }
 }
 </script>
 
-<style scoped>
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.modal {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 480px;
-  position: relative;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.4s ease-out;
-}
-
-.close-button {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  color: #999;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.close-button:hover {
-  color: #333;
-}
-</style>
