@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
-import SuperAdmin from "@/views/SuperAdmin.vue";
+import SuperadminPage from "@/pages/SuperadminPage.vue"
 import Coordinador from "@/views/Coordinador.vue";
 import Pruebas from "../views/Pruebas.vue";
 import Employees from "@/views/Employees.vue";
@@ -14,7 +14,7 @@ const routes = [
   {
     path: "/superadmin",
     name: "SuperAdmin",
-    component: SuperAdmin,
+    component: SuperadminPage,
     meta: { requiresAuth: true, role: "superadmin" },
   },
   {
