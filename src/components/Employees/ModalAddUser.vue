@@ -35,12 +35,13 @@ const segundoApd = ref('')
 const email = ref('')
 const password = ref('')
 const rol = ref('')
-
 const userStore = useUserStore()
+
 //Accede al id de la sede del usuario logueado
 const authStore = useAuthStore()
 const id_headquarters = authStore.user?.id_headquarters
 
+//Establece los roles aceptados para mostrar en el formulario.
 const roles = [
     {label: 'Coordinador', value:'coordinator'},
     {label: 'Trabajador', value:'employee'}
@@ -48,6 +49,7 @@ const roles = [
 
 const close = () => emit('close')
 
+//Función para manejar el submit del formulario.
 const submitForm = async () => {
   try{
     const error = await userStore.createUser({
