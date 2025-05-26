@@ -4,14 +4,14 @@
       <button class="close-button" @click="close">×</button>
       <h2>Crear nuevo usuario</h2>
 
-      <AppForm @submit="submitForm">
+      <AppForm :onSubmit="submitForm">
         <AppInput v-model="nombre" label="Nombre" type="text" :required="true"/>
         <AppInput v-model="primerApd" label="Primer apellido" type="text" :required="true"/>
         <AppInput v-model="segundoApd" label="Segundo apellido" type="text" :required="true"/>
         <AppInput v-model="email" label="Email" type="email" :required="true"/>
         <AppInput v-model="password" label="Contraseña" type="password" :required="true"/>
         <AppSelect v-model="rol" :options="roles" label="Rol" type="" placeholder="Selecciona un rol" :required="true"/>
-        <AppButton v-model="submit" variant="primary">Añadir</AppButton>
+        <AppButton type="submit" variant="primary">Añadir</AppButton>
       </AppForm>
 
     </div>
@@ -25,6 +25,7 @@ import AppForm from '../common/AppForm.vue';
 import AppInput from '../common/AppInput.vue';
 import AppSelect from '../common/AppSelect.vue';
 import { useAuthStore } from '@/stores/useAuthStore'
+import { useUserStore } from '@/stores/useUserStore'
 
 const emit = defineEmits(['close','submit']);
 
@@ -35,6 +36,7 @@ const email = ref('')
 const password = ref('')
 const rol = ref('')
 
+const userStore = useUserStore()
 //Accede al id de la sede del usuario logueado
 const authStore = useAuthStore()
 const id_headquarters = authStore.user?.id_headquarters
@@ -48,24 +50,17 @@ const close = () => emit('close')
 
 const submitForm = async () => {
   try{
-    const response = await fetch('https://bvpcgsajyrjjzsrutgtv.supabase.co/functions/v1/create_user_with_profile',{
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/json'
-      },
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value,
-        name: nombre.value,
-        first_surname: primerApd.value,
-        second_surname: segundoApd.value,
-        rol: rol.value,
-        id_headquarters
-      })
-    });
-    const data = await response.json();
-    if (!response.ok){
-      alert('Error al crear usuario: '+ (data.error?.message || JSON.stringify(data.error)));
+    const error = await userStore.createUser({
+      name: nombre.value,
+      first_surname: primerApd.value,
+      second_surname: segundoApd.value,
+      email: email.value,
+      rol: rol.value,
+      date: new Date().toISOString(),
+      id_headquarters
+    })
+    if (error){
+      alert('Error al crear usuario: '+ error.message);
       return;
     }
     emit('submit')
