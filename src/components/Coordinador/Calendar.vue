@@ -9,34 +9,41 @@
     <div class="days-grid">
       <div class="day-name" v-for="(day, i) in days" :key="i">{{ day }}</div>
 
-      <div
-        v-for="(day, index) in calendarDays"
-        :key="index"
-        :class="[
-          'day',
-          day === today.getDate() &&
-          currentDate.getMonth() === today.getMonth() &&
-          currentDate.getFullYear() === today.getFullYear()
-            ? 'today'
-            : '',
-          selectedDay === day ? 'selected' : '',
-        ]"
-        @click="selectDay(day)"
-      >
-        {{ day || '' }}
-      </div>
+  <div
+  v-for="(day, index) in calendarDays"
+  :key="index"
+  :class="[
+    'day',
+    day === today.getDate() &&
+    currentDate.getMonth() === today.getMonth() &&
+    currentDate.getFullYear() === today.getFullYear()
+      ? 'today'
+      : '',
+    day === props.selectedDay ? 'selected' : '',
+  ]"
+  @click="selectDay(day)"
+>
+  {{ day || '' }}
+</div>
+
+
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed } from 'vue'
 
+const emit = defineEmits(['selectDay', 'changeMonth', 'changeYear'])
+const props = defineProps({
+  selectedDay: {
+    type: Number,
+    default: null,
+  },
+})
+
 const today = new Date()
 const currentDate = ref(new Date())
-const selectedDay = ref(null)
-
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const days = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 
 const monthName = computed(() =>
   currentDate.value.toLocaleString('default', { month: 'long' })
@@ -54,7 +61,6 @@ const calendarDays = computed(() => {
   const daysInMonth = getDaysInMonth(year, month)
   const startDay = getStartDayOfMonth(year, month)
 
-  // Rellenamos días vacíos al inicio y días del mes
   const daysArray = Array(startDay).fill(null)
   for (let i = 1; i <= daysInMonth; i++) {
     daysArray.push(i)
@@ -63,23 +69,26 @@ const calendarDays = computed(() => {
   return daysArray
 })
 
-const prevMonth = () => {
+function prevMonth() {
   currentDate.value.setMonth(currentDate.value.getMonth() - 1)
   currentDate.value = new Date(currentDate.value)
+  emit('changeMonth', currentDate.value.getMonth())
+  emit('changeYear', currentDate.value.getFullYear())
 }
 
-const nextMonth = () => {
+function nextMonth() {
   currentDate.value.setMonth(currentDate.value.getMonth() + 1)
   currentDate.value = new Date(currentDate.value)
+  emit('changeMonth', currentDate.value.getMonth())
+  emit('changeYear', currentDate.value.getFullYear())
 }
 
 function selectDay(day) {
   if (!day) return
-  selectedDay.value = day
-  // Emitimos el día seleccionado
   emit('selectDay', day)
 }
 </script>
+
 
 <style scoped>
 .calendar-container {

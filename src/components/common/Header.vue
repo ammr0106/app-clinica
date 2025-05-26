@@ -3,35 +3,31 @@
     <div class="header-left"></div>
 
     <div class="header-center">
-      <h1 class="clinic-name">Multispecialty<span class="accent">Clinic</span></h1>
+      <h1 class="clinic-name">
+        Multispecialty<span class="accent">Clinic</span>
+      </h1>
     </div>
 
     <div class="header-right">
-  
-
-      <!-- Men√∫ hamburguesa -->
-      <MenuBurger />
+      <AppSideBar :menu-items="menuItems" />
     </div>
   </header>
   <AuthModal v-if="showAuth" @close="showAuth = false" />
 </template>
 
 <script setup>
-import MenuBurger from './MenuBurger.vue'
-import { ref } from 'vue'
-const showAuth = ref(false) // Controla la visibilidad del modal de autenticaci√≥n
+import AppSideBar from "@/components/common/AppSideBar.vue";
+
+const props = defineProps({
+  menuItems: {
+    type: Array,
+    required: true,
+    default: () => [],
+  },
+});
 </script>
 
 <style scoped>
-:root {
-  --azul-profesional: #1565C0;
-  --verde-confianza: #43A047;
-  --gris-claro: #F5F5F5;
-  --blanco-puro: #FFFFFF;
-  --rojo-controlado: #EF5350;
-  --texto: #263238;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -69,7 +65,7 @@ const showAuth = ref(false) // Controla la visibilidad del modal de autenticaci√
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .accent {
@@ -104,7 +100,7 @@ const showAuth = ref(false) // Controla la visibilidad del modal de autenticaci√
 .username {
   font-size: 1rem;
   font-weight: 500;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   white-space: nowrap;
 }
 
