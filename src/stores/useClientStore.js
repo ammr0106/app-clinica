@@ -28,6 +28,9 @@ export const useClientStore = defineStore('client', {
       const data = await fetchClients()
       this.clients = data.map(client => ({
         id: client.id,
+        name: client.name, // Agrega la propiedad name
+        first_surname: client.first_surname, // Agrega la propiedad first_surname
+        second_surname: client.second_surname, // Agrega la propiedad second_surname
         full_name: `${client.name} ${client.first_surname} ${client.second_surname || ''}`.trim(),
         DNI: client.DNI,
         email: client.email,

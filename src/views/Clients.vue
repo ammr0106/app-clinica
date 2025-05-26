@@ -4,21 +4,29 @@
 
     <main class="main-content">
       <div class="search-and-buttons">
-        <Searchbar v-model="searchTerm" class="searchbar"/>
+        <ClientSearchBar @search="handleSearch" class="client-search"/>
         <div class="buttons">
-          <AppButton @click="openCreateClientForm">Agregar Cliente</AppButton>
-          <AppButton @click="openEditClientForm" :disabled="!selectedClient">Editar Cliente</AppButton>
+          <AppButton @click="openCreateClientForm" type="button">Agregar Cliente</AppButton>
+          <AppButton @click="openEditClientForm" :disabled="!selectedClient" type="button">Editar Cliente</AppButton>
         </div>
       </div>
 
       <ClientsTable :clients="filteredClients" @select-client="selectClient" />
 
-      <ClientsForm
-        v-if="showClientForm"
-        :client="selectedClient"
-        @close="closeClientForm"
-        @submit="handleClientSubmit"
-      />
+      <AppModal v-if="showClientForm" @close="closeClientForm">
+        <ClientsForm
+          :client="selectedClient"
+          :headquartersId="headquartersId"
+          :isEdit="!!selectedClient?.id"
+          @close="closeClientForm"
+          @submit="handleSubmitClientForm"
+          @open-pets-form="openPetsForm"
+        />
+      </AppModal>
+
+      <AppModal v-if="showPetsForm" @close="closePetsForm">
+        <PetsForm @close="closePetsForm" />
+      </AppModal>
     </main>
   </div>
 </template>
@@ -26,14 +34,30 @@
 <script setup>
 import Header from '@/components/Header.vue';
 import { ref, onMounted, computed } from 'vue';
-import Searchbar from '@/components/Searchbar.vue';
 import ClientsTable from '@/components/Clients/ClientsTable.vue';
 import ClientsForm from '@/components/Clients/ClientsForm.vue';
 import AppButton from '@/components/common/AppButton.vue';
-import { fetchClients } from '@/services/ClientService'; 
+import AppModal from '@/components/Clients/AppModal.vue';
+import PetsForm from '@/components/Clients/PetsForm.vue';
+import ClientSearchBar from '@/components/Clients/ClientSearchBar.vue';
+import { useClientStore } from "@/stores/useClientStore";
+import { usePetsStore } from "@/stores/usePetStore";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useHeadquartersStore } from "@/stores/useHeadquartersStore";  // Importa la store de headquarters
 
-// Datos del nuevo cliente
-const nuevoCliente = ref({
+const clientStore = useClientStore();
+const petStore = usePetsStore();
+const authStore = useAuthStore();
+const headquartersStore = useHeadquartersStore();  // Inicializa la store de headquarters
+
+const searchTerm = ref('');
+const filterBy = ref('name');
+const showClientForm = ref(false);
+const selectedClient = ref(null);
+const showPetsForm = ref(false);
+const currentClientId = ref(null);
+
+const newClient = ref({
   name: '',
   first_surname: '',
   second_surname: '',
@@ -44,69 +68,37 @@ const nuevoCliente = ref({
   id_headquarters: null
 });
 
-// Lista de clientes
-const clientes = ref([]);
-const searchTerm = ref('');
-const showClientForm = ref(false);
-const selectedClient = ref(null);
+const headquartersId = computed(() => authStore.profile?.id_headquarters || null);
 
-// Función para crear el cliente
-const crearCliente = async () => {
-  const coordinadorId = 123 // Reemplaza con la lógica para obtener el ID del coordinador
-
-  nuevoCliente.value.id_headquarters = coordinadorId
-
-  const { data, error } = await supabase
-    .from('client')
-    .insert([nuevoCliente.value])
-    .select()
-
-  if (error) {
-    console.error('Error al crear cliente:', error)
-    alert('Error al crear cliente: ' + error.message)
-  } else {
-    console.log('Cliente creado:', data)
-    nuevoCliente.value = {
-      name: '',
-      first_surname: '',
-      second_surname: '',
-      DNI: '',
-      phone: '',
-      email: '',
-      address: '',
-      id_headquarters: null
-    }
-    getClientes()
-    alert('Cliente creado correctamente!')
-  }
-}
-
-// Función para obtener la lista de clientes
-const getClientes = async () => {
-  try {
-    const data = await fetchClients();
-    clientes.value = data;
-  } catch (error) {
-    console.error('Error al obtener clientes:', error);
-  }
-};
-
-// Obtener la lista de clientes al montar el componente
-onMounted(() => {
-  getClientes()
+onMounted(async () => {
+  await clientStore.loadClients();
+  await headquartersStore.loadHeadquarters();  // Carga las sedes al montar el componente
 })
 
 const filteredClients = computed(() => {
-  return clientes.value.filter(client => {
-    return client.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-           client.first_surname.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-           client.second_surname.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-           client.DNI.toLowerCase().includes(searchTerm.value.toLowerCase());
+  return clientStore.clients.filter(client => {
+    const term = searchTerm.value.toLowerCase();
+    const filter = filterBy.value;
+
+    if (!term) {
+      return true;
+    }
+
+    return String(client[filter]).toLowerCase().includes(term);
   });
 });
 
 const openCreateClientForm = () => {
-  selectedClient.value = null;
+  selectedClient.value = {
+    name: '',
+    first_surname: '',
+    second_surname: '',
+    DNI: '',
+    phone: '',
+    email: '',
+    address: '',
+    id_headquarters: headquartersId.value
+  };
   showClientForm.value = true;
 };
 
@@ -120,12 +112,89 @@ const closeClientForm = () => {
 };
 
 const selectClient = (client) => {
-  selectedClient.value = client;
+  selectedClient.value = { ...client };
 };
 
-const handleClientSubmit = () => {
-  getClientes();
-  closeClientForm();
+const handleCreateClient = async (clientData) => {
+  try {
+    const isValidHeadquarters =
+      !clientData.id_headquarters ||
+      headquartersStore.headquarters.some(
+        (hq) => hq.id === clientData.id_headquarters
+      );
+
+    if (!isValidHeadquarters) {
+      console.error("Error: ID de sede inválido");
+      alert("Error: ID de sede inválido");
+      return;
+    }
+
+    const error = await clientStore.createClient(clientData);
+    if (error) {
+      console.error("Error al crear cliente:", error);
+      alert("Error al crear cliente: " + error.message);
+    } else {
+      clientStore.loadClients();
+      closeClientForm();
+    }
+  } catch (error) {
+    console.error("Error al crear cliente:", error);
+    alert("Error al crear cliente: " + error.message);
+  }
+};
+
+const handleEditClient = async (clientData) => {
+  try {
+    const isValidHeadquarters =
+      !clientData.id_headquarters ||
+      headquartersStore.headquarters.some(
+        (hq) => hq.id === clientData.id_headquarters
+      );
+
+    if (!isValidHeadquarters) {
+      console.error("Error: ID de sede inválido");
+      alert("Error: ID de sede inválido");
+      return;
+    }
+
+    const error = await clientStore.editClient(selectedClient.value.id, clientData);
+    if (error) {
+      console.error("Error al editar cliente:", error);
+      alert("Error al editar cliente: " + error.message);
+    } else {
+      clientStore.loadClients();
+      closeClientForm();
+    }
+  } catch (error) {
+    console.error("Error al editar cliente:", error);
+    alert("Error al editar cliente: " + error.message);
+  }
+};
+
+const handleSubmitClientForm = async (clientData, event) => {
+  event?.preventDefault?.();
+  if (selectedClient.value && selectedClient.value.id) {
+    await handleEditClient(clientData);
+  } else {
+    await handleCreateClient(clientData);
+  }
+};
+
+const openPetsForm = () => {
+  showPetsForm.value = true;
+};
+
+const closePetsForm = () => {
+  showPetsForm.value = false;
+};
+
+const handlePetSubmit = () => {
+  closePetsForm();
+};
+
+const handleSearch = (searchParams) => {
+  searchTerm.value = searchParams.term;
+  filterBy.value = searchParams.filter;
 };
 </script>
 
@@ -208,5 +277,9 @@ const handleClientSubmit = () => {
 
 .searchbar {
   width: 70%; /* Ajusta el ancho de la barra de búsqueda */
+}
+
+.client-search {
+  width: 70%;
 }
 </style>
