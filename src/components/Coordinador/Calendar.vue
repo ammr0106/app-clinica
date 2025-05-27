@@ -28,12 +28,12 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed, watch } from "vue";
 
 const emit = defineEmits(["selectDay", "changeMonth", "changeYear"]);
 //Recibe también selectedMonth y selectedYear como props.
+
 const props = defineProps({
   selectedDay: {
     type: Number,
@@ -111,6 +111,7 @@ function selectDay(day) {
   emit("selectDay", day);
 }
 </script>
+
 
 <style scoped>
 .calendar-container {

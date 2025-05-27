@@ -93,6 +93,7 @@ function handleDeleteCita(id) {
 }
 </script>
 
+
 <style scoped>
 .citas-container {
   background: linear-gradient(to bottom right, #177ca9, #15587b);
