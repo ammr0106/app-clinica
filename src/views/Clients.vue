@@ -44,8 +44,8 @@
       </Modal>
 
       <Modal v-if="showPetsForm" title="Agregar mascota" @close="closePetsForm">
-        <PetsForm
-          :clientId="selectedClient?.id"
+        <PetForm
+          :pet="newPet"
           @close="closePetsForm"
           @submit="handlePetSubmit"
         />
@@ -60,14 +60,13 @@ import { ref, onMounted, computed, watch } from "vue";
 import ClientsTable from "@/components/Clients/ClientsTable.vue";
 import ClientsForm from "@/components/Clients/ClientsForm.vue";
 import AppButton from "@/components/common/AppButton.vue";
-import AppModal from "@/components/Clients/AppModal.vue";
-import PetsForm from "@/components/Clients/PetsForm.vue";
+import Modal from "@/components/common/Modal.vue";
+import PetForm from "@/components/Pets/PetForm.vue";
 import ClientSearchBar from "@/components/Clients/ClientSearchBar.vue";
 import { useClientStore } from "@/stores/useClientStore";
 import { usePetsStore } from "@/stores/usePetStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useHeadquartersStore } from "@/stores/useHeadquartersStore";
-import Modal from "@/components/common/Modal.vue";
 import AppSearchbar from "@/components/common/AppSearchbar.vue";
 import { useRoute } from "vue-router";
 
@@ -95,9 +94,9 @@ const filtrosDisponibles = [
 const showClientForm = ref(false);
 const selectedClient = ref(null);
 const showPetsForm = ref(false);
-const currentClientId = ref(null);
+const newPet = ref({});
 
-// Array de objetos para los elementos del menú ¿Debería crearse un store?
+// Array de objetos para los elementos del menú
 const menuItems = [
   { label: "Clientes", path: "/clients" },
   { label: "Mascotas", path: "/pets" },
@@ -274,6 +273,7 @@ const handleSubmitClientForm = async (clientData, event) => {
 
 // Abre el formulario para agregar una mascota a un cliente
 const openPetsForm = () => {
+  newPet.value = { id_client: selectedClient.value?.id };
   showPetsForm.value = true;
 };
 
@@ -283,25 +283,24 @@ const closePetsForm = () => {
 };
 
 // Maneja el envío del formulario de mascotas
-const handlePetSubmit = () => {
-  closePetsForm();
-};
-
-// Maneja la eliminación de clientes
-const handleDeleteClient = async (client) => {
+const handlePetSubmit = async (petData) => {
   try {
-    const error = await clientStore.removeClient(client.id);
+    // Incluir el client_id en los datos a crear
+    const newPetData = {
+      ...petData,
+      id_client: selectedClient.value.id,
+    };
+    const error = await petStore.createPet(newPetData);
     if (error) {
-      console.error("Error al eliminar cliente:", error);
-      alert("Error al eliminar cliente: " + error.message);
+      console.error("Error al crear mascota:", error);
+      alert("Error al crear mascota: " + error.message);
     } else {
-      console.log("Cliente eliminado correctamente");
-      clientStore.loadClients();
-      closeClientForm();
+      petStore.loadPets();
+      closePetsForm();
     }
   } catch (error) {
-    console.error("Error al eliminar cliente:", error);
-    alert("Error al eliminar cliente: " + error.message);
+    console.error("Error al crear mascota:", error);
+    alert("Error al crear mascota: " + error.message);
   }
 };
 </script>

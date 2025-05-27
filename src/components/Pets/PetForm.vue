@@ -42,7 +42,7 @@
     </div>
 
     <div class="buttons">
-      <AppButton type="submit">Guardar</AppButton>
+      <AppButton type="submit" variant="green">Guardar</AppButton>
       <AppButton @click="close">Cancelar</AppButton>
     </div>
   </AppForm>
@@ -70,6 +70,10 @@ const pet = ref({ ...props.pet });
 watch(
   () => props.pet,
   (newPet) => {
+    // Convertir chip_number a string si es un número
+    if (typeof newPet.chip_number === 'number') {
+      newPet.chip_number = String(newPet.chip_number);
+    }
     pet.value = { ...newPet };
   },
   { deep: true, immediate: true }
@@ -95,5 +99,6 @@ const close = () => {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  gap: 1rem;
 }
 </style>

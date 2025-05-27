@@ -115,8 +115,13 @@ const handleEditPetSubmit = async (petData) => {
   try {
     // Incluir el client_id en los datos a actualizar
     const updatedPetData = {
-      ...petData,
-      id_client: selectedPet.value.id_client,
+      name: petData.name,
+      kind: petData.kind,
+      breed: petData.breed,
+      birthdate: petData.birthdate,
+      chip_number: petData.chip_number,
+      observations: petData.observations,
+      id_client: selectedPet.value.id_client, // Usar el id_client existente
     };
     const error = await petStore.editPet(selectedPet.value.id, updatedPetData);
     if (error) {

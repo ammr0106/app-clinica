@@ -17,6 +17,7 @@ import {
  * @property {string} breed
  * @property {string} headquarters_name
  * @property {string} id_client
+ * @property {string} client_DNI
  */
 
 export const usePetsStore = defineStore('pets', {
@@ -43,7 +44,8 @@ export const usePetsStore = defineStore('pets', {
           observations: pet.observations,
           breed: pet.breed,
           headquarters_name: pet.headquarters?.name || 'Sin sede',
-          id_client: pet.client?.id || null, // Usar id_client
+          id_client: pet.client?.id || null,
+          client_DNI: pet.client?.DNI || 'Sin cliente',
         }))
       } catch (err) {
         this.error = err

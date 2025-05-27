@@ -31,7 +31,7 @@ import { supabase } from "./DatabaseConnection";
  * @property {number} chip_number
  * @property {string} observations
  * @property {string} breed
- * @property {string} client_id
+ * @property {string} id_client // Cambiar client_id a id_client
  * @property {string} headquarters_id
  */
 

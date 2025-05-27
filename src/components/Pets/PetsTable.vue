@@ -9,7 +9,7 @@
           <th>Fecha de Nacimiento</th>
           <th>Número de Chip</th>
           <th>Observaciones</th>
-          <th>Dueño</th> <!-- Nueva columna -->
+          <th>Dueño</th> 
         </tr>
       </thead>
       <tbody>
