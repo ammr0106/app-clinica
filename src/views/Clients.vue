@@ -4,16 +4,33 @@
 
     <main class="main-content">
       <div class="search-and-buttons">
-        <ClientSearchBar @search="handleSearch" class="client-search"/>
+        <AppSearchbar
+          class="client-search"
+          v-model="searchTerm"
+          v-model:modelFiltro="filterBy"
+          :filtros="filtrosDisponibles"
+          placeholder="Buscar cliente..."
+        />
         <div class="buttons">
-          <AppButton @click="openCreateClientForm" type="button">Agregar Cliente</AppButton>
-          <AppButton @click="openEditClientForm" :disabled="!selectedClient" type="button">Editar Cliente</AppButton>
+          <AppButton @click="openCreateClientForm" type="button"
+            >Agregar Cliente</AppButton
+          >
+          <AppButton
+            @click="openEditClientForm"
+            :disabled="!selectedClient"
+            type="button"
+            >Editar Cliente</AppButton
+          >
         </div>
       </div>
 
       <ClientsTable :clients="filteredClients" @select-client="selectClient" />
-      <Modal v-if="showClientForm" :title="!!selectedClient?.id ? 'Editar Cliente' : 'Agregar Cliente'" @close="closeClientForm" >
-         <ClientsForm
+      <Modal
+        v-if="showClientForm"
+        :title="!!selectedClient?.id ? 'Editar Cliente' : 'Agregar Cliente'"
+        @close="closeClientForm"
+      >
+        <ClientsForm
           :client="selectedClient"
           :headquartersId="headquartersId"
           :isEdit="!!selectedClient?.id"
@@ -26,7 +43,7 @@
 
       <Modal v-if="showPetsForm" title="Agregar mascota" @close="closePetsForm">
         <PetsForm
-          :clientId="selectedClient?.id" 
+          :clientId="selectedClient?.id"
           @close="closePetsForm"
           @submit="handlePetSubmit"
         />
@@ -36,30 +53,39 @@
 </template>
 
 <script setup>
-import Header from '@/components/common/Header.vue';
-import { ref, onMounted, computed } from 'vue';
-import ClientsTable from '@/components/Clients/ClientsTable.vue';
-import ClientsForm from '@/components/Clients/ClientsForm.vue';
-import AppButton from '@/components/common/AppButton.vue';
-import AppModal from '@/components/Clients/AppModal.vue';
-import PetsForm from '@/components/Clients/PetsForm.vue';
-import ClientSearchBar from '@/components/Clients/ClientSearchBar.vue';
+import Header from "@/components/common/Header.vue";
+import { ref, onMounted, computed } from "vue";
+import ClientsTable from "@/components/Clients/ClientsTable.vue";
+import ClientsForm from "@/components/Clients/ClientsForm.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import AppModal from "@/components/Clients/AppModal.vue";
+import PetsForm from "@/components/Clients/PetsForm.vue";
+import ClientSearchBar from "@/components/Clients/ClientSearchBar.vue";
 import { useClientStore } from "@/stores/useClientStore";
 import { usePetsStore } from "@/stores/usePetStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useHeadquartersStore } from "@/stores/useHeadquartersStore";  
-import AppSearchbar from '@/components/common/AppSearchbar.vue';
-import Modal from '@/components/common/Modal.vue';
+import { useHeadquartersStore } from "@/stores/useHeadquartersStore";
+import Modal from "@/components/common/Modal.vue";
+import AppSearchbar from "@/components/common/AppSearchbar.vue";
 
 // Inicialización de stores
 const clientStore = useClientStore();
 const petStore = usePetsStore();
 const authStore = useAuthStore();
-const headquartersStore = useHeadquartersStore();  
+const headquartersStore = useHeadquartersStore();
 
 // Estado reactivo para la búsqueda y filtrado de clientes
-const searchTerm = ref('');
-const filterBy = ref('name');
+const searchTerm = ref("");
+const filterBy = ref("name");
+
+const filtrosDisponibles = [
+  { label: "Nombre", value: "name" },
+  { label: "Primer Apellido", value: "first_surname" },
+  { label: "Segundo Apellido", value: "second_surname" },
+  { label: "DNI", value: "DNI" },
+  { label: "Email", value: "email" },
+  { label: "Teléfono", value: "phone" },
+];
 
 // Estado reactivo para controlar la visibilidad de los modales
 const showClientForm = ref(false);
@@ -74,17 +100,19 @@ const menuItems = [
 ];
 
 // Obtiene el ID de la sede del usuario autenticado
-const headquartersId = computed(() => authStore.profile?.id_headquarters || null);
+const headquartersId = computed(
+  () => authStore.profile?.id_headquarters || null
+);
 
 // Carga los clientes y las sedes al montar el componente
 onMounted(async () => {
   await clientStore.loadClients();
-  await headquartersStore.loadHeadquarters();  // Carga las sedes al montar el componente
-})
+  await headquartersStore.loadHeadquarters(); // Carga las sedes al montar el componente
+});
 
 // Filtra los clientes basándose en el término de búsqueda y el filtro seleccionado
 const filteredClients = computed(() => {
-  return clientStore.clients.filter(client => {
+  return clientStore.clients.filter((client) => {
     const term = searchTerm.value.toLowerCase();
     const filter = filterBy.value;
 
@@ -99,14 +127,14 @@ const filteredClients = computed(() => {
 // Abre el formulario para crear un nuevo cliente
 const openCreateClientForm = () => {
   selectedClient.value = {
-    name: '',
-    first_surname: '',
-    second_surname: '',
-    DNI: '',
-    phone: '',
-    email: '',
-    address: '',
-    id_headquarters: headquartersId.value
+    name: "",
+    first_surname: "",
+    second_surname: "",
+    DNI: "",
+    phone: "",
+    email: "",
+    address: "",
+    id_headquarters: headquartersId.value,
   };
   showClientForm.value = true;
 };
@@ -186,7 +214,10 @@ const handleEditClient = async (clientData) => {
       id_headquarters: clientData.id_headquarters,
     };
 
-    const error = await clientStore.editClient(selectedClient.value.id, updatedClientData);
+    const error = await clientStore.editClient(
+      selectedClient.value.id,
+      updatedClientData
+    );
     if (error) {
       console.error("Error al editar cliente:", error);
       alert("Error al editar cliente: " + error.message);
@@ -231,12 +262,6 @@ const closePetsForm = () => {
 // Maneja el envío del formulario de mascotas
 const handlePetSubmit = () => {
   closePetsForm();
-};
-
-// Maneja la búsqueda de clientes
-const handleSearch = (searchParams) => {
-  searchTerm.value = searchParams.term;
-  filterBy.value = searchParams.filter;
 };
 
 // Maneja la eliminación de clientes
