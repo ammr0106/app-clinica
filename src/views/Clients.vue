@@ -21,6 +21,7 @@
           @close="closeClientForm"
           @submit="handleSubmitClientForm"
           @open-pets-form="openPetsForm"
+          @delete="handleDeleteClient"
         />
       </AppModal>
 
@@ -47,44 +48,40 @@ import ClientSearchBar from '@/components/Clients/ClientSearchBar.vue';
 import { useClientStore } from "@/stores/useClientStore";
 import { usePetsStore } from "@/stores/usePetStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useHeadquartersStore } from "@/stores/useHeadquartersStore";  // Importa la store de headquarters
+import { useHeadquartersStore } from "@/stores/useHeadquartersStore";  
 
+// Inicialización de stores
 const clientStore = useClientStore();
 const petStore = usePetsStore();
 const authStore = useAuthStore();
-const headquartersStore = useHeadquartersStore();  // Inicializa la store de headquarters
+const headquartersStore = useHeadquartersStore();  
 
+// Estado reactivo para la búsqueda y filtrado de clientes
 const searchTerm = ref('');
 const filterBy = ref('name');
+
+// Estado reactivo para controlar la visibilidad de los modales
 const showClientForm = ref(false);
 const selectedClient = ref(null);
 const showPetsForm = ref(false);
 const currentClientId = ref(null);
 
+// Array de objetos para los elementos del menú ¿Debería crearse un store?
 const menuItems = [
   { label: "Clientes", path: "/clients" },
   // Agrega aquí los demás items del menú
-  // DEBERÍA CREARSE UN STORE
 ];
 
-const newClient = ref({
-  name: '',
-  first_surname: '',
-  second_surname: '',
-  DNI: '',
-  phone: '',
-  email: '',
-  address: '',
-  id_headquarters: null
-});
-
+// Obtiene el ID de la sede del usuario autenticado
 const headquartersId = computed(() => authStore.profile?.id_headquarters || null);
 
+// Carga los clientes y las sedes al montar el componente
 onMounted(async () => {
   await clientStore.loadClients();
   await headquartersStore.loadHeadquarters();  // Carga las sedes al montar el componente
 })
 
+// Filtra los clientes basándose en el término de búsqueda y el filtro seleccionado
 const filteredClients = computed(() => {
   return clientStore.clients.filter(client => {
     const term = searchTerm.value.toLowerCase();
@@ -98,6 +95,7 @@ const filteredClients = computed(() => {
   });
 });
 
+// Abre el formulario para crear un nuevo cliente
 const openCreateClientForm = () => {
   selectedClient.value = {
     name: '',
@@ -112,19 +110,23 @@ const openCreateClientForm = () => {
   showClientForm.value = true;
 };
 
+// Abre el formulario para editar un cliente existente
 const openEditClientForm = () => {
   showClientForm.value = true;
 };
 
+// Cierra el formulario de cliente y deselecciona el cliente
 const closeClientForm = () => {
   showClientForm.value = false;
   selectedClient.value = null;
 };
 
+// Selecciona un cliente de la tabla para editarlo
 const selectClient = (client) => {
   selectedClient.value = { ...client };
 };
 
+// Maneja la creación de un nuevo cliente
 const handleCreateClient = async (clientData) => {
   try {
     const isValidHeadquarters =
@@ -153,6 +155,7 @@ const handleCreateClient = async (clientData) => {
   }
 };
 
+// Maneja la edición de un cliente existente
 const handleEditClient = async (clientData) => {
   try {
     // Divide el full_name en sus componentes
@@ -204,6 +207,7 @@ const splitFullName = (clientData) => {
   return { name, first_surname, second_surname };
 };
 
+// Maneja el envío del formulario de cliente (creación o edición)
 const handleSubmitClientForm = async (clientData, event) => {
   event?.preventDefault?.();
   if (selectedClient.value && selectedClient.value.id) {
@@ -213,21 +217,43 @@ const handleSubmitClientForm = async (clientData, event) => {
   }
 };
 
+// Abre el formulario para agregar una mascota a un cliente
 const openPetsForm = () => {
   showPetsForm.value = true;
 };
 
+// Cierra el formulario de mascotas
 const closePetsForm = () => {
   showPetsForm.value = false;
 };
 
+// Maneja el envío del formulario de mascotas
 const handlePetSubmit = () => {
   closePetsForm();
 };
 
+// Maneja la búsqueda de clientes
 const handleSearch = (searchParams) => {
   searchTerm.value = searchParams.term;
   filterBy.value = searchParams.filter;
+};
+
+// Maneja la eliminación de clientes
+const handleDeleteClient = async (client) => {
+  try {
+    const error = await clientStore.removeClient(client.id);
+    if (error) {
+      console.error("Error al eliminar cliente:", error);
+      alert("Error al eliminar cliente: " + error.message);
+    } else {
+      console.log("Cliente eliminado correctamente");
+      clientStore.loadClients();
+      closeClientForm();
+    }
+  } catch (error) {
+    console.error("Error al eliminar cliente:", error);
+    alert("Error al eliminar cliente: " + error.message);
+  }
 };
 </script>
 

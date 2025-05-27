@@ -59,6 +59,7 @@
     <div class="buttons">
       <AppButton type="submit">Guardar</AppButton>
       <AppButton @click="close">Cancelar</AppButton>
+      <AppButton v-if="props.isEdit" type="button" @click="handleDelete" variant="red">Eliminar Cliente</AppButton>
     </div>
   </AppForm>
 </template>
@@ -125,6 +126,12 @@ const close = () => {
 
 const openPetsForm = () => {
   emit("open-pets-form");
+};
+
+const handleDelete = () => {
+  if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+    emit("delete", props.client);
+  }
 };
 </script>
 
