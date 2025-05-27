@@ -12,9 +12,8 @@
       </div>
 
       <ClientsTable :clients="filteredClients" @select-client="selectClient" />
-
-      <AppModal v-if="showClientForm" @close="closeClientForm">
-        <ClientsForm
+      <Modal v-if="showClientForm" :title="!!selectedClient?.id ? 'Editar Cliente' : 'Agregar Cliente'" @close="closeClientForm" >
+         <ClientsForm
           :client="selectedClient"
           :headquartersId="headquartersId"
           :isEdit="!!selectedClient?.id"
@@ -23,15 +22,15 @@
           @open-pets-form="openPetsForm"
           @delete="handleDeleteClient"
         />
-      </AppModal>
+      </Modal>
 
-      <AppModal v-if="showPetsForm" @close="closePetsForm">
+      <Modal v-if="showPetsForm" title="Agregar mascota" @close="closePetsForm">
         <PetsForm
           :clientId="selectedClient?.id" 
           @close="closePetsForm"
           @submit="handlePetSubmit"
         />
-      </AppModal>
+      </Modal>
     </main>
   </div>
 </template>
@@ -49,6 +48,8 @@ import { useClientStore } from "@/stores/useClientStore";
 import { usePetsStore } from "@/stores/usePetStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useHeadquartersStore } from "@/stores/useHeadquartersStore";  
+import AppSearchbar from '@/components/common/AppSearchbar.vue';
+import Modal from '@/components/common/Modal.vue';
 
 // Inicialización de stores
 const clientStore = useClientStore();

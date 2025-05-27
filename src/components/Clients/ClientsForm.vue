@@ -57,7 +57,7 @@
     <AppButton v-if="hasPet" @click="openPetsForm">Añadir Mascota</AppButton>
 
     <div class="buttons">
-      <AppButton type="submit">Guardar</AppButton>
+      <AppButton variant="green" type="submit">Guardar</AppButton>
       <AppButton @click="close">Cancelar</AppButton>
       <AppButton v-if="props.isEdit" type="button" @click="handleDelete" variant="red">Eliminar Cliente</AppButton>
     </div>
@@ -145,6 +145,7 @@ const handleDelete = () => {
 .buttons {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   margin-top: 1rem;
 }
 </style>

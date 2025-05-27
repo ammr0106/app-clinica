@@ -42,7 +42,7 @@
     </div>
 
     <div class="buttons">
-      <AppButton type="submit">Guardar Mascota</AppButton>
+      <AppButton type="submit" variant="green">Guardar Mascota</AppButton>
       <AppButton @click="close">Cancelar</AppButton>
     </div>
   </AppForm>
@@ -105,5 +105,6 @@ const close = () => {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  gap: 1rem;
 }
 </style>

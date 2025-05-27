@@ -79,7 +79,7 @@ function handleClick(e) {
   background-color: #388e3c;
 }
 
-.app-button--secondary {
+.app-button--red {
   margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--rojo-controlado);
@@ -91,7 +91,7 @@ function handleClick(e) {
   transition: background-color 0.3s ease;
 }
 
-.app-button--secondary:hover {
+.app-button--red:hover {
   background-color: #C62828;
 }
 
