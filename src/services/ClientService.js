@@ -77,3 +77,4 @@ export async function deleteClient(id) {
   const { error } = await supabase.from('client').delete().eq('id', id)
   return { error }
 }
+

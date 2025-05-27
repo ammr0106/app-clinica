@@ -85,6 +85,7 @@ const filtrosDisponibles = [
   { label: "DNI", value: "DNI" },
   { label: "Email", value: "email" },
   { label: "Teléfono", value: "phone" },
+  { label: "Dirección", value: "address" },
 ];
 
 // Estado reactivo para controlar la visibilidad de los modales
