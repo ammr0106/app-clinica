@@ -23,7 +23,7 @@ import AppInput from '../common/AppInput.vue';
 import AppSelect from '../common/AppSelect.vue';
 import { useUserStore } from '@/stores/useUserStore'
 
-const emit = defineEmits(['close','submit']);
+const emit = defineEmits(['close','submit','error']);
 
 const props = defineProps({
     user: { type:Object, required: true }
@@ -82,21 +82,21 @@ const submitForm = async () => {
 
     //Comprueba si hay cambios.
     if (Object.keys(updateFields).length === 0) {
-        alert('No hay cambios para guardar.')
-        return
+      emit('error','No hay cambios para guardar')
+      return
     }
 
    //Llama al store pasando el id y los campos modificados.
     const { error } = await userStore.editUser(props.user.id, updateFields)
     if (error){
-        alert('Error al actualizar usuario: '+ (result.error.message || JSON.stringify(result.error)))
-        return
+      emit('error','Error al actualizar usuario.' + (error.message))
+      return
     }
     emit('submit')
     emit('close')
 
   } catch (err) {
-    alert('Error inesperado: '+ err.message)
+      emit('error','Error inesperado: ' + err.message)
   }
 }
 

@@ -1,4 +1,5 @@
 <template>
+    <!-- Tarjetas para ver los usuarios -->
     <CardUser 
     v-for="user in users"
     :key="user.id"
@@ -6,12 +7,20 @@
     @edit="handleEditUser"
     @delete="handleDeleteUser"
     />
-    <ModalEditUser v-if="showModalEditUser" :user="userToEdit" @close="showModalEditUser = false"/>
+    <!-- Modales para edición y eliminación de usuarios-->
+    <ModalEditUser 
+        v-if="showModalEditUser" 
+        :user="userToEdit" 
+        @close="showModalEditUser = false" 
+        @submit="onUserEdited"
+        @error="msg => $emit('notify', msg, 'error')"
+    />
     <DeleteUser v-if="showDeleteUser" 
         :userId="userToDelete?.id" 
         @close="showDeleteUser = false" 
         @deleted="onUserDeleted"
-        />
+        @error="msg => $emit('notify', msg, 'error')"
+    />
 </template>
 
 <script setup>
@@ -22,12 +31,15 @@ import CardUser from './CardUser.vue';
 import ModalEditUser from './ModalEditUser.vue';
 import DeleteUser from './DeleteUser.vue';
 
+const emit = defineEmits(['notify'])
+
 const userStore = useUserStore()
 const authStore = useAuthStore()
 const showModalEditUser = ref(false)
 const userToEdit = ref(null)
 const showDeleteUser = ref(false)
 const userToDelete = ref(null)
+
 
 const props = defineProps({
     search: String,
@@ -59,10 +71,16 @@ function handleDeleteUser(user){
     showDeleteUser.value = true
 }
 
-// Refrescar la lista tras el borrado.
+// Cerrar modal y mostrar notificación.
+function onUserEdited(){
+    showModalEditUser.value = false
+    emit('notify', 'Usuario modificado correctamente','success')
+}
+// Refrescar la lista tras el borrado y mostrar notificación.
 function onUserDeleted(){
     userStore.loadUsers()
     showDeleteUser.value = false
+    emit('notify', 'Usuario eliminado correctamente.','success')
 }
 
 onMounted(() => {

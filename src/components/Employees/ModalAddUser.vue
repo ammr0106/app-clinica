@@ -24,7 +24,7 @@ import AppSelect from '../common/AppSelect.vue';
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useUserStore } from '@/stores/useUserStore'
 
-const emit = defineEmits(['close','submit']);
+const emit = defineEmits(['close','submit', 'error']);
 
 const nombre = ref('')
 const primerApd = ref('')
@@ -57,13 +57,13 @@ const submitForm = async () => {
       id_headquarters
     })
     if (error){
-      alert('Error al crear usuario: '+ error.message);
+      emit('error','Error al crear el usuario.' + error.message)
       return;
     }
     emit('submit')
     emit('close')
   } catch (err) {
-    alert('Error inesperado: '+ err.message)
+    emit('error','Error inesperado: ' + err.message)
   }
 }
 </script>

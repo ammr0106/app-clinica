@@ -10,29 +10,18 @@
             <AppButton :disabled="loading" variant="primary" @click="handleCancel">Cancelar</AppButton>
         </div>
     </Modal>
-
-    <!-- Notificación -->
-     <AppNotification
-        v-if="notification.message"
-        :message="notification.message"
-        :type="notification.type"
-        @hidden="notification.message = ''"
-        />
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import AppButton from '../common/AppButton.vue';
 import Modal from '../common/Modal.vue';
-import AppNotification from '../common/AppNotification.vue';
 import { useUserStore } from '@/stores/useUserStore';
 
 const userStore = useUserStore()
-const showDialog = ref(false)
-const notification = ref({message: '',type:'success'})
 const loading = ref(false)
 
-const emit = defineEmits(['close','deleted'])
+const emit = defineEmits(['close','deleted','error'])
 
 // Recibe el id del usuario a eliminar como prop.
 const props = defineProps({
@@ -49,9 +38,8 @@ const confirmDelete = async () => {
     const error = await userStore.removeUser(props.userId)
     loading.value = false
     if(error) 
-        notification.value = { message: 'Error al eliminar usuario.', type: 'error'}
+        emit('error', 'Error al eliminar usuario.')
     else{
-        notification.value = { message: 'Usuario eliminado con éxito.', type: 'success'}
         emit('deleted')
     }
 }
