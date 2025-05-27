@@ -33,6 +33,9 @@ export const useUserStore = defineStore("user", {
         const data = await fetchUsers();
         this.users = data.map((user) => ({
           id: user.id,
+          name: user.name,
+          first_surname: user.first_surname,
+          second_surname: user.second_surname,
           full_name: `${user.name} ${user.first_surname} ${
             user.second_surname || ""
           }`.trim(),
@@ -40,6 +43,7 @@ export const useUserStore = defineStore("user", {
           rol: user.rol,
           date: user.date,
           headquarters_name: user.headquarters?.name || "Sin sede",
+          headquarters_id: user.headquarters?.id || null,
         }));
       } catch (err) {
         this.error = err;
@@ -55,9 +59,14 @@ export const useUserStore = defineStore("user", {
     },
 
     async editUser(id, updatedData) {
-      const { error } = await updateUserService(id, updatedData);
-      if (!error) await this.loadUsers();
-      return error;
+      try{
+      const response = await updateUserService(id, updatedData);
+      await this.loadUsers();
+      return {data: response}
+    }catch (error) {
+      return {error}
+    }
+      
     },
 
     async removeUser(id) {

@@ -4,7 +4,9 @@
     :disabled="isDisabled"
     :class="['app-button', variantClass]"
     @click="handleClick"
+    @click="handleClick"
   >
+    <span v-if="formLoading && type === 'submit' && showLoader">Cargando...</span>
     <span v-if="formLoading && type === 'submit' && showLoader">Cargando...</span>
     <slot v-else />
   </button>
@@ -31,19 +33,29 @@ const props = defineProps({
     type: String,
     default: "primary",
     validator: (val) => ["primary", "red", "green", "orange"].includes(val),
+    validator: (val) => ["primary", "red", "green", "orange"].includes(val),
   },
 });
 
 // Estado de carga del formulario desde el proveedor
+// Estado de carga del formulario desde el proveedor
 const formLoading = inject("formLoading", ref(false));
 
 const isDisabled = computed(() => {
+  if (props.type === "submit") return formLoading.value || props.disabled;
   if (props.type === "submit") return formLoading.value || props.disabled;
   return props.disabled;
 });
 
 const variantClass = computed(() => `app-button--${props.variant}`);
 
+const emit = defineEmits(["click"]);
+
+function handleClick(e) {
+  if (props.type !== "submit") {
+    emit("click", e);
+  }
+}
 const emit = defineEmits(["click"]);
 
 function handleClick(e) {
@@ -83,6 +95,7 @@ function handleClick(e) {
   margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--rojo-controlado);
+  background-color: var(--rojo-controlado);
   color: white;
   border-radius: 12px;
   font-weight: bold;
@@ -96,6 +109,7 @@ function handleClick(e) {
 }
 
 .app-button--primary {
+  margin-top: 1rem;
   margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--azul-profesional, #1565c0);
@@ -121,6 +135,33 @@ function handleClick(e) {
   cursor: pointer;
   width: 100%;
   transition: background-color 0.3s ease;
+}
+
+.app-button--primary:hover {
+  background-color: #0d47a1;
+}
+
+.app-button--orange {
+    margin-top: 1rem;
+  padding: 0.9rem;
+  background-color: #ff9800;
+  color: white;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.app-button--orange:hover {
+  background-color: #ef6c00;
+}
+
+.app-button:disabled {
+  background-color: #ccc ; 
+  color: #666 ; 
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .app-button--orange:hover {
