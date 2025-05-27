@@ -4,8 +4,14 @@
     :key="user.id"
     :user="user"
     @edit="handleEditUser"
+    @delete="handleDeleteUser"
     />
     <ModalEditUser v-if="showModalEditUser" :user="userToEdit" @close="showModalEditUser = false"/>
+    <DeleteUser v-if="showDeleteUser" 
+        :userId="userToDelete?.id" 
+        @close="showDeleteUser = false" 
+        @deleted="onUserDeleted"
+        />
 </template>
 
 <script setup>
@@ -14,11 +20,14 @@ import { useUserStore } from '@/stores/useUserStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import CardUser from './CardUser.vue';
 import ModalEditUser from './ModalEditUser.vue';
+import DeleteUser from './DeleteUser.vue';
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
 const showModalEditUser = ref(false)
 const userToEdit = ref(null)
+const showDeleteUser = ref(false)
+const userToDelete = ref(null)
 
 const props = defineProps({
     search: String,
@@ -42,6 +51,18 @@ const users = computed(() => userStore.users)//mostrarlos sin filtro.
 function handleEditUser(user){
     userToEdit.value = user
     showModalEditUser.value = true
+}
+
+// Función para controlar eliminar un usuario.
+function handleDeleteUser(user){
+    userToDelete.value = user
+    showDeleteUser.value = true
+}
+
+// Refrescar la lista tras el borrado.
+function onUserDeleted(){
+    userStore.loadUsers()
+    showDeleteUser.value = false
 }
 
 onMounted(() => {

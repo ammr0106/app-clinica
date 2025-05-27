@@ -2,7 +2,12 @@
     <Header :menu-items="menuItems"/>
     <main class="content">
         <div class="top-bar">
-            <AppSearchbar v-model="search" v-model:filter="filter"/> 
+            <AppSearchbar v-model="search" v-model:filter="filter"
+                :filtros="[
+                    { label: 'Nombre', value: name },
+                    { label: 'Rol', value: rol }
+                ]"
+            /> 
             <AppButton variant="primary" @click="showModalAddUser = true" class="addBtn">Añadir usuario</AppButton>
         </div>
         <!--Modal para añadir usuario-->

@@ -3,7 +3,7 @@
         <div class="user-info">
             <p><strong>Nombre:</strong> {{ user.full_name }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Rol:</strong> {{ user.rol }}</p>
+            <p><strong>Rol:</strong> {{ roleLabels[user.rol] }}</p>
         </div>
         <!--Botones para la gestión de usuarios-->
         <div class="action">
@@ -22,6 +22,12 @@ defineProps({
         required: true
     }
 })
+
+// Mapa de roles para mostrar el nombre legible del rol.
+const roleLabels = {
+  worker: 'Trabajador',
+  coordinator: 'Coordinador'
+}
 </script>
 
 <style scoped>
