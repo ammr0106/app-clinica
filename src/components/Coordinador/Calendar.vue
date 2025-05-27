@@ -87,20 +87,17 @@ watch(
 );
 
 function prevMonth() {
-  currentDate.value = new Date(
-    currentDate.value.getFullYear(),
-    currentDate.value.getMonth() - 1,
-    1
-  );
-  emit("changeMonth", currentDate.value.getMonth());
-  emit("changeYear", currentDate.value.getFullYear());
+  const prev = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1);
+  currentDate.value = prev;
+  emit("changeMonth", prev.getMonth());
+  emit("changeYear", prev.getFullYear());
 }
 
 function nextMonth() {
-  currentDate.value.setMonth(currentDate.value.getMonth() + 1);
-  currentDate.value = new Date(currentDate.value);
-  emit("changeMonth", currentDate.value.getMonth());
-  emit("changeYear", currentDate.value.getFullYear());
+  const next = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
+  currentDate.value = next;
+  emit("changeMonth", next.getMonth());
+  emit("changeYear", next.getFullYear());
 }
 
 function selectDay(day) {

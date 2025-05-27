@@ -42,7 +42,10 @@ export function useCalendar(appointmentsSource = []) {
     });
   });
 
-  // Cambiar mes y año
+  // Cambiar dia, mes y año
+  function handleDaySelected(day) {
+    selectedDay.value = day;
+  }
   function handleChangeMonth(newMonth) {
     selectedMonth.value = newMonth;
     selectedDay.value = null;
@@ -52,10 +55,6 @@ export function useCalendar(appointmentsSource = []) {
     selectedDay.value = null;
   }
 
-  // Seleccionar día
-  function handleDaySelected(day) {
-    selectedDay.value = day;
-  }
 
   // Crear nueva cita
   function handleCreateDate(dateInfo) {

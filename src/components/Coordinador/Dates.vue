@@ -44,19 +44,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import EditDateModal from './EditDateModal.vue'
 import DeleteDateModal from './DeleteDateModal.vue'
 
 const props = defineProps({
-  fecha: {
-    type: String,
-    required: true,
-  },
-  citas: {
-    type: Array,
-    default: () => [],
-  },
+  fecha: String,
+  citas: Array,
 })
 
 const emit = defineEmits(['update-cita', 'delete-cita'])

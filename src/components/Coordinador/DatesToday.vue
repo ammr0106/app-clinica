@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import EditDateModal from './EditDateModal.vue'
 import DeleteDateModal from './DeleteDateModal.vue'
 
