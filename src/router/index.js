@@ -1,10 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
-import SuperadminPage from "@/pages/SuperadminPage.vue"
+import SuperadminPage from "@/pages/SuperadminPage.vue";
 import Coordinador from "@/views/Coordinador.vue";
-import Pruebas from "../views/Pruebas.vue";
 import Clients from "@/views/Clients.vue";
-
+import Pets from "@/views/Pets.vue"; // Importa la vista de mascotas
 
 const routes = [
   {
@@ -24,16 +23,17 @@ const routes = [
     component: Coordinador,
     meta: { requiresAuth: true, role: "coordinador" },
   },
-  { 
-    path: "/pruebas",
-    name: "Pruebas",
-    component: Pruebas,
-  },
-   {
-    path: "/clients",
+  {
+    path: "/clients/:clientId?", // Agrega un parámetro opcional clientId
     name: "Clients",
     component: Clients,
     meta: { requiresAuth: true, role: "coordinador" },
+  },
+  {
+    path: "/pets", // Agrega la ruta para la vista de mascotas
+    name: "Pets",
+    component: Pets,
+    meta: { requiresAuth: true, role: "coordinador" }, // Ajusta el rol si es necesario
   },
 ];
 

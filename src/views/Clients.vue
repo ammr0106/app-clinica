@@ -12,19 +12,22 @@
           placeholder="Buscar cliente..."
         />
         <div class="buttons">
-          <AppButton @click="openCreateClientForm" type="button"
-            >Agregar Cliente</AppButton
-          >
+          <AppButton @click="openCreateClientForm" type="button">Agregar Cliente</AppButton>
           <AppButton
             @click="openEditClientForm"
             :disabled="!selectedClient"
             type="button"
-            >Editar Cliente</AppButton
-          >
+          >Editar Cliente</AppButton>
+          <AppButton
+            @click="openPetsForm"
+            :disabled="!selectedClient"
+            type="button"
+          >Mascotas</AppButton>
         </div>
       </div>
 
       <ClientsTable :clients="filteredClients" @select-client="selectClient" />
+
       <Modal
         v-if="showClientForm"
         :title="!!selectedClient?.id ? 'Editar Cliente' : 'Agregar Cliente'"
@@ -36,7 +39,6 @@
           :isEdit="!!selectedClient?.id"
           @close="closeClientForm"
           @submit="handleSubmitClientForm"
-          @open-pets-form="openPetsForm"
           @delete="handleDeleteClient"
         />
       </Modal>
@@ -54,7 +56,7 @@
 
 <script setup>
 import Header from "@/components/common/Header.vue";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import ClientsTable from "@/components/Clients/ClientsTable.vue";
 import ClientsForm from "@/components/Clients/ClientsForm.vue";
 import AppButton from "@/components/common/AppButton.vue";
@@ -67,6 +69,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useHeadquartersStore } from "@/stores/useHeadquartersStore";
 import Modal from "@/components/common/Modal.vue";
 import AppSearchbar from "@/components/common/AppSearchbar.vue";
+import { useRoute } from "vue-router";
 
 // Inicialización de stores
 const clientStore = useClientStore();
@@ -97,13 +100,16 @@ const currentClientId = ref(null);
 // Array de objetos para los elementos del menú ¿Debería crearse un store?
 const menuItems = [
   { label: "Clientes", path: "/clients" },
-  // Agrega aquí los demás items del menú
+  { label: "Mascotas", path: "/pets" },
 ];
 
 // Obtiene el ID de la sede del usuario autenticado
 const headquartersId = computed(
   () => authStore.profile?.id_headquarters || null
 );
+
+const route = useRoute();
+const clientIdFromRoute = computed(() => route.params.clientId);
 
 // Carga los clientes y las sedes al montar el componente
 onMounted(async () => {
@@ -113,6 +119,11 @@ onMounted(async () => {
 
 // Filtra los clientes basándose en el término de búsqueda y el filtro seleccionado
 const filteredClients = computed(() => {
+  if (clientIdFromRoute.value) {
+    return clientStore.clients.filter(
+      (client) => client.id === clientIdFromRoute.value
+    );
+  }
   return clientStore.clients.filter((client) => {
     const term = searchTerm.value.toLowerCase();
     const filter = filterBy.value;
@@ -124,6 +135,17 @@ const filteredClients = computed(() => {
     return String(client[filter]).toLowerCase().includes(term);
   });
 });
+
+// Watch para limpiar el filtro cuando cambia la ruta
+watch(
+  () => clientIdFromRoute.value,
+  (newClientId) => {
+    if (newClientId) {
+      searchTerm.value = "";
+      filterBy.value = "name";
+    }
+  }
+);
 
 // Abre el formulario para crear un nuevo cliente
 const openCreateClientForm = () => {
@@ -298,71 +320,20 @@ const handleDeleteClient = async (client) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centra horizontalmente */
 }
 
 .search-and-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 95%; /* Ajusta el ancho */
+  width: 95%;
   margin-bottom: 1rem;
 }
 
 .buttons {
   display: flex;
   gap: 0.5rem;
-}
-
-/* Estilos existentes */
-.crear-cliente-panel {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 50%;
-  margin-top: 2rem;
-}
-
-.crear-cliente-panel h2 {
-  font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #333;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 0.8rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  color: #555;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-.btn {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-}
-
-.searchbar {
-  width: 70%; /* Ajusta el ancho de la barra de búsqueda */
 }
 
 .client-search {

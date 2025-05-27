@@ -47,7 +47,7 @@ export async function fetchPets() {
       chip_number,
       observations,
       breed,
-      client ( name ),
+      client ( id, DNI ),
       headquarters ( name )
     `);
 

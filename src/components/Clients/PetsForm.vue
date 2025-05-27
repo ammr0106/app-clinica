@@ -2,47 +2,47 @@
   <AppForm @submit="handleSubmit">
     <div class="form-grid">
       <AppInput
-        v-model="localPet.name"
-        label="Nombre de la Mascota"
-        placeholder="Ingrese el nombre de la mascota"
-        id="petName"
+        v-model="pet.name"
+        label="Nombre"
+        placeholder="Ingrese el nombre"
+        id="name"
         required
       />
       <AppInput
-        v-model="localPet.kind"
-        label="Tipo de Mascota"
-        placeholder="Ingrese el tipo de mascota"
-        id="petKind"
+        v-model="pet.kind"
+        label="Tipo"
+        placeholder="Ingrese el tipo"
+        id="kind"
         required
       />
       <AppInput
-        v-model="localPet.breed"
+        v-model="pet.breed"
         label="Raza"
         placeholder="Ingrese la raza"
-        id="petBreed"
+        id="breed"
       />
       <AppInput
-        v-model="localPet.birthdate"
+        v-model="pet.birthdate"
         label="Fecha de Nacimiento"
         type="date"
-        id="petBirthdate"
+        id="birthdate"
       />
       <AppInput
-        v-model="localPet.chip_number"
+        v-model="pet.chip_number"
         label="Número de Chip"
         placeholder="Ingrese el número de chip"
-        id="petChipNumber"
+        id="chip_number"
       />
       <AppInput
-        v-model="localPet.observations"
+        v-model="pet.observations"
         label="Observaciones"
-        placeholder="Ingrese observaciones"
-        id="petObservations"
+        placeholder="Ingrese las observaciones"
+        id="observations"
       />
     </div>
 
     <div class="buttons">
-      <AppButton type="submit" variant="green">Guardar Mascota</AppButton>
+      <AppButton type="submit">Guardar</AppButton>
       <AppButton @click="close">Cancelar</AppButton>
     </div>
   </AppForm>
@@ -52,41 +52,19 @@
 import AppForm from "@/components/common/AppForm.vue";
 import AppInput from "@/components/common/AppInput.vue";
 import AppButton from "@/components/common/AppButton.vue";
-import { defineProps, defineEmits, ref } from "vue";
-import { usePetsStore } from "@/stores/usePetStore"; // Importa el store de mascotas
+import { defineProps, defineEmits } from "vue";
 
 const props = defineProps({
-  clientId: { // Recibe el ID del cliente como prop
-    type: String,
-    required: true
-  }
+  pet: {
+    type: Object,
+    required: true,
+  },
 });
 
 const emit = defineEmits(["submit", "close"]);
 
-const localPet = ref({
-  name: "",
-  kind: "",
-  birthdate: "",
-  chip_number: "",
-  observations: "",
-  breed: "",
-  id_client: props.clientId // Asigna el ID del cliente a la mascota
-});
-
-const petStore = usePetsStore(); // Inicializa el store de mascotas
-
-const handleSubmit = async () => {
-  // Llama a la acción createPet del store
-  const error = await petStore.createPet(localPet.value);
-
-  if (error) {
-    console.error("Error al crear la mascota:", error);
-    alert("Error al crear la mascota");
-  } else {
-    console.log("Mascota creada correctamente");
-    emit("submit"); // Emite el evento submit para cerrar el formulario
-  }
+const handleSubmit = () => {
+  emit("submit", pet);
 };
 
 const close = () => {
@@ -105,6 +83,5 @@ const close = () => {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
-  gap: 1rem;
 }
 </style>

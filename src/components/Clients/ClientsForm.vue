@@ -49,13 +49,6 @@
       />
     </div>
 
-    <div class="form-group">
-      <label for="hasPet">¿Tiene Mascota?</label>
-      <input type="checkbox" id="hasPet" v-model="hasPet" />
-    </div>
-
-    <AppButton v-if="hasPet" @click="openPetsForm">Añadir Mascota</AppButton>
-
     <div class="buttons">
       <AppButton variant="green" type="submit">Guardar</AppButton>
       <AppButton @click="close">Cancelar</AppButton>
@@ -69,7 +62,7 @@ import AppForm from "@/components/common/AppForm.vue";
 import AppInput from "@/components/common/AppInput.vue";
 import AppButton from "@/components/common/AppButton.vue";
 import { ref, watch, defineProps } from "vue";
-import { useClientStore } from "@/stores/useClientStore"; 
+import { useClientStore } from "@/stores/useClientStore";
 
 const props = defineProps({
   client: {
@@ -83,24 +76,23 @@ const props = defineProps({
       phone: "",
       email: "",
       address: "",
-      id_headquarters: null  // Agrega id_headquarters al default
+      id_headquarters: null, // Agrega id_headquarters al default
     }),
   },
   headquartersId: {
     type: [String, Number],
     required: false,
-    default: null
+    default: null,
   },
   isEdit: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
-const emit = defineEmits(["submit", "close", "open-pets-form"]);
+const emit = defineEmits(["submit", "close", "delete"]);
 
 const clientStore = useClientStore(); // Inicializa la store
-const hasPet = ref(false);
 
 // Define client as a ref
 const client = ref({ ...props.client });
@@ -115,7 +107,7 @@ watch(
 );
 
 const handleSubmit = (event) => {
-   event?.preventDefault?.(); 
+  event?.preventDefault?.();
   client.value.id_headquarters = props.headquartersId;
   emit("submit", { ...client.value }, event);
 };
@@ -124,12 +116,8 @@ const close = () => {
   emit("close");
 };
 
-const openPetsForm = () => {
-  emit("open-pets-form");
-};
-
 const handleDelete = () => {
-  if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+  if (confirm("¿Estás seguro de que quieres eliminar este cliente?")) {
     emit("delete", props.client);
   }
 };
