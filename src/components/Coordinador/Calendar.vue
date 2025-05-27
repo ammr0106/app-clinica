@@ -76,8 +76,6 @@ const calendarDays = computed(() => {
   return daysArray;
 });
 
-
-
 // Sincroniza currentDate con selectedMonth y selectedYear.
 watch(
   () => [props.selectedMonth, props.selectedYear],
@@ -87,14 +85,22 @@ watch(
 );
 
 function prevMonth() {
-  const prev = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1);
+  const prev = new Date(
+    currentDate.value.getFullYear(),
+    currentDate.value.getMonth() - 1,
+    1
+  );
   currentDate.value = prev;
   emit("changeMonth", prev.getMonth());
   emit("changeYear", prev.getFullYear());
 }
 
 function nextMonth() {
-  const next = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
+  const next = new Date(
+    currentDate.value.getFullYear(),
+    currentDate.value.getMonth() + 1,
+    1
+  );
   currentDate.value = next;
   emit("changeMonth", next.getMonth());
   emit("changeYear", next.getFullYear());

@@ -38,11 +38,18 @@
           @delete-cita="handleDeleteCita"
         />
         <!-- Componente que muestra las citas -->
-        <DatesToday
-        :fecha="new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"
-        :citas="citasHoy"
-        @update-cita="handleUpdateCita"
-        @delete-cita="handleDeleteCita"
+        <DatesTomorrow
+          :fecha="
+            new Date(Date.now() + 24*60*60*1000).toLocaleDateString(undefined, {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          "
+          :citas="citasTomorrow"
+          @update-cita="handleUpdateCita"
+          @delete-cita="handleDeleteCita"
         />
       </div>
     </main>
@@ -55,7 +62,7 @@ import { ref, provide, computed, watch, onMounted } from "vue";
 // Importaciones de componentes
 import Header from "@/components/common/Header.vue";
 import Dates from "@/components/Coordinador/Dates.vue";
-import DatesToday from "@/components/Coordinador/DatesToday.vue";
+import DatesTomorrow from "@/components/Coordinador/DatesTomorrow.vue";
 import Calendar from "@/components/Coordinador/Calendar.vue";
 import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
 // Importamos el store de citas
@@ -68,7 +75,7 @@ const {
   selectedYear,
   citas,
   citasDelDia,
-  citasHoy,
+  citasTomorrow,
   fechaFormateada,
   handleChangeMonth,
   handleChangeYear,
@@ -77,7 +84,6 @@ const {
   handleUpdateCita,
   handleDeleteCita,
 } = useCalendar();
-
 
 // Inicializamos el store
 const appointmentStore = useAppointmentStore();
@@ -113,7 +119,6 @@ const fecha = computed(() => {
     day: "numeric", // Día numérico
   });
 });
-
 </script>
 
 <style scoped>

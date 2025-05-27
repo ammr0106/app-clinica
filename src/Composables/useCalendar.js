@@ -2,7 +2,7 @@ import { ref, computed, watch } from "vue";
 
 // Estado reactivo para el día, mes y año seleccionados
 export function useCalendar(appointmentsSource = []) {
-  const selectedDay = ref(null);
+  const selectedDay = ref(new Date().getDate());
   const selectedMonth = ref(new Date().getMonth());
   const selectedYear = ref(new Date().getFullYear());
   const citas = ref([...appointmentsSource]);
@@ -13,7 +13,9 @@ export function useCalendar(appointmentsSource = []) {
   // Fecha seleccionada en formato YYYY-MM-DD
   const selectedDate = computed(() =>
     selectedDay.value
-      ? `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(selectedDay.value)}`
+      ? `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(
+          selectedDay.value
+        )}`
       : ""
   );
 
@@ -23,17 +25,27 @@ export function useCalendar(appointmentsSource = []) {
     return citas.value.filter((c) => c.date === selectedDate.value);
   });
 
-  // Citas de hoy
-  const citasHoy = computed(() => {
+
+  // Citas de mañana
+  const citasTomorrow = computed(() => {
     const hoy = new Date();
-    const fechaHoy = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())}`;
-    return citas.value.filter((c) => c.date === fechaHoy);
+    const tomorrow = new Date(hoy);
+    tomorrow.setDate(hoy.getDate() + 1);
+    const fechaTomorrow = `${tomorrow.getFullYear()}-${pad(
+      tomorrow.getMonth() + 1
+    )}-${pad(tomorrow.getDate())}`;
+    console.log("Citas de mañana:", citasTomorrow.value);
+    return citas.value.filter((c) => c.date === fechaTomorrow);
   });
 
   // Fecha seleccionada formateada para mostrar
   const fechaFormateada = computed(() => {
     if (!selectedDay.value) return "";
-    const dateObj = new Date(selectedYear.value, selectedMonth.value, selectedDay.value);
+    const dateObj = new Date(
+      selectedYear.value,
+      selectedMonth.value,
+      selectedDay.value
+    );
     return dateObj.toLocaleDateString(undefined, {
       weekday: "long",
       year: "numeric",
@@ -55,19 +67,20 @@ export function useCalendar(appointmentsSource = []) {
     selectedDay.value = null;
   }
 
-
   // Crear nueva cita
   function handleCreateDate(dateInfo) {
-    const date = `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(dateInfo.day)}`;
-    citas.value.push({
-      id: Date.now(),
-      date,
-      nombre: dateInfo.patient,
-      hora: dateInfo.time,
-      descripcion: dateInfo.description,
-      // ...otros campos
-    });
-  }
+  const date = `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(
+    dateInfo.day
+  )}`;
+  citas.value.push({
+    id: Date.now(),
+    date,
+    client_name: dateInfo.patient, // Usa el mismo campo que el backend
+    hora: dateInfo.time,
+    descripcion: dateInfo.description,
+    // ...otros campos
+  });
+}
 
   // Actualizar cita
   function handleUpdateCita({ editedCita, index }) {
@@ -94,7 +107,7 @@ export function useCalendar(appointmentsSource = []) {
     selectedYear,
     citas,
     citasDelDia,
-    citasHoy,
+    citasTomorrow,
     fechaFormateada,
     selectedDate,
     handleChangeMonth,
