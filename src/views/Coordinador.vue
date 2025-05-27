@@ -22,9 +22,11 @@
           <!-- Componente de calendario -->
           <Calendar
             :selectedDay="selectedDay"
+            :selectedMonth="selectedMonth"
+            :selectedYear="selectedYear"
             @selectDay="handleDaySelected"
-            @changeMonth="(newMonth) => (selectedMonth.value = newMonth)"
-            @changeYear="(newYear) => (selectedYear.value = newYear)"
+            @changeMonth="handleChangeMonth"
+            @changeYear="handleChangeYear"
           />
         </div>
 
@@ -109,15 +111,15 @@ function handleDaySelected(day) {
 
 // Función que maneja la creación de nuevas citas
 function handleCreateDate(dateInfo) {
-  // Añade nueva cita al array
+  const pad = (n) => n.toString().padStart(2, '0');
+  const date = `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(dateInfo.day)}`;
   citas.value.push({
     id: Date.now(), // ID único basado en timestamp
-    day: dateInfo.day, // Día de la cita
-    month: selectedMonth.value, // Mes actual
-    year: selectedYear.value, // Año actual
+    date, // <-- ¡Clave para el filtrado!
     nombre: dateInfo.patient, // Nombre del paciente
     hora: dateInfo.time, // Hora de la cita
     descripcion: dateInfo.description, // Descripción
+    // Puedes añadir otros campos si los necesitas
   });
 }
 
@@ -147,7 +149,17 @@ const citasDelDia = computed(() => {
   const pad = (n) => n.toString().padStart(2, '0');
   const selectedDate = `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(selectedDay.value)}`;
   return citas.value.filter((c) => c.date === selectedDate);
+  console.log("Dia seleccionado:", selectedDay.value);
 });
+
+function handleChangeMonth(newMonth) {
+  selectedMonth.value = newMonth;
+  selectedDay.value = null; // Resetea el día seleccionado
+}
+function handleChangeYear(newYear) {
+  selectedYear.value = newYear;
+  selectedDay.value = null; // Resetea el día seleccionado
+}
 
 // Función que maneja la actualización de citas existentes
 function handleUpdateCita({ editedCita, index }) {
