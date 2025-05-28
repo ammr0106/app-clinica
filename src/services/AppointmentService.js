@@ -51,6 +51,10 @@ export async function fetchAppointments() {
   return data
 }
 
+export async function fetchFormularData() {
+  
+}
+
 /**
  * @param {AppointmentInput} appointmentData
  * @returns {Promise<{ error: any }>}

@@ -67,40 +67,7 @@ export function useCalendar(appointmentsSource = []) {
     selectedDay.value = null;
   }
 
-  // Crear nueva cita
-  function handleCreateDate(dateInfo) {
-  const date = `${selectedYear.value}-${pad(selectedMonth.value + 1)}-${pad(
-    dateInfo.day
-  )}`;
-  citas.value.push({
-    id: Date.now(),
-    date,
-    client_name: dateInfo.patient, // Usa el mismo campo que el backend
-    hora: dateInfo.time,
-    descripcion: dateInfo.description,
-    // ...otros campos
-  });
-}
-
-  // Actualizar cita
-  function handleUpdateCita({ editedCita, index }) {
-    citas.value[index] = editedCita;
-  }
-
-  // Eliminar cita
-  function handleDeleteCita(id) {
-    citas.value = citas.value.filter((cita) => cita.id !== id);
-  }
-
-  // Sincronizar con localStorage si lo necesitas
-  watch(
-    citas,
-    (newCitas) => {
-      localStorage.setItem("citas", JSON.stringify(newCitas));
-    },
-    { deep: true }
-  );
-
+  
   return {
     selectedDay,
     selectedMonth,
@@ -113,8 +80,5 @@ export function useCalendar(appointmentsSource = []) {
     handleChangeMonth,
     handleChangeYear,
     handleDaySelected,
-    handleCreateDate,
-    handleUpdateCita,
-    handleDeleteCita,
   };
 }

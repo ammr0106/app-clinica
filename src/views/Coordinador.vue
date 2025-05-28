@@ -1,18 +1,9 @@
 <template>
-  <!-- Contenedor principal del coordinador -->
   <div class="coordinador-container">
-    <!-- Componente de encabezado -->
     <Header />
 
-    <!-- Contenido principal -->
     <main class="main-content">
-      <!-- Sección de acciones -->
       <div class="acciones">
-        <!-- Componente para crear nuevas citas -->
-        <MakeDateBtn
-          :selectedDay="selectedDay"
-          @create-date="handleCreateDate"
-        />
         <AppButton @click="showModal = true">Crear cita</AppButton>
       </div>
 
@@ -32,12 +23,7 @@
         <!-- Citas a la derecha -->
         <div class="contenido">
           <!-- Componente que muestra las citas -->
-          <Dates
-            :fecha="fecha"
-            :citas="citasDelDia"
-            @update-cita="handleUpdateCita"
-            @delete-cita="handleDeleteCita"
-          />
+          <Dates :fecha="fecha" :citas="citasDelDia" />
           <!-- Componente que muestra las citas -->
           <DatesTomorrow
             :fecha="
@@ -70,9 +56,6 @@
 </template>
 
 <script setup>
-
-// Importaciones de Supabase
-import { supabase } from '../services/DatabaseConnection.js'
 // Importaciones de Vue
 import { ref, provide, computed, watch, onMounted } from "vue";
 // Importaciones de componentes
@@ -84,9 +67,9 @@ import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
 // Importamos el store de citas
 import { useAppointmentStore } from "@/stores/useAppointmentStore";
 import { useCalendar } from "@/Composables/useCalendar";
-import AppButton from '@/components/common/AppButton.vue';
-import Modal from '@/components/common/Modal.vue';
-import MakeDateForm from '@/components/Coordinador/MakeDateForm.vue';
+import AppButton from "@/components/common/AppButton.vue";
+import Modal from "@/components/common/Modal.vue";
+import MakeDateForm from "@/components/Coordinador/MakeDateForm.vue";
 
 const {
   selectedDay,
@@ -99,9 +82,6 @@ const {
   handleChangeMonth,
   handleChangeYear,
   handleDaySelected,
-  handleCreateDate,
-  handleUpdateCita,
-  handleDeleteCita,
 } = useCalendar();
 
 // Inicializamos el store
@@ -143,7 +123,6 @@ const fecha = computed(() => {
 });
 </script>
 
-
 <style scoped>
 .coordinador-container {
   background-color: #f0fdfc;
@@ -158,7 +137,9 @@ const fecha = computed(() => {
 }
 
 .acciones {
-  padding: 1rem 0;
+  margin: 0px 0 20px 0;
+  width: 8%;
+  min-width: 100px;
 }
 
 .layout {

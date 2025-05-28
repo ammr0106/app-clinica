@@ -117,15 +117,10 @@ async function submit() {
     mascota: form.pet, // Mascota
     day: props.selectedDay, // Día recibido como prop
   };
-
-  emit("save", nuevaCita); // Emitimos el evento 'save' con la nueva cita
-  close(); // Cerramos el modal
+  emit('close');
+  emit("save", nuevaCita);
 }
 
-// Función para emitir el cierre del modal
-function close() {
-  emit("close");
-}
 </script>
 
 <style>
