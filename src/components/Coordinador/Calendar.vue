@@ -31,63 +31,79 @@
   </div>
 </template>
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue' // Importamos herramientas de Vue para reactividad y propiedades computadas
 
+// Definimos los eventos que este componente puede emitir
 const emit = defineEmits(['selectDay', 'changeMonth', 'changeYear'])
+
+// Definimos las props que este componente recibe
 const props = defineProps({
   selectedDay: {
     type: Number,
-    default: null,
+    default: null, // Día seleccionado inicialmente
   },
 })
 
+// Obtenemos la fecha actual
 const today = new Date()
+// Variable reactiva para manejar la fecha actual mostrada en el calendario
 const currentDate = ref(new Date())
+// Días de la semana en formato corto
 const days = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 
+// Nombre del mes actual, calculado dinámicamente
 const monthName = computed(() =>
   currentDate.value.toLocaleString('default', { month: 'long' })
 )
 
+// Función que devuelve el número de días de un mes dado
 const getDaysInMonth = (year, month) =>
   new Date(year, month + 1, 0).getDate()
 
+// Función que devuelve el día de la semana en el que empieza el mes
 const getStartDayOfMonth = (year, month) =>
   new Date(year, month, 1).getDay()
 
+// Calculamos los días a mostrar en el calendario, incluyendo espacios vacíos al principio
 const calendarDays = computed(() => {
   const year = currentDate.value.getFullYear()
   const month = currentDate.value.getMonth()
   const daysInMonth = getDaysInMonth(year, month)
   const startDay = getStartDayOfMonth(year, month)
 
+  // Rellenamos los días vacíos antes del inicio del mes
   const daysArray = Array(startDay).fill(null)
+  // Añadimos todos los días del mes
   for (let i = 1; i <= daysInMonth; i++) {
     daysArray.push(i)
   }
 
-  return daysArray
+  return daysArray // Devolvemos el array para que el componente lo pinte
 })
 
+// Función para ir al mes anterior
 function prevMonth() {
   currentDate.value.setMonth(currentDate.value.getMonth() - 1)
-  currentDate.value = new Date(currentDate.value)
-  emit('changeMonth', currentDate.value.getMonth())
-  emit('changeYear', currentDate.value.getFullYear())
+  currentDate.value = new Date(currentDate.value) // Se fuerza el refresco
+  emit('changeMonth', currentDate.value.getMonth()) // Emitimos el nuevo mes
+  emit('changeYear', currentDate.value.getFullYear()) // Emitimos el nuevo año
 }
 
+// Función para ir al mes siguiente
 function nextMonth() {
   currentDate.value.setMonth(currentDate.value.getMonth() + 1)
-  currentDate.value = new Date(currentDate.value)
-  emit('changeMonth', currentDate.value.getMonth())
-  emit('changeYear', currentDate.value.getFullYear())
+  currentDate.value = new Date(currentDate.value) // Se fuerza el refresco
+  emit('changeMonth', currentDate.value.getMonth()) // Emitimos el nuevo mes
+  emit('changeYear', currentDate.value.getFullYear()) // Emitimos el nuevo año
 }
 
+// Función que emite el día seleccionado, si es válido
 function selectDay(day) {
-  if (!day) return
-  emit('selectDay', day)
+  if (!day) return // Evita emitir si es un hueco vacío
+  emit('selectDay', day) // Emitimos el día seleccionado
 }
 </script>
+
 
 
 <style scoped>

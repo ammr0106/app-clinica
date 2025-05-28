@@ -20,12 +20,12 @@
         <!-- Contenedor del calendario -->
         <div class="calendario">
           <!-- Componente de calendario -->
-          <Calendar 
-            :selectedDay="selectedDay"             
-            @selectDay="handleDaySelected"       
-            @changeMonth="(newMonth) => selectedMonth.value = newMonth"  
-            @changeYear="(newYear) => selectedYear.value = newYear"      
-          />
+           <Calendar 
+    :selectedDay="selectedDay"             
+    @selectDay="handleDaySelected"       
+    @changeMonth="handleMonthChange"  
+    @changeYear="handleYearChange"    
+  />
         </div>
 
         <!-- Componente que muestra las citas -->
@@ -33,7 +33,7 @@
           :fecha="fecha"                          
           :citas="citasDelDia"                    
           @update-cita="handleUpdateCita"          
-          @delete-cita="handleDeleteCita"          
+          @delete="eliminarCita"          
         />
       </div>
     </main>
@@ -41,8 +41,11 @@
 </template>
 
 <script setup>
+
+// Importaciones de Supabase
+import { supabase } from '../services/DatabaseConnection.js'
 // Importaciones de Vue
-import { ref, provide, computed, watch } from 'vue'
+import { ref, provide, computed, watch, onMounted } from 'vue'
 // Importaciones de componentes
 import Header from '@/components/Header.vue'
 import Dates from '@/components/Coordinador/Dates.vue'
@@ -59,68 +62,79 @@ const selectedYear = ref(new Date().getFullYear())
 // Provee el día seleccionado a componentes hijos
 provide('selectedDay', selectedDay)
 
+function handleMonthChange(newMonth) {
+  selectedMonth.value = newMonth // Asignamos directamente al .value de la ref
+}
+
+function handleYearChange(newYear) {
+  selectedYear.value = newYear // Asignamos directamente al .value de la ref
+}
 // Estado reactivo para almacenar todas las citas
 const citas = ref([])
 
-// Intenta cargar citas desde localStorage
-const storedCitas = localStorage.getItem('citas')
-// Si hay citas almacenadas
-if (storedCitas) {
-  try {
-    // Parsea las citas desde JSON
-    citas.value = JSON.parse(storedCitas)
-  } catch (e) {
-    // Maneja errores de parsing
-    console.error('Error parsing citas from localStorage', e)
+// 👉 1. Cargar citas desde Supabase
+async function cargarCitas() {
+  const { data, error } = await supabase.from('Dates').select('*')
+  if (error) {
+    console.error('Error cargando citas:', error.message)
+  } else {
+    citas.value = data.map((cita) => {
+      const fecha = new Date(cita.created_at)
+      return {
+        ...cita,
+        day: fecha.getDate(),
+        month: fecha.getMonth(),
+        year: fecha.getFullYear(),
+        hora: fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }
+    })
   }
 }
 
-// Watcher que observa cambios en las citas
-watch(citas, (newCitas) => {
-  // Guarda las citas en localStorage cuando cambian
-  localStorage.setItem('citas', JSON.stringify(newCitas))
-}, { deep: true }) // Observa cambios profundos en el array
+// 👉 2. Insertar nueva cita en Supabase
+async function handleCreateDate(dateInfo) {
+  // Guarda en el estado local
+  const nuevaCita = {
+    id: Date.now(),
+    day: dateInfo.day,
+    month: selectedMonth.value,
+    year: selectedYear.value,
+    nombre: dateInfo.nombre,
+    hora: dateInfo.hora,
+    descripcion: dateInfo.descripcion,
+    especialidad: dateInfo.especialidad,
+    dni: dateInfo.dni,
+    confirmada: dateInfo.confirmada,
+    mascota: dateInfo.mascota,
+  }
 
-// Función que maneja la selección de día desde el calendario
-function handleDaySelected(day) {
-  // Actualiza el día seleccionado
-  selectedDay.value = day
+  citas.value.push(nuevaCita)
+
+  // Guarda en Supabase
+  const { error } = await supabase.from('Dates').insert([{
+    DNI: nuevaCita.dni,
+    Nombre: nuevaCita.nombre,
+    Especialidad: nuevaCita.especialidad,
+    Descripcion: nuevaCita.descripcion,
+    Confirmada: nuevaCita.confirmada,
+    Mascota: nuevaCita.mascota,
+    Hora: nuevaCita.hora,
+    Dia: nuevaCita.day,
+    Mes: nuevaCita.month +1,
+    Anio: nuevaCita.year
+  }])
+
+  if (error) {
+    console.error('Error al guardar en Supabase:', error.message)
+    alert('Error al guardar la cita en Supabase.')
+  } else {
+    console.log('Cita guardada correctamente en Supabase.')
+  }
 }
 
-// Función que maneja la creación de nuevas citas
-function handleCreateDate(dateInfo) {
-  // Añade nueva cita al array
-  citas.value.push({
-    id: Date.now(), // ID único basado en timestamp
-    day: dateInfo.day, // Día de la cita
-    month: selectedMonth.value, // Mes actual
-    year: selectedYear.value, // Año actual
-    nombre: dateInfo.patient, // Nombre del paciente
-    hora: dateInfo.time, // Hora de la cita
-    descripcion: dateInfo.description, // Descripción
-  })
-}
-
-// Computed property que formatea la fecha seleccionada
-const fecha = computed(() => {
-  // Si no hay día seleccionado, retorna string vacío
-  if (!selectedDay.value) return ''
-  // Crea objeto Date con los valores seleccionados
-  const dateObj = new Date(selectedYear.value, selectedMonth.value, selectedDay.value)
-  // Retorna fecha formateada
-  return dateObj.toLocaleDateString(undefined, {
-    weekday: 'long',   // Nombre completo del día
-    year: 'numeric',   // Año numérico
-    month: 'long',     // Nombre completo del mes
-    day: 'numeric',    // Día numérico
-  })
-})
-
-// Computed property que filtra las citas del día seleccionado
+// 👉 3. Filtrar citas del día seleccionado
 const citasDelDia = computed(() => {
-  // Si no hay día seleccionado, retorna array vacío
   if (!selectedDay.value) return []
-  // Filtra citas que coincidan con día, mes y año seleccionados
   return citas.value.filter(
     c =>
       c.day === selectedDay.value &&
@@ -129,20 +143,53 @@ const citasDelDia = computed(() => {
   )
 })
 
-// Función que maneja la actualización de citas existentes
+// 👉 4. Formatear fecha
+const fecha = computed(() => {
+  if (!selectedDay.value) return ''
+  const dateObj = new Date(selectedYear.value, selectedMonth.value, selectedDay.value)
+  return dateObj.toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+})
+
+// 👉 5. Selección de día
+function handleDaySelected(day) {
+  // Actualiza el día seleccionado
+  selectedDay.value = day
+}
+
+// 👉 6. Editar cita (a nivel local; puedes extenderlo para que actualice también en Supabase)
 function handleUpdateCita({ editedCita, index }) {
   // Reemplaza la cita en el índice especificado
   citas.value[index] = editedCita
 }
 
-// Función que maneja la eliminación de citas
-function handleDeleteCita(id) {
-  // Filtra el array para eliminar la cita con el ID especificado
-  citas.value = citas.value.filter(cita => cita.id !== id)
-  // Actualiza localStorage con el nuevo array
-  localStorage.setItem('citas', JSON.stringify(citas.value))
+// 👉 7. Eliminar cita desde Supabase y actualizar estado local
+async function handleDeleteCita(id) {
+  // Elimina la cita en Supabase
+  const { error } = await supabase.from('Dates').delete().eq('id', id)
+  if (error) {
+    console.error('Error eliminando cita:', error.message)
+  } else {
+    // Si se elimina correctamente, recarga las citas desde Supabase
+    await cargarCitas()
+  }
 }
+
+// 👉 8. Cargar citas al montar componente
+onMounted(() => {
+  cargarCitas()
+})
+
+// 👉 9. Guardar citas en localStorage cuando haya cambios
+watch(citas, (newCitas) => {
+  localStorage.setItem('citas', JSON.stringify(newCitas))
+}, { deep: true }) // Observa cambios profundos en el array
 </script>
+
 
 <style scoped>
 .coordinador-container {

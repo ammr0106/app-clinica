@@ -1,21 +1,28 @@
 <template>
-  <!-- Botón que al hacer clic llama a confirmDelete -->
-  <button class="delete-btn" @click="confirmDelete">
+  <button class="delete-btn" @click="handleDelete">
     Eliminar cita
   </button>
 </template>
 
 <script setup>
-// Definimos que este componente emitirá un evento llamado 'delete'
-const emit = defineEmits(['delete'])
+// Importamos las funciones necesarias de Vue para definir eventos y props
+import { defineEmits, defineProps } from 'vue'
 
-// Función que muestra un confirm modal al usuario antes de eliminar
-function confirmDelete() {
-  // Si el usuario confirma que quiere eliminar la cita
-  if (confirm('¿Estás seguro de que quieres eliminar esta cita?')) {
-    // Emitimos el evento 'delete' para que el componente padre actúe
-    emit('delete')
+// Definimos los eventos que este componente puede emitir: 'delete' y 'close'
+const emit = defineEmits(['delete', 'close'])
+
+// Definimos las propiedades que este componente espera recibir
+const props = defineProps({
+  citaId: {
+    type: Number,     // El ID de la cita que se va a eliminar
+    required: true    // Es obligatorio recibir esta prop
   }
+})
+
+// Función que se ejecuta cuando se quiere eliminar la cita
+function handleDelete() {
+  emit('delete', props.citaId) // Emitimos el evento 'delete' pasando el ID de la cita
+  emit('close')                // También emitimos el evento 'close' para cerrar el modal
 }
 </script>
 
@@ -24,19 +31,14 @@ function confirmDelete() {
   background-color: #d32f2f;
   color: white;
   border: none;
+  padding: 0.6rem 1rem;
   border-radius: 8px;
-  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
-  width: 100%;
+  transition: background 0.3s ease;
+  font-weight: bold;
 }
 
 .delete-btn:hover {
   background-color: #b71c1c;
-  scale: 1.05;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: 0.3s ease;
 }
 </style>

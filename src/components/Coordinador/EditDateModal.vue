@@ -23,7 +23,13 @@
           <button type="submit">Guardar</button>
 
           <!-- Botón para eliminar la cita, llama a handleDelete -->
-          <DeleteDateBtn @delete="handleDelete" />
+          <DeleteDateBtn
+            :citaId="editedCita.id"
+            @delete="eliminarCita"
+            @close="emit('close')"
+/>
+
+
 
           <!-- Botón para cerrar el modal sin guardar -->
           <button type="button" @click="close">Cancelar</button>
@@ -36,6 +42,7 @@
 <script setup>
 import { reactive, watch } from 'vue'
 import DeleteDateBtn from './DeleteDateBtn.vue'
+import { supabase } from '@/services/DatabaseConnection.js'
 
 // Definimos los eventos que este componente puede emitir
 const emit = defineEmits(['close', 'save', 'delete'])
@@ -69,11 +76,26 @@ function close() {
 }
 
 // Función para manejar la eliminación de la cita
-function handleDelete() {
-  // Emitimos el evento 'delete' con el id de la cita a eliminar
-  emit('delete', editedCita.id)
-  // Cerramos el modal después de emitir el evento
-  emit('close')
+async function eliminarCita(id) {
+  try {
+    const { error } = await supabase
+      .from('Dates')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error al eliminar la cita:', error.message)
+      return
+    }
+
+    console.log('Cita eliminada con éxito')
+
+    // Actualiza la lista después de eliminar
+    await fetchCitas()
+
+  } catch (err) {
+    console.error('Error inesperado al eliminar la cita:', err.message || err)
+  }
 }
 </script>
 
@@ -170,7 +192,7 @@ textarea {
   margin-top: 1.5rem;
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 button {

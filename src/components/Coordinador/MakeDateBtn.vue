@@ -16,7 +16,8 @@
       v-if="showModal"
       :selectedDay="props.selectedDay"      
       @close="showModal = false"             
-      @save="handleSave"                      
+      @save="handleSave"  
+                          
     />
   </div>
 </template>
