@@ -3,11 +3,11 @@
     <Modal title="Confirmar eliminación" @close="handleCancel">
         <p>¿Estás seguro de que quieres eliminar este usuario?</p>
         <div class="btns">
-            <AppButton :disabled="loading" variant="primary"  @click="confirmDelete">
+            <AppButton :disabled="loading" variant="green"  @click="confirmDelete">
                 <span v-if="loading"> Eliminando...</span>
                 <span v-else>Sí, eliminar</span>
             </AppButton>
-            <AppButton :disabled="loading" variant="primary" @click="handleCancel">Cancelar</AppButton>
+            <AppButton :disabled="loading" variant="secondary" @click="handleCancel">Cancelar</AppButton>
         </div>
     </Modal>
 </template>

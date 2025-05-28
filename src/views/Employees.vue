@@ -56,11 +56,12 @@ function showNotification(message, type = 'success') {
 
 // Creación de las opciones del sidebar.
 const menuItems =[
-    { label: 'Inicio', path: '/coordinador'},
-    { label: 'Empleados', path:'/employees'}
+    { label: 'Inicio', path: '/coordinador' },
+    { label: 'Empleados', path: '/employees' },
+    { label: 'Clientes', path: '/clients' },
+    { label: 'Mascotas', path: '/pets' }
 ]   
 
-// 
 function onUserCreated() {
     showModalAddUser.value = false
     showNotification('Usuario creado correctamente.','success')
@@ -70,8 +71,11 @@ function onUserCreated() {
 <style scoped>
 .top-bar{
     display: flex;
+    width: 100%;
 }
 .addBtn{
-    width: 30%;
+   margin-top: 0;
+   width: 30%;
+   font-size: 1rem;
 }
 </style>
