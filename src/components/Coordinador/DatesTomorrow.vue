@@ -130,15 +130,12 @@ function handleDeleteCita(id) {
   background: linear-gradient(to bottom right, #177ca9, #15587b);
   color: white;
   padding: 1.5rem;
-  border-radius: 12px;
   margin-left: 1rem;
   flex-grow: 1;
   box-shadow: 0 8px 10px rgba(0, 0, 0, 0.25);
   font-family: "Segoe UI", sans-serif;
-  display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow-y: hidden;
 }
 
 h3 {
@@ -155,43 +152,36 @@ h3 {
   list-style: none;
   padding: 0;
   margin: 0;
-  width: 100%;
-  overflow-y: hidden;
 }
 
 table {
-  width: 100%;
   border-collapse: collapse;
 }
+
 thead {
   background-color: rgba(255, 255, 255, 0.1);
   padding: 0.8rem 1rem;
   margin-bottom: 0.5rem;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   backdrop-filter: blur(4px);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  width: 100%;
+}
+.cita-encabezado {
+  text-align: left;
+  color: #263238;
+  font-size: 1.2rem;
 }
 
 tbody {
   display: block;
-  max-height: 300px;   /* Ajusta el alto según tu diseño */
+  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
-  width: 100%;
 }
 .cita-card {
   background-color: rgba(255, 255, 255, 0.1);
   padding: 0.8rem 1rem;
   margin-bottom: 0.5rem;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   backdrop-filter: blur(4px);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
@@ -203,6 +193,7 @@ tbody {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+.cita-info,
 .cita-encabezado {
   display: grid;
   grid-template-columns:
@@ -215,28 +206,6 @@ tbody {
     2.5fr /* Nota */
     0.75fr; /* Mascota */
   gap: 1.5rem;
-  justify-content: space-between;
-  width: 100%;
-  text-align: left;
-  color: #263238;
-  font-size: 1.2rem;
-  width: 100%;
-}
-
-.cita-info {
-  display: grid;
-  grid-template-columns:
-    1.5fr /* Nombre */
-    0.5fr /* Hora */
-    2.5fr /* Razón */
-    0.75fr /* Especialidad */
-    1.5fr /* Trabajador */
-    0.75fr /* Estado */
-    2.5fr /* Nota */
-    0.75fr; /* Mascota */
-  gap: 1.5rem;
-  justify-content: space-between;
-  width: 100%;
 }
 
 .cita-info th {
@@ -260,34 +229,27 @@ tbody {
 }
 .cita-estado {
   border: 0px solid;
-  border-radius: 16px;
-  padding: 0.2rem 4rem;
+  padding: 0.2rem 1rem;
   font-weight: bold;
-  display: flex;
-  align-items: center;
   justify-content: center;
   text-align: center;
   height: 100%;
+  max-width: 100px;
+  min-width: auto;
 }
 .cita-estado.estado-pendiente {
   background: #ffffff;
   color: #263238;
-  max-width: 100px;
-  min-width: auto;
 }
 
 .cita-estado.estado-confirmada {
   background: #43a047;
   color: #263238;
-  max-width: 100px;
-  min-width: auto;
 }
 
 .cita-estado.estado-cancelada {
   background: #ef5350;
   color: #263238;
-  max-width: 100px;
-  min-width: auto;
 }
 
 .cita-vacia {
@@ -306,5 +268,34 @@ tbody {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(5px);
+}
+.cita-estado,
+.citas-container,
+.cita-card,
+thead {
+  border-radius: 12px;
+}
+.cita-estado,
+.citas-container thead {
+  display: flex;
+}
+.citas-list,
+table,
+thead,
+.cita-encabezado,
+tbody,
+.cita-info {
+  width: 100%;
+}
+thead,
+.cita-encabezado,
+.cita-card,
+.cita-info {
+  justify-content: space-between;
+}
+thead,
+.cita-estado,
+.cita-card {
+  align-items: center;
 }
 </style>
