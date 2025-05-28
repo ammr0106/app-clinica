@@ -23,7 +23,6 @@
 
 <script setup>
 import AppSideBar from "@/components/common/AppSideBar.vue";
-import MenuBurger from './MenuBurger.vue'
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
