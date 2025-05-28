@@ -2,47 +2,52 @@
   <AppForm @submit="handleSubmit">
     <div class="form-grid">
       <AppInput
-        v-model:modelValue="props.client.name"
+        v-model:modelValue="client.name"
         label="Nombre"
         placeholder="Ingrese el nombre"
         id="name"
         required
+        :error="errors.name"
       />
       <AppInput
-        v-model:modelValue="props.client.first_surname"
+        v-model:modelValue="client.first_surname"
         label="Primer Apellido"
         placeholder="Ingrese el primer apellido"
         id="first_surname"
         required
+        :error="errors.first_surname"
       />
       <AppInput
-        v-model:modelValue="props.client.second_surname"
+        v-model:modelValue="client.second_surname"
         label="Segundo Apellido"
         placeholder="Ingrese el segundo apellido"
         id="second_surname"
       />
       <AppInput
-        v-model:modelValue="props.client.DNI"
+        v-model:modelValue="client.DNI"
         label="DNI"
         placeholder="Ingrese el DNI"
         id="DNI"
         required
+        :error="errors.DNI"
       />
       <AppInput
-        v-model:modelValue="props.client.phone"
+        v-model:modelValue="client.phone"
         label="Teléfono"
         placeholder="Ingrese el teléfono"
         id="phone"
+        :error="errors.phone"
       />
       <AppInput
-        v-model:modelValue="props.client.email"
+        v-model:modelValue="client.email"
         label="Email"
         type="email"
         placeholder="Ingrese el email"
         id="email"
+        :error="errors.email"
       />
       <AppInput
-        v-model:modelValue="props.client.address"
+        v-model:modelValue="client.address"
         label="Dirección"
         placeholder="Ingrese la dirección"
         id="address"
@@ -61,7 +66,7 @@
 import AppForm from "@/components/common/AppForm.vue";
 import AppInput from "@/components/common/AppInput.vue";
 import AppButton from "@/components/common/AppButton.vue";
-import { ref, watch, defineProps } from "vue";
+import { ref, watch, defineProps, reactive } from "vue";
 import { useClientStore } from "@/stores/useClientStore";
 
 const props = defineProps({
@@ -97,6 +102,14 @@ const clientStore = useClientStore(); // Inicializa la store
 // Define client as a ref
 const client = ref({ ...props.client });
 
+const errors = reactive({
+  name: "",
+  first_surname: "",
+  DNI: "",
+  email: "",
+  phone: "",
+});
+
 // Watch for changes in the client prop and update the local client
 watch(
   () => props.client,
@@ -108,8 +121,17 @@ watch(
 
 const handleSubmit = (event) => {
   event?.preventDefault?.();
-  client.value.id_headquarters = props.headquartersId;
-  emit("submit", { ...client.value }, event);
+
+  errors.name = client.value.name ? "" : "El nombre es obligatorio.";
+  errors.first_surname = client.value.first_surname ? "" : "El primer apellido es obligatorio.";
+  errors.DNI = client.value.DNI ? "" : "El DNI es obligatorio.";
+  errors.email = client.value.email ? "" : "El email es obligatorio.";
+  errors.phone = client.value.phone ? "" : "El teléfono es obligatorio.";
+
+  if (Object.values(errors).every(error => !error)) {
+    client.value.id_headquarters = props.headquartersId;
+    emit("submit", { ...client.value }, event);
+  }
 };
 
 const close = () => {

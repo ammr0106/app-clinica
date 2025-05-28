@@ -7,6 +7,7 @@
         placeholder="Ingrese el nombre"
         id="name"
         required
+        :error="errors.name"
       />
       <AppInput
         v-model="pet.kind"
@@ -14,6 +15,7 @@
         placeholder="Ingrese el tipo"
         id="kind"
         required
+        :error="errors.kind"
       />
       <AppInput
         v-model="pet.breed"
@@ -32,6 +34,7 @@
         label="Número de Chip"
         placeholder="Ingrese el número de chip"
         id="chip_number"
+        :error="errors.chip_number"
       />
       <AppInput
         v-model="pet.observations"
@@ -52,7 +55,7 @@
 import AppForm from "@/components/common/AppForm.vue";
 import AppInput from "@/components/common/AppInput.vue";
 import AppButton from "@/components/common/AppButton.vue";
-import { defineProps, defineEmits, ref, watch } from "vue";
+import { defineProps, defineEmits, ref, watch, reactive } from "vue";
 
 const props = defineProps({
   pet: {
@@ -65,6 +68,12 @@ const emit = defineEmits(["submit", "close"]);
 
 // Define pet as a ref
 const pet = ref({ ...props.pet });
+
+const errors = reactive({
+  name: "",
+  kind: "",
+  chip_number: "",
+});
 
 // Watch for changes in the pet prop and update the local pet
 watch(
@@ -80,7 +89,13 @@ watch(
 );
 
 const handleSubmit = () => {
-  emit("submit", { ...pet.value });
+  errors.name = pet.value.name ? "" : "El nombre es obligatorio.";
+  errors.kind = pet.value.kind ? "" : "El tipo es obligatorio.";
+  errors.chip_number = /^\d+$/.test(pet.value.chip_number) || !pet.value.chip_number ? "" : "El número de chip debe contener solo dígitos.";
+
+  if (Object.values(errors).every(error => !error)) {
+    emit("submit", { ...pet.value });
+  }
 };
 
 const close = () => {
