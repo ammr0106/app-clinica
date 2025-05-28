@@ -91,8 +91,8 @@ function handleClick(e) {
   transition: background-color 0.3s ease;
 }
 
-.app-button--secondary:hover {
-  background-color: #C62828;
+.app-button--red:hover {
+  background-color: #c62828;
 }
 
 .app-button--primary {
@@ -112,7 +112,23 @@ function handleClick(e) {
 }
 
 .app-button--orange {
-    margin-top: 1rem;
+  margin-top: 1rem;
+  padding: 0.9rem;
+  background-color: #ff9800;
+  color: white;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.app-button--primary:hover {
+  background-color: #0d47a1;
+}
+
+.app-button--orange {
+  margin-top: 1rem;
   padding: 0.9rem;
   background-color: #ff9800;
   color: white;
@@ -128,8 +144,19 @@ function handleClick(e) {
 }
 
 .app-button:disabled {
-  background-color: #ccc ; 
-  color: #666 ; 
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.app-button--orange:hover {
+  background-color: #ef6c00;
+}
+
+.app-button:disabled {
+  background-color: #ccc;
+  color: #666;
   cursor: not-allowed;
   opacity: 0.7;
 }
