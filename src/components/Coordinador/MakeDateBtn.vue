@@ -24,7 +24,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import MakeDateModal from './MakeDateModal.vue'
+import MakeDateModal from './MakeDateForm.vue'
 
 // Recibimos el día seleccionado desde el componente padre
 const props = defineProps({

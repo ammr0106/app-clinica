@@ -13,6 +13,7 @@
           :selectedDay="selectedDay"
           @create-date="handleCreateDate"
         />
+        <AppButton @click="showModal = true">Crear cita</AppButton>
       </div>
 
       <!-- Sección de contenido principal -->
@@ -52,6 +53,14 @@
           @delete-cita="handleDeleteCita"
         />
       </div>
+
+      <Modal @close="showModal = false" v-if="showModal" title="Crear cita">
+        <MakeDateForm
+          :selectedDay="selectedDay"
+          @close="showModal = false"
+          @save="handleSave"
+        />
+      </Modal>
     </main>
   </div>
 </template>
@@ -71,6 +80,9 @@ import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
 // Importamos el store de citas
 import { useAppointmentStore } from "@/stores/useAppointmentStore";
 import { useCalendar } from "@/Composables/useCalendar";
+import AppButton from '@/components/common/AppButton.vue';
+import Modal from '@/components/common/Modal.vue';
+import MakeDateForm from '@/components/Coordinador/MakeDateForm.vue';
 
 const {
   selectedDay,
@@ -93,6 +105,9 @@ const appointmentStore = useAppointmentStore();
 
 // Provee el día seleccionado a componentes hijos
 provide("selectedDay", selectedDay);
+
+//Modal
+const showModal = ref(false);
 
 // Cargamos las citas si el array está vacío
 onMounted(async () => {

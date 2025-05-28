@@ -15,8 +15,8 @@
       >
         {{ option.label }}
       </option>
+      <slot></slot>
     </select>
-    <slot></slot>
     <p v-if="error" class="app-select__error">{{ error }}</p>
   </div>
 </template>
@@ -78,5 +78,11 @@ const model = computed({
 .app-select__error {
   color: var(--rojo-controlado);
   font-size: 0.85rem;
+}
+
+.app-select__field:focus {
+  outline: none;
+  border-color: var(--azul-profesional, #1565c0);
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
 }
 </style>
