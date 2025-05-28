@@ -51,6 +51,14 @@
         />
       </Modal>
     </main>
+
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="3000"
+      @hidden="notification.show = false"
+    />
   </div>
 </template>
 
@@ -69,6 +77,14 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useHeadquartersStore } from "@/stores/useHeadquartersStore";
 import AppSearchbar from "@/components/common/AppSearchbar.vue";
 import { useRoute } from "vue-router";
+import AppNotification from "@/components/common/AppNotification.vue";
+
+// Notificaciones
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success", // o "error", "warning", "info"
+});
 
 // Inicialización de stores
 const clientStore = useClientStore();
@@ -188,21 +204,38 @@ const handleCreateClient = async (clientData) => {
 
     if (!isValidHeadquarters) {
       console.error("Error: ID de sede inválido");
-      alert("Error: ID de sede inválido");
+      notification.value = {
+        show: true,
+        message: "Error: ID de sede inválido",
+        type: "error",
+      };
       return;
     }
 
     const error = await clientStore.createClient(clientData);
     if (error) {
       console.error("Error al crear cliente:", error);
-      alert("Error al crear cliente: " + error.message);
+      notification.value = {
+        show: true,
+        message: "Error al crear cliente: " + error.message,
+        type: "error",
+      };
     } else {
       clientStore.loadClients();
       closeClientForm();
+      notification.value = {
+        show: true,
+        message: "Cliente creado correctamente.",
+        type: "success",
+      };
     }
   } catch (error) {
     console.error("Error al crear cliente:", error);
-    alert("Error al crear cliente: " + error.message);
+    notification.value = {
+      show: true,
+      message: "Error al crear cliente: " + error.message,
+      type: "error",
+    };
   }
 };
 
@@ -220,7 +253,11 @@ const handleEditClient = async (clientData) => {
 
     if (!isValidHeadquarters) {
       console.error("Error: ID de sede inválido");
-      alert("Error: ID de sede inválido");
+      notification.value = {
+        show: true,
+        message: "Error: ID de sede inválido",
+        type: "error",
+      };
       return;
     }
 
@@ -242,14 +279,57 @@ const handleEditClient = async (clientData) => {
     );
     if (error) {
       console.error("Error al editar cliente:", error);
-      alert("Error al editar cliente: " + error.message);
+      notification.value = {
+        show: true,
+        message: "Error al editar cliente: " + error.message,
+        type: "error",
+      };
     } else {
       clientStore.loadClients();
       closeClientForm();
+      notification.value = {
+        show: true,
+        message: "Cliente editado correctamente.",
+        type: "success",
+      };
     }
   } catch (error) {
     console.error("Error al editar cliente:", error);
-    alert("Error al editar cliente: " + error.message);
+    notification.value = {
+      show: true,
+      message: "Error al editar cliente: " + error.message,
+      type: "error",
+    };
+  }
+};
+
+// Maneja la eliminación de un cliente existente
+const handleDeleteClient = async (clientToDelete) => {
+  try {
+    const error = await clientStore.removeClient(clientToDelete.id);
+    if (error) {
+      console.error("Error al eliminar cliente:", error);
+      notification.value = {
+        show: true,
+        message: "Error al eliminar cliente: " + error.message,
+        type: "error",
+      };
+    } else {
+      clientStore.loadClients();
+      closeClientForm();
+      notification.value = {
+        show: true,
+        message: "Cliente eliminado correctamente.",
+        type: "success",
+      };
+    }
+  } catch (error) {
+    console.error("Error al eliminar cliente:", error);
+    notification.value = {
+      show: true,
+      message: "Error al eliminar cliente: " + error.message,
+      type: "error",
+    };
   }
 };
 
@@ -293,14 +373,27 @@ const handlePetSubmit = async (petData) => {
     const error = await petStore.createPet(newPetData);
     if (error) {
       console.error("Error al crear mascota:", error);
-      alert("Error al crear mascota: " + error.message);
+      notification.value = {
+        show: true,
+        message: "Error al crear mascota: " + error.message,
+        type: "error",
+      };
     } else {
       petStore.loadPets();
       closePetsForm();
+      notification.value = {
+        show: true,
+        message: "Mascota creada correctamente.",
+        type: "success",
+      };
     }
   } catch (error) {
     console.error("Error al crear mascota:", error);
-    alert("Error al crear mascota: " + error.message);
+    notification.value = {
+      show: true,
+      message: "Error al crear mascota: " + error.message,
+      type: "error",
+    };
   }
 };
 </script>

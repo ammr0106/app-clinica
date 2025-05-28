@@ -38,6 +38,14 @@
         />
       </Modal>
     </main>
+
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="3000"
+      @hidden="notification.show = false"
+    />
   </div>
 </template>
 
@@ -50,6 +58,7 @@ import AppButton from "@/components/common/AppButton.vue";
 import Modal from "@/components/common/Modal.vue";
 import AppSearchbar from "@/components/common/AppSearchbar.vue";
 import { usePetsStore } from "@/stores/usePetStore";
+import AppNotification from "@/components/common/AppNotification.vue";
 
 // Inicialización del store de mascotas
 const petStore = usePetsStore();
@@ -126,14 +135,27 @@ const handleEditPetSubmit = async (petData) => {
     const error = await petStore.editPet(selectedPet.value.id, updatedPetData);
     if (error) {
       console.error("Error al editar mascota:", error);
-      alert("Error al editar mascota: " + error.message);
+      notification.value = {
+        show: true,
+        message: "Error al editar mascota: " + error.message,
+        type: "error",
+      };
     } else {
       petStore.loadPets();
       closePetForm();
+      notification.value = {
+        show: true,
+        message: "Mascota editada correctamente.",
+        type: "success",
+      };
     }
   } catch (error) {
     console.error("Error al editar mascota:", error);
-    alert("Error al editar mascota: " + error.message);
+    notification.value = {
+      show: true,
+      message: "Error al editar mascota: " + error.message,
+      type: "error",
+    };
   }
 };
 
@@ -144,18 +166,37 @@ const handleDeletePet = async () => {
       const error = await petStore.removePet(selectedPet.value.id);
       if (error) {
         console.error("Error al eliminar mascota:", error);
-        alert("Error al eliminar mascota: " + error.message);
+        notification.value = {
+          show: true,
+          message: "Error al eliminar mascota: " + error.message,
+          type: "error",
+        };
       } else {
         console.log("Mascota eliminada correctamente");
         petStore.loadPets();
         closePetForm();
+        notification.value = {
+          show: true,
+          message: "Mascota eliminada correctamente.",
+          type: "success",
+        };
       }
     } catch (error) {
       console.error("Error al eliminar mascota:", error);
-      alert("Error al eliminar mascota: " + error.message);
+      notification.value = {
+        show: true,
+        message: "Error al eliminar mascota: " + error.message,
+        type: "error",
+      };
     }
   }
 };
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
 </script>
 
 <style scoped>
