@@ -22,9 +22,17 @@
           <span class="cita-nombre">{{ cita.note }}</span>
           <span class="cita-especialidad">{{ cita.specialty_name }}</span>
           <span class="cita-trabajador">{{ cita.employee_name }}</span>
-          <span class="cita-estado">{{ cita.status }}</span>
+          <span
+            class="cita-estado"
+            :class="{
+              'estado-pendiente': cita.status === 'Pendiente',
+              'estado-confirmada': cita.status === 'Confirmado',
+              'estado-cancelada': cita.status === 'Cancelado',
+            }"
+          >
+            {{ cita.status }}
+          </span>
           <span class="cita-mascota">{{ cita.pet_name }} </span>
-        
         </div>
       </li>
 
@@ -108,12 +116,12 @@ function handleDeleteCita(id) {
   border-radius: 12px;
   margin-left: 1rem;
   flex-grow: 1;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.25);
   font-family: "Segoe UI", sans-serif;
-  min-height: 240px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  overflow-y: hidden;
 }
 
 h3 {
@@ -130,6 +138,8 @@ h3 {
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .cita-card {
@@ -143,6 +153,7 @@ h3 {
   backdrop-filter: blur(4px);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  width: 100%;
 }
 
 .cita-card:hover {
@@ -151,9 +162,28 @@ h3 {
 }
 
 .cita-info {
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    1.5fr /* Nombre */
+    0.5fr /* Hora */
+    2.5fr /* Razón */
+    0.75fr /* Especialidad */
+    1.5fr /* Trabajador */
+    0.75fr /* Estado */
+    2.5fr /* Nota */
+    0.75fr; /* Mascota */
+  gap: 1.5rem;
   justify-content: space-between;
   width: 100%;
+}
+
+.cita-info span {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
 }
 
 .cita-nombre {
@@ -164,6 +194,38 @@ h3 {
 .cita-hora {
   font-size: 0.9rem;
   color: #cbe9f3;
+  max-width: 20px;
+}
+.cita-estado {
+  border: 0px solid;
+  border-radius: 16px;
+  padding: 0.2rem 4rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+.cita-estado.estado-pendiente {
+  background: #ffffff;
+  color: #263238;
+  max-width: 100px;
+  min-width: auto;
+}
+
+.cita-estado.estado-confirmada {
+  background: #43a047;
+  color: #263238;
+  max-width: 100px;
+  min-width: auto;
+}
+
+.cita-estado.estado-cancelada {
+  background: #ef5350;
+  color: #263238;
+  max-width: 100px;
+  min-width: auto;
 }
 
 .cita-vacia {

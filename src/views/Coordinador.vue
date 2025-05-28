@@ -6,7 +6,6 @@
 
     <!-- Contenido principal -->
     <main class="main-content">
-
       <!-- Sección de acciones -->
       <div class="acciones">
         <!-- Componente para crear nuevas citas -->
@@ -17,8 +16,8 @@
       </div>
 
       <div class="layout">
-      <!-- Calendario a la izquierda -->
-       <div class="calendario">
+        <!-- Calendario a la izquierda -->
+        <div class="calendario">
           <!-- Componente de calendario -->
           <Calendar
             :selectedDay="selectedDay"
@@ -30,31 +29,33 @@
           />
         </div>
         <!-- Citas a la derecha -->
-      <div class="contenido">
-        
-        <!-- Componente que muestra las citas -->
-        <Dates
-          :fecha="fecha"
-          :citas="citasDelDia"
-          @update-cita="handleUpdateCita"
-          @delete-cita="handleDeleteCita"
-        />
-        <!-- Componente que muestra las citas -->
-        <DatesTomorrow
-          :fecha="
-            new Date(Date.now() + 24*60*60*1000).toLocaleDateString(undefined, {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-          "
-          :citas="citasTomorrow"
-          @update-cita="handleUpdateCita"
-          @delete-cita="handleDeleteCita"
-        />
+        <div class="contenido">
+          <!-- Componente que muestra las citas -->
+          <Dates
+            :fecha="fecha"
+            :citas="citasDelDia"
+            @update-cita="handleUpdateCita"
+            @delete-cita="handleDeleteCita"
+          />
+          <!-- Componente que muestra las citas -->
+          <DatesTomorrow
+            :fecha="
+              new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString(
+                undefined,
+                {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                }
+              )
+            "
+            :citas="citasTomorrow"
+            @update-cita="handleUpdateCita"
+            @delete-cita="handleDeleteCita"
+          />
+        </div>
       </div>
-       </div>
     </main>
   </div>
 </template>
@@ -151,18 +152,20 @@ const fecha = computed(() => {
 
 .contenido {
   flex: 2 1 0;
-  display: flex;
+  display: grid;
   flex-direction: column;
   flex: auto;
-  gap: 1.5rem;
-  overflow-y: auto;
-  min-width: 0;
+  width: 700px;
+  min-width: 600px;
+  max-width: 100%;
+  gap: 1rem;
 }
 
 .calendario {
   flex: 1 1 320px;
-  max-width: 350px;
-  min-width: 260px;
+  min-width: 350px;
+  max-width: 450px;
+  height: 350px;
   aspect-ratio: 1 / 1;
   background-color: #2e3b4e;
   color: white;
