@@ -16,9 +16,8 @@
         <AppButton @click="showModal = true">Crear cita</AppButton>
       </div>
 
-      <!-- Sección de contenido principal -->
-      <div class="contenido">
-        <!-- Contenedor del calendario -->
+      <div class="layout">
+        <!-- Calendario a la izquierda -->
         <div class="calendario">
           <!-- Componente de calendario -->
           <Calendar
@@ -30,28 +29,33 @@
             @changeYear="handleChangeYear"
           />
         </div>
-
-        <!-- Componente que muestra las citas -->
-        <Dates
-          :fecha="fecha"
-          :citas="citasDelDia"
-          @update-cita="handleUpdateCita"
-          @delete-cita="handleDeleteCita"
-        />
-        <!-- Componente que muestra las citas -->
-        <DatesTomorrow
-          :fecha="
-            new Date(Date.now() + 24*60*60*1000).toLocaleDateString(undefined, {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-          "
-          :citas="citasTomorrow"
-          @update-cita="handleUpdateCita"
-          @delete-cita="handleDeleteCita"
-        />
+        <!-- Citas a la derecha -->
+        <div class="contenido">
+          <!-- Componente que muestra las citas -->
+          <Dates
+            :fecha="fecha"
+            :citas="citasDelDia"
+            @update-cita="handleUpdateCita"
+            @delete-cita="handleDeleteCita"
+          />
+          <!-- Componente que muestra las citas -->
+          <DatesTomorrow
+            :fecha="
+              new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString(
+                undefined,
+                {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                }
+              )
+            "
+            :citas="citasTomorrow"
+            @update-cita="handleUpdateCita"
+            @delete-cita="handleDeleteCita"
+          />
+        </div>
       </div>
 
       <Modal @close="showModal = false" v-if="showModal" title="Crear cita">
@@ -147,35 +151,46 @@ const fecha = computed(() => {
 }
 
 .main-content {
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  height: calc((100vh - 64px) - 2rem); /* Ajusta según la altura del header */
 }
 
 .acciones {
-  display: flex;
-  gap: 1rem;
   padding: 1rem 0;
 }
 
-.btn {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+.layout {
+  display: flex;
+  gap: 2rem;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
 }
 
 .contenido {
-  display: flex;
+  flex: 2 1 0;
+  display: grid;
+  flex-direction: column;
+  flex: auto;
+  width: 700px;
+  min-width: 600px;
+  max-width: 100%;
   gap: 1rem;
 }
 
 .calendario {
-  flex: 1;
+  flex: 1 1 320px;
+  min-width: 350px;
+  max-width: 450px;
+  height: 350px;
+  aspect-ratio: 1 / 1;
   background-color: #2e3b4e;
   color: white;
   padding: 1rem;
   border-radius: 10px;
+  box-sizing: border-box;
+  align-self: flex-start;
 }
 </style>
