@@ -1,20 +1,34 @@
 <template>
   <div class="citas-container">
-    <h3>Citas para <span class="fecha">{{ fecha }}</span>:</h3>
+    <!-- Título con la fecha -->
+    <h3>
+      Citas para <span class="fecha">{{ fecha }}</span
+      >:
+    </h3>
 
     <transition-group name="fade" tag="ul" class="citas-list">
       <li
-  v-for="(cita, i) in citas"
-  :key="cita.id || i"
-  class="cita-card"
-  @click="openOptions(cita, i)"
->
-  <div class="cita-info">
-    <p><strong>Nombre:</strong> {{ cita.nombre }}</p>
-    <p><strong>DNI:</strong> {{ cita.dni }}</p>
-    <p><strong>Hora:</strong> {{ cita.hora }}</p>
-  </div>
-</li>
+        v-for="(cita, i) in citas"
+        :key="i"
+        class="cita-card"
+        @click="openOptions(cita, i)"
+      >
+        <div class="cita-info">
+          <span class="cita-nombre">{{ cita.client_name }}</span>
+          <span class="cita-hora">{{ cita.time }}</span>
+          <span class="cita-razon">{{ cita.reason }}</span>
+          <span class="cita-nombre">{{ cita.note }}</span>
+          <span class="cita-especialidad">{{ cita.specialty_name }}</span>
+          <span class="cita-trabajador">{{ cita.employee_name }}</span>
+          <span class="cita-estado">{{ cita.status }}</span>
+          <span class="cita-mascota">{{ cita.pet_name }} </span>
+        </div>
+      </li>
+
+      <!-- Si no hay citas, mostramos un mensaje -->
+      <li v-if="citas.length === 0" key="no-citas" class="cita-vacia">
+        No hay citas para este día.
+      </li>
     </transition-group>
 
     <div v-if="citas.length === 0" class="cita-vacia">
@@ -39,25 +53,21 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import EditDateModal from './EditDateModal.vue'
-import DeleteDateModal from './DeleteDateModal.vue'
-import { supabase } from '@/services/DatabaseConnection'
+import { ref, computed, watch } from "vue";
+import EditDateModal from "./EditDateModal.vue";
+import DeleteDateModal from "./DeleteDateModal.vue";
 
 const props = defineProps({
-  fecha: {
-    type: String,
-    required: true,
-  },
-})
+  fecha: String,
+  citas: Array,
+});
 
-const emit = defineEmits(['update-cita', 'delete-cita'])
+const emit = defineEmits(["update-cita", "delete-cita"]);
 
-const citas = ref([])
-const showEditModal = ref(false)
-const showDeleteModal = ref(false)
-const selectedCita = ref(null)
-const selectedIndex = ref(null)
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const selectedCita = ref(null);
+const selectedIndex = ref(null);
 
 watch(() => props.fecha, fetchCitas, { immediate: true })
 
@@ -143,29 +153,26 @@ async function fetchCitas() {
 
 
 function openOptions(cita, index) {
-  console.log('Cita seleccionada:', cita)
-  selectedCita.value = { ...cita }
-  selectedIndex.value = index
-  showEditModal.value = true
+  selectedCita.value = { ...cita };
+  selectedIndex.value = index;
+  showEditModal.value = true;
 }
 
 function closeModals() {
-  showEditModal.value = false
-  showDeleteModal.value = false
-  selectedCita.value = null
-  selectedIndex.value = null
+  showEditModal.value = false;
+  showDeleteModal.value = false;
+  selectedCita.value = null;
+  selectedIndex.value = null;
 }
 
 function handleSaveEdit(editedCita) {
-  console.log('Guardando cita editada:', editedCita)
-  emit('update-cita', { editedCita, index: selectedIndex.value })
-  closeModals()
+  emit("update-cita", { editedCita, index: selectedIndex.value });
+  closeModals();
 }
 
 function handleDeleteCita(id) {
-  console.log('Cita eliminada con ID:', id)
-  emit('delete-cita', id)
-  closeModals()
+  emit("delete-cita", id);
+  closeModals();
 }
 </script>
 
@@ -180,7 +187,7 @@ function handleDeleteCita(id) {
   margin-left: 1rem;
   flex-grow: 1;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   min-height: 240px;
   display: flex;
   flex-direction: column;

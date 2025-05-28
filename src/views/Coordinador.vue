@@ -9,9 +9,9 @@
       <!-- Sección de acciones -->
       <div class="acciones">
         <!-- Componente para crear nuevas citas -->
-        <MakeDateBtn 
-          :selectedDay="selectedDay"               
-          @create-date="handleCreateDate"          
+        <MakeDateBtn
+          :selectedDay="selectedDay"
+          @create-date="handleCreateDate"
         />
       </div>
 
@@ -20,20 +20,36 @@
         <!-- Contenedor del calendario -->
         <div class="calendario">
           <!-- Componente de calendario -->
-           <Calendar 
-    :selectedDay="selectedDay"             
-    @selectDay="handleDaySelected"       
-    @changeMonth="handleMonthChange"  
-    @changeYear="handleYearChange"    
-  />
+          <Calendar
+            :selectedDay="selectedDay"
+            :selectedMonth="selectedMonth"
+            :selectedYear="selectedYear"
+            @selectDay="handleDaySelected"
+            @changeMonth="handleChangeMonth"
+            @changeYear="handleChangeYear"
+          />
         </div>
 
         <!-- Componente que muestra las citas -->
         <Dates
-          :fecha="fecha"                          
-          :citas="citasDelDia"                    
-          @update-cita="handleUpdateCita"          
-          @delete="eliminarCita"          
+          :fecha="fecha"
+          :citas="citasDelDia"
+          @update-cita="handleUpdateCita"
+          @delete-cita="handleDeleteCita"
+        />
+        <!-- Componente que muestra las citas -->
+        <DatesTomorrow
+          :fecha="
+            new Date(Date.now() + 24*60*60*1000).toLocaleDateString(undefined, {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          "
+          :citas="citasTomorrow"
+          @update-cita="handleUpdateCita"
+          @delete-cita="handleDeleteCita"
         />
       </div>
     </main>
@@ -45,149 +61,67 @@
 // Importaciones de Supabase
 import { supabase } from '../services/DatabaseConnection.js'
 // Importaciones de Vue
-import { ref, provide, computed, watch, onMounted } from 'vue'
+import { ref, provide, computed, watch, onMounted } from "vue";
 // Importaciones de componentes
-import Header from '@/components/Header.vue'
-import Dates from '@/components/Coordinador/Dates.vue'
-import Calendar from '@/components/Coordinador/Calendar.vue'
-import MakeDateBtn from '@/components/Coordinador/MakeDateBtn.vue'
+import Header from "@/components/common/Header.vue";
+import Dates from "@/components/Coordinador/Dates.vue";
+import DatesTomorrow from "@/components/Coordinador/DatesTomorrow.vue";
+import Calendar from "@/components/Coordinador/Calendar.vue";
+import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
+// Importamos el store de citas
+import { useAppointmentStore } from "@/stores/useAppointmentStore";
+import { useCalendar } from "@/Composables/useCalendar";
 
-// Estado reactivo para el día seleccionado (inicialmente null)
-const selectedDay = ref(null)
-// Estado reactivo para el mes seleccionado (mes actual por defecto)
-const selectedMonth = ref(new Date().getMonth())
-// Estado reactivo para el año seleccionado (año actual por defecto)
-const selectedYear = ref(new Date().getFullYear())
+const {
+  selectedDay,
+  selectedMonth,
+  selectedYear,
+  citas,
+  citasDelDia,
+  citasTomorrow,
+  fechaFormateada,
+  handleChangeMonth,
+  handleChangeYear,
+  handleDaySelected,
+  handleCreateDate,
+  handleUpdateCita,
+  handleDeleteCita,
+} = useCalendar();
+
+// Inicializamos el store
+const appointmentStore = useAppointmentStore();
 
 // Provee el día seleccionado a componentes hijos
-provide('selectedDay', selectedDay)
+provide("selectedDay", selectedDay);
 
-function handleMonthChange(newMonth) {
-  selectedMonth.value = newMonth // Asignamos directamente al .value de la ref
-}
-
-function handleYearChange(newYear) {
-  selectedYear.value = newYear // Asignamos directamente al .value de la ref
-}
-// Estado reactivo para almacenar todas las citas
-const citas = ref([])
-
-// 👉 1. Cargar citas desde Supabase
-async function cargarCitas() {
-  const { data, error } = await supabase.from('Dates').select('*')
-  if (error) {
-    console.error('Error cargando citas:', error.message)
-  } else {
-    citas.value = data.map((cita) => {
-      const fecha = new Date(cita.created_at)
-      return {
-        ...cita,
-        day: fecha.getDate(),
-        month: fecha.getMonth(),
-        year: fecha.getFullYear(),
-        hora: fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
-    })
+// Cargamos las citas si el array está vacío
+onMounted(async () => {
+  if (!appointmentStore.appointments.length) {
+    console.log("📥 Cargando citas desde store...");
+    await appointmentStore.loadAppointments();
+    citas.value = appointmentStore.appointments;
+    console.log("Citas cargadas:", citas.value);
   }
-}
+});
 
-// 👉 2. Insertar nueva cita en Supabase
-async function handleCreateDate(dateInfo) {
-  // Guarda en el estado local
-  const nuevaCita = {
-    id: Date.now(),
-    day: dateInfo.day,
-    month: selectedMonth.value,
-    year: selectedYear.value,
-    nombre: dateInfo.nombre,
-    hora: dateInfo.hora,
-    descripcion: dateInfo.descripcion,
-    especialidad: dateInfo.especialidad,
-    dni: dateInfo.dni,
-    confirmada: dateInfo.confirmada,
-    mascota: dateInfo.mascota,
-  }
-
-  citas.value.push(nuevaCita)
-
-  // Guarda en Supabase
-  const { error } = await supabase.from('Dates').insert([{
-    DNI: nuevaCita.dni,
-    Nombre: nuevaCita.nombre,
-    Especialidad: nuevaCita.especialidad,
-    Descripcion: nuevaCita.descripcion,
-    Confirmada: nuevaCita.confirmada,
-    Mascota: nuevaCita.mascota,
-    Hora: nuevaCita.hora,
-    Dia: nuevaCita.day,
-    Mes: nuevaCita.month +1,
-    Anio: nuevaCita.year
-  }])
-
-  if (error) {
-    console.error('Error al guardar en Supabase:', error.message)
-    alert('Error al guardar la cita en Supabase.')
-  } else {
-    console.log('Cita guardada correctamente en Supabase.')
-  }
-}
-
-// 👉 3. Filtrar citas del día seleccionado
-const citasDelDia = computed(() => {
-  if (!selectedDay.value) return []
-  return citas.value.filter(
-    c =>
-      c.day === selectedDay.value &&
-      c.month === selectedMonth.value &&
-      c.year === selectedYear.value
-  )
-})
-
-// 👉 4. Formatear fecha
+// Computed property que formatea la fecha seleccionada
 const fecha = computed(() => {
-  if (!selectedDay.value) return ''
-  const dateObj = new Date(selectedYear.value, selectedMonth.value, selectedDay.value)
+  // Si no hay día seleccionado, retorna string vacío
+  if (!selectedDay.value) return "";
+  // Crea objeto Date con los valores seleccionados
+  const dateObj = new Date(
+    selectedYear.value,
+    selectedMonth.value,
+    selectedDay.value
+  );
+  // Retorna fecha formateada
   return dateObj.toLocaleDateString(undefined, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-})
-
-// 👉 5. Selección de día
-function handleDaySelected(day) {
-  // Actualiza el día seleccionado
-  selectedDay.value = day
-}
-
-// 👉 6. Editar cita (a nivel local; puedes extenderlo para que actualice también en Supabase)
-function handleUpdateCita({ editedCita, index }) {
-  // Reemplaza la cita en el índice especificado
-  citas.value[index] = editedCita
-}
-
-// 👉 7. Eliminar cita desde Supabase y actualizar estado local
-async function handleDeleteCita(id) {
-  // Elimina la cita en Supabase
-  const { error } = await supabase.from('Dates').delete().eq('id', id)
-  if (error) {
-    console.error('Error eliminando cita:', error.message)
-  } else {
-    // Si se elimina correctamente, recarga las citas desde Supabase
-    await cargarCitas()
-  }
-}
-
-// 👉 8. Cargar citas al montar componente
-onMounted(() => {
-  cargarCitas()
-})
-
-// 👉 9. Guardar citas en localStorage cuando haya cambios
-watch(citas, (newCitas) => {
-  localStorage.setItem('citas', JSON.stringify(newCitas))
-}, { deep: true }) // Observa cambios profundos en el array
+    weekday: "long", // Nombre completo del día
+    year: "numeric", // Año numérico
+    month: "long", // Nombre completo del mes
+    day: "numeric", // Día numérico
+  });
+});
 </script>
 
 
@@ -229,5 +163,4 @@ watch(citas, (newCitas) => {
   padding: 1rem;
   border-radius: 10px;
 }
-
 </style>

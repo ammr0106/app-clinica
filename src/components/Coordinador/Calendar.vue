@@ -9,98 +9,110 @@
     <div class="days-grid">
       <div class="day-name" v-for="(day, i) in days" :key="i">{{ day }}</div>
 
-  <div
-  v-for="(day, index) in calendarDays"
-  :key="index"
-  :class="[
-    'day',
-    day === today.getDate() &&
-    currentDate.getMonth() === today.getMonth() &&
-    currentDate.getFullYear() === today.getFullYear()
-      ? 'today'
-      : '',
-    day === props.selectedDay ? 'selected' : '',
-  ]"
-  @click="selectDay(day)"
->
-  {{ day || '' }}
-</div>
-
-
+      <div
+        v-for="(day, index) in calendarDays"
+        :key="index"
+        :class="[
+          'day',
+          day === today.getDate() &&
+          currentDate.getMonth() === today.getMonth() &&
+          currentDate.getFullYear() === today.getFullYear()
+            ? 'today'
+            : '',
+          day === props.selectedDay ? 'selected' : '',
+        ]"
+        @click="selectDay(day)"
+      >
+        {{ day || "" }}
+      </div>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, computed } from 'vue' // Importamos herramientas de Vue para reactividad y propiedades computadas
+import { ref, computed, watch } from "vue";
 
-// Definimos los eventos que este componente puede emitir
-const emit = defineEmits(['selectDay', 'changeMonth', 'changeYear'])
+const emit = defineEmits(["selectDay", "changeMonth", "changeYear"]);
+//Recibe también selectedMonth y selectedYear como props.
 
-// Definimos las props que este componente recibe
 const props = defineProps({
   selectedDay: {
     type: Number,
     default: null, // Día seleccionado inicialmente
   },
-})
+  selectedMonth: {
+    type: Number,
+    required: true,
+  },
+  selectedYear: {
+    type: Number,
+    required: true,
+  },
+});
 
-// Obtenemos la fecha actual
-const today = new Date()
-// Variable reactiva para manejar la fecha actual mostrada en el calendario
-const currentDate = ref(new Date())
-// Días de la semana en formato corto
-const days = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
+const today = new Date();
+const currentDate = ref(new Date());
+const days = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
 
 // Nombre del mes actual, calculado dinámicamente
 const monthName = computed(() =>
-  currentDate.value.toLocaleString('default', { month: 'long' })
-)
+  currentDate.value.toLocaleString("default", { month: "long" })
+);
 
-// Función que devuelve el número de días de un mes dado
-const getDaysInMonth = (year, month) =>
-  new Date(year, month + 1, 0).getDate()
+const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
-// Función que devuelve el día de la semana en el que empieza el mes
-const getStartDayOfMonth = (year, month) =>
-  new Date(year, month, 1).getDay()
+const getStartDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
 
-// Calculamos los días a mostrar en el calendario, incluyendo espacios vacíos al principio
+// Computa los días del mes actual, incluyendo los días vacíos al inicio.
 const calendarDays = computed(() => {
-  const year = currentDate.value.getFullYear()
-  const month = currentDate.value.getMonth()
-  const daysInMonth = getDaysInMonth(year, month)
-  const startDay = getStartDayOfMonth(year, month)
+  const year = currentDate.value.getFullYear();
+  const month = currentDate.value.getMonth();
+  const daysInMonth = getDaysInMonth(year, month);
+  const startDay = getStartDayOfMonth(year, month);
 
-  // Rellenamos los días vacíos antes del inicio del mes
-  const daysArray = Array(startDay).fill(null)
-  // Añadimos todos los días del mes
+  const daysArray = Array(startDay).fill(null);
   for (let i = 1; i <= daysInMonth; i++) {
-    daysArray.push(i)
+    daysArray.push(i);
   }
 
-  return daysArray // Devolvemos el array para que el componente lo pinte
-})
+  return daysArray;
+});
+
+// Sincroniza currentDate con selectedMonth y selectedYear.
+watch(
+  () => [props.selectedMonth, props.selectedYear],
+  ([newMonth, newYear]) => {
+    currentDate.value = new Date(newYear, newMonth, 1);
+  }
+);
 
 // Función para ir al mes anterior
 function prevMonth() {
-  currentDate.value.setMonth(currentDate.value.getMonth() - 1)
-  currentDate.value = new Date(currentDate.value) // Se fuerza el refresco
-  emit('changeMonth', currentDate.value.getMonth()) // Emitimos el nuevo mes
-  emit('changeYear', currentDate.value.getFullYear()) // Emitimos el nuevo año
+  const prev = new Date(
+    currentDate.value.getFullYear(),
+    currentDate.value.getMonth() - 1,
+    1
+  );
+  currentDate.value = prev;
+  emit("changeMonth", prev.getMonth());
+  emit("changeYear", prev.getFullYear());
 }
 
 // Función para ir al mes siguiente
 function nextMonth() {
-  currentDate.value.setMonth(currentDate.value.getMonth() + 1)
-  currentDate.value = new Date(currentDate.value) // Se fuerza el refresco
-  emit('changeMonth', currentDate.value.getMonth()) // Emitimos el nuevo mes
-  emit('changeYear', currentDate.value.getFullYear()) // Emitimos el nuevo año
+  const next = new Date(
+    currentDate.value.getFullYear(),
+    currentDate.value.getMonth() + 1,
+    1
+  );
+  currentDate.value = next;
+  emit("changeMonth", next.getMonth());
+  emit("changeYear", next.getFullYear());
 }
 
 // Función que emite el día seleccionado, si es válido
 function selectDay(day) {
-  if (!day) return // Evita emitir si es un hueco vacío
-  emit('selectDay', day) // Emitimos el día seleccionado
+  if (!day) return;
+  emit("selectDay", day);
 }
 </script>
 
@@ -115,7 +127,7 @@ function selectDay(day) {
   width: 100%;
   max-width: 340px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   transition: all 0.3s ease;
 }
 

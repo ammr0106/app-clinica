@@ -5,8 +5,14 @@
 </template>
 
 <script setup>
-import { ref, provide } from "vue";
-const emit = defineEmits(["submit"]);
+import { ref, provide, toRef } from "vue";
+
+const props = defineProps({
+  onSubmit: {
+    type: Function,
+    required: true,
+  },
+});
 
 const loading = ref(false);
 provide("formLoading", loading);
@@ -14,7 +20,9 @@ provide("formLoading", loading);
 const handleSubmit = async () => {
   loading.value = true;
   try {
-    emit("submit");
+    await props.onSubmit();
+  } catch (error) {
+    console.error(error);
   } finally {
     loading.value = false;
   }
