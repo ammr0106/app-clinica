@@ -1,6 +1,12 @@
 <template>
   <header class="header">
-    <div class="header-left"></div>
+    <div class="header-left">
+
+      <div v-if="authStore.user && authStore.profile" class="user-info">
+        <span>Bienvenido, {{ authStore.profile.name }} 👋</span>
+        <AppButton @click="logout" variant="secondary" class="logout-button">Cerrar sesión</AppButton>
+      </div>
+    </div>
 
     <div class="header-center">
       <h1 class="clinic-name">
@@ -17,6 +23,11 @@
 
 <script setup>
 import AppSideBar from "@/components/common/AppSideBar.vue";
+import MenuBurger from './MenuBurger.vue'
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useRouter } from 'vue-router'
+
 
 const props = defineProps({
   menuItems: {
@@ -25,6 +36,25 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+
+const showAuth = ref(false) 
+
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+onMounted(async () => {
+  if (!authStore.user || !authStore.profile) {
+    await authStore.fetchUser()
+  }
+})
+
+//Funcion para cerrar sesion
+const logout = async () => {
+  await authStore.logout()
+  router.push('/')
+}
 </script>
 
 <style scoped>
@@ -102,6 +132,45 @@ const props = defineProps({
   font-weight: 500;
   font-family: "Roboto", sans-serif;
   white-space: nowrap;
+}
+
+.user-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-family: 'Roboto', sans-serif;
+  color: var(--blanco-puro);
+  white-space: nowrap;
+}
+
+.welcome-message {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--blanco-puro);
+  font-family: 'Roboto', sans-serif;
+  white-space: nowrap;
+}
+
+.logout-button {
+  background-color: var(--rojo-controlado, #ef5350) !important;
+  color: white !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #c62828 !important;
+  transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
