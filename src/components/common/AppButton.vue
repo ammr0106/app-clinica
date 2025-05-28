@@ -5,12 +5,7 @@
     :class="['app-button', variantClass]"
     @click="handleClick"
   >
-    <span v-if="formLoading && type === 'submit' && showLoader"
-      >Cargando...</span
-    >
-    <span v-if="formLoading && type === 'submit' && showLoader"
-      >Cargando...</span
-    >
+    <span v-if="formLoading && type === 'submit' && showLoader">Cargando...</span>
     <slot v-else />
   </button>
 </template>
@@ -36,16 +31,13 @@ const props = defineProps({
     type: String,
     default: "primary",
     validator: (val) => ["primary", "red", "green", "orange"].includes(val),
-    validator: (val) => ["primary", "red", "green", "orange"].includes(val),
   },
 });
 
 // Estado de carga del formulario desde el proveedor
-// Estado de carga del formulario desde el proveedor
 const formLoading = inject("formLoading", ref(false));
 
 const isDisabled = computed(() => {
-  if (props.type === "submit") return formLoading.value || props.disabled;
   if (props.type === "submit") return formLoading.value || props.disabled;
   return props.disabled;
 });
@@ -87,10 +79,9 @@ function handleClick(e) {
   background-color: #388e3c;
 }
 
-.app-button--red {
+.app-button--secondary {
   margin-top: 1rem;
   padding: 0.9rem;
-  background-color: var(--rojo-controlado);
   background-color: var(--rojo-controlado);
   color: white;
   border-radius: 12px;
@@ -105,7 +96,6 @@ function handleClick(e) {
 }
 
 .app-button--primary {
-  margin-top: 1rem;
   margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--azul-profesional, #1565c0);

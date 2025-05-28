@@ -20,6 +20,10 @@ import {
  * @property {string} employee_name
  * @property {string} headquarters_name
  */
+function capitalize(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
 
 export const useAppointmentStore = defineStore("appointment", {
   state: () => ({
@@ -33,15 +37,15 @@ export const useAppointmentStore = defineStore("appointment", {
       this.appointments = data.map((appointment) => ({
         id: appointment.id,
         date: appointment.date,
-        time: appointment.time,
-        reason: appointment.reason,
-        status: appointment.status,
-        note: appointment.note,
-        pet_name: appointment.pets?.name || "Sin mascota",
-        specialty_name: appointment.specialties?.name || "Sin especialidad",
-        client_name: appointment.client?.name || "Sin cliente",
-        employee_name: appointment.employee?.name || "Sin empleado",
-        headquarters_name: appointment.headquarters?.name || "Sin sede",
+        time: appointment.time ? appointment.time.split("+")[0].slice(0, 5) : "", //De esta forma se obtiene la hora sin la zona horaria
+        reason: capitalize(appointment.reason),
+        status: capitalize(appointment.status),
+        note: capitalize(appointment.note),
+        pet_name: capitalize(appointment.pets?.name || "Sin mascota"),
+        specialty_name: capitalize(appointment.specialties?.name || "Sin especialidad"),
+        client_name: capitalize(appointment.client?.name || "Sin cliente"),
+        employee_name: capitalize(appointment.employee?.name || "Sin empleado"),
+        headquarters_name: capitalize(appointment.headquarters?.name || "Sin sede"),
       }));
     },
 
