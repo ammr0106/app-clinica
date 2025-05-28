@@ -7,8 +7,11 @@
         <AppInput v-model="segundoApd" label="Segundo apellido" type="text" :required="true"/>
         <AppInput v-model="email" label="Email" type="email" :required="true"/>
         <AppInput v-model="password" label="Contraseña" type="password" :required="true"/>
+        <p v-if="password && password.length > 0 && password.length < 6" class="error">
+            La contraseña debe de tener al menos 6 caracteres.
+        </p>
         <AppSelect v-model="rol" :options="roles" label="Rol" type="" placeholder="Selecciona un rol" :required="true"/>
-        <AppButton type="submit" variant="primary">Añadir</AppButton>
+        <AppButton type="submit" variant="primary">Confirmar</AppButton>
       </AppForm>
 
     </Modal>
@@ -46,6 +49,10 @@ const roles = [
 
 //Función para manejar el submit del formulario.
 const submitForm = async () => {
+  if(password.value.length < 6) {
+    return
+  }
+
   try{
     const error = await userStore.createUser({
       name: nombre.value,
@@ -67,4 +74,19 @@ const submitForm = async () => {
   }
 }
 </script>
+
+<style scoped>
+.error{
+  color: red;
+  margin-top: -0.8rem;
+  margin-bottom: 0.5rem;
+  font-size: small;
+
+}
+</style>
+<style>
+.notification.error{
+  z-index: 3000 !important;
+}
+</style>-->
 

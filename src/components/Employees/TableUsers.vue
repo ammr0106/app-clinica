@@ -7,7 +7,7 @@
     @edit="handleEditUser"
     @delete="handleDeleteUser"
     />
-    <!-- Modales para edición y eliminación de usuarios-->
+    <!-- Modales para edición y eliminación de usuarios -->
     <ModalEditUser 
         v-if="showModalEditUser" 
         :user="userToEdit" 
@@ -53,13 +53,13 @@ const props = defineProps({
     return userStore.users.filter(
         user => 
         user.id_headquarters === headquartersId &&
-        user.rol !== 'superadmin &&
-        (!props.search || (user.[props.filtro]?.toLowerCase().includes(props.search.toLowerCase())))
+        user.rol !== 'superadmin' &&
+        (!props.search || (user.[props.filter]?.toLowerCase().includes(props.search.toLowerCase())))
         )
 })*/
 const users = computed(() => userStore.users)//mostrarlos sin filtro.
 
-//Función para controlar el modal de editar usuario.
+// Función para controlar el modal de editar usuario.
 function handleEditUser(user){
     userToEdit.value = user
     showModalEditUser.value = true
@@ -88,6 +88,3 @@ onMounted(() => {
 })
 
 </script>
-
-<style scoped>
-</style>

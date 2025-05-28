@@ -7,8 +7,11 @@
         <AppInput v-model="segundoApd" label="Segundo apellido" type="text"/>
         <AppInput v-model="email" label="Email" type="email"/>
         <AppInput v-model="password" label="Contraseña" type="password"/>
+        <p v-if="password && password.length > 0 && password.length < 6" class="error">
+            La contraseña debe de tener al menos 6 caracteres.
+        </p>
         <AppSelect v-model="rol" :options="roles" label="Rol" type="" placeholder="Selecciona un rol"/>
-        <AppButton type="submit" variant="primary">Modificar</AppButton>
+        <AppButton type="submit" variant="primary">Guardar cambios</AppButton>
       </AppForm>
 
     </Modal>
@@ -80,6 +83,11 @@ const submitForm = async () => {
         }
     })
 
+    //Comrpueba si la contraseña se ha modificado y si tiene al menos 6 caracteres.
+    if (updateFields.password && updateFields.password.length < 6) {
+      return
+    }
+    
     //Comprueba si hay cambios.
     if (Object.keys(updateFields).length === 0) {
       emit('error','No hay cambios para guardar')
@@ -99,5 +107,14 @@ const submitForm = async () => {
       emit('error','Error inesperado: ' + err.message)
   }
 }
-
 </script>
+
+<style scoped>
+.error{
+  color: red;
+  margin-top: -0.8rem;
+  margin-bottom: 0.5rem;
+  font-size: small;
+
+}
+</style>

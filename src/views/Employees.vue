@@ -63,7 +63,7 @@ const menuItems =[
 // 
 function onUserCreated() {
     showModalAddUser.value = false
-    emit('Usuario creado correctamente.','success')
+    showNotification('Usuario creado correctamente.','success')
 }
 </script>
 
