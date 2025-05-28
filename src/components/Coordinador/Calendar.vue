@@ -119,8 +119,6 @@ function selectDay(day) {
   color: white;
   padding: 1rem;
   border-radius: 12px;
-  width: 100%;
-  max-width: 340px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   font-family: "Segoe UI", sans-serif;
   transition: all 0.3s ease;

@@ -6,6 +6,7 @@
 
     <!-- Contenido principal -->
     <main class="main-content">
+
       <!-- Sección de acciones -->
       <div class="acciones">
         <!-- Componente para crear nuevas citas -->
@@ -15,10 +16,9 @@
         />
       </div>
 
-      <!-- Sección de contenido principal -->
-      <div class="contenido">
-        <!-- Contenedor del calendario -->
-        <div class="calendario">
+      <div class="layout">
+      <!-- Calendario a la izquierda -->
+       <div class="calendario">
           <!-- Componente de calendario -->
           <Calendar
             :selectedDay="selectedDay"
@@ -29,7 +29,9 @@
             @changeYear="handleChangeYear"
           />
         </div>
-
+        <!-- Citas a la derecha -->
+      <div class="contenido">
+        
         <!-- Componente que muestra las citas -->
         <Dates
           :fecha="fecha"
@@ -52,6 +54,7 @@
           @delete-cita="handleDeleteCita"
         />
       </div>
+       </div>
     </main>
   </div>
 </template>
@@ -128,35 +131,44 @@ const fecha = computed(() => {
 }
 
 .main-content {
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  height: calc((100vh - 64px) - 2rem); /* Ajusta según la altura del header */
 }
 
 .acciones {
-  display: flex;
-  gap: 1rem;
   padding: 1rem 0;
 }
 
-.btn {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+.layout {
+  display: flex;
+  gap: 2rem;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
 }
 
 .contenido {
+  flex: 2 1 0;
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  flex: auto;
+  gap: 1.5rem;
+  overflow-y: auto;
+  min-width: 0;
 }
 
 .calendario {
-  flex: 1;
+  flex: 1 1 320px;
+  max-width: 350px;
+  min-width: 260px;
+  aspect-ratio: 1 / 1;
   background-color: #2e3b4e;
   color: white;
   padding: 1rem;
   border-radius: 10px;
+  box-sizing: border-box;
+  align-self: flex-start;
 }
 </style>
