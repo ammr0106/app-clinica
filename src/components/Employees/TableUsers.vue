@@ -46,18 +46,34 @@ const props = defineProps({
     filter: String
 })
 
-/*Función para filtrar los usuarios a mostrar según: 
-    el id del usuario logueado, sin mostrar los superadmin y según la barra de búsqueda.*/
-/* const users = computed(() => {
+// Traducción de los valores en inglés de los roles para la searchBar.
+const roleMap = {
+    coordinador: 'coordinator',
+    trabajador: 'worker'
+}
+/* Función para filtrar los usuarios a mostrar según: 
+    el id del usuario logueado, sin mostrar los superadmin y según la barra de búsqueda. */
+const users = computed(() => {
     const headquartersId = authStore.user?.id_headquarters
-    return userStore.users.filter(
-        user => 
-        user.id_headquarters === headquartersId &&
-        user.rol !== 'superadmin' &&
-        (!props.search || (user.[props.filter]?.toLowerCase().includes(props.search.toLowerCase())))
-        )
-})*/
-const users = computed(() => userStore.users)//mostrarlos sin filtro.
+    return userStore.users.filter(user => {
+        const matchesHeadquarters = user.id_headquarters === headquartersId
+        const notSuperAdmin = user.rol !== 'superadmin'
+        let matchesSearch = true
+
+        if (props.search){
+            if (props.filter === 'rol'){
+                const searchValue = props.search.trim().toLowerCase()
+                const dbRole = roleMap[searchValue]
+                matchesSearch = dbRole
+                    ? user.rol === dbRole
+                    : user.rol.includes(searchValue)
+            } else{
+                matchesSearch = user[props.filter]?.toLowerCase().includes(props.search.toLowerCase())
+            }
+        }
+        return matchesHeadquarters && notSuperAdmin && matchesSearch
+    })
+})
 
 // Función para controlar el modal de editar usuario.
 function handleEditUser(user){

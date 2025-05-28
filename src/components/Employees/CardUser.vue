@@ -8,7 +8,7 @@
         <!--Botones para la gestión de usuarios-->
         <div class="action">
         <AppButton variant="primary" @click="$emit('edit',user)">Editar</AppButton>
-        <AppButton variant="secondary" @click="$emit('delete',user)">Eliminar</AppButton>
+        <AppButton variant="red" @click="$emit('delete',user)">Eliminar</AppButton>
         </div>
     </div>
 </template>

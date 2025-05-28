@@ -3,7 +3,7 @@
     <main class="content">
         <!-- Barra de búsqueda y botón de añadir usuario -->
         <div class="top-bar">
-            <AppSearchbar v-model="search" v-model:filter="filter"
+            <AppSearchbar v-model="search" v-model:modelFiltro="filter"
                 :filtros="[
                     { label: 'Nombre', value: name },
                     { label: 'Rol', value: rol }
@@ -44,10 +44,13 @@ import ModalAddUser from '@/components/Employees/ModalAddUser.vue'
 import TableUsers from '@/components/Employees/TableUsers.vue'
 import AppNotification from '@/components/common/AppNotification.vue'
 
+const name = 'name'
+const rol = 'rol'
 const search = ref('')
-const filter = ref('nombre')
+const filter = ref('name')
 const showModalAddUser = ref(false)
 const notification = ref({ show: false, message: '', type: 'success'})
+
 
 // Mostrar notificaciones.
 function showNotification(message, type = 'success') {
