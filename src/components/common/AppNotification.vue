@@ -1,8 +1,13 @@
 <template>
   <transition name="slide-fade">
     <div v-if="visible" :class="['notification', type]">
+      <img :src="iconSrc" alt="Success icon" width="30px" />
       <span class="message">{{ message }}</span>
-      <button class="close-btn" @click="visible = false" aria-label="Close notification">
+      <button
+        class="close-btn"
+        @click="visible = false"
+        aria-label="Close notification"
+      >
         ✕
       </button>
     </div>
@@ -10,9 +15,9 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, onUnmounted } from "vue";
+import { ref, watchEffect, onUnmounted, computed } from "vue";
 
-const emit = defineEmits(['hidden'])
+const emit = defineEmits(["hidden"]);
 
 const props = defineProps({
   message: String,
@@ -26,6 +31,18 @@ const props = defineProps({
   },
 });
 
+// Mapeo de iconos por tipo
+const iconMap = {
+  success: new URL("@/assets/notification-icons/success.svg", import.meta.url)
+    .href,
+  error: new URL("@/assets/notification-icons/error.svg", import.meta.url).href,
+  info: new URL("@/assets/notification-icons/info.svg", import.meta.url).href,
+  warning: new URL("@/assets/notification-icons/warning.svg", import.meta.url)
+    .href,
+};
+
+const iconSrc = computed(() => iconMap[props.type]);
+
 const visible = ref(true);
 let timeoutId = null;
 
@@ -38,7 +55,7 @@ watchEffect(() => {
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       visible.value = false;
-      emit('hidden');
+      emit("hidden");
     }, props.duration);
   }
 });
@@ -54,12 +71,12 @@ onUnmounted(() => {
   bottom: 1rem;
   right: 1rem;
   min-width: 280px;
-  max-width: 320px;
+  max-width: 400px;
   padding: 1rem 1.5rem;
   border-radius: 12px;
   color: white;
   font-weight: 600;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
@@ -69,11 +86,11 @@ onUnmounted(() => {
 }
 
 .notification.success {
-  background: linear-gradient(135deg, var(--verde-confianza), #2E7D32);
+  background: linear-gradient(135deg, var(--verde-confianza), #2e7d32);
 }
 
 .notification.error {
-  background: linear-gradient(135deg, var(--rojo-controlado), #C62828);
+  background: linear-gradient(135deg, var(--rojo-controlado), #c62828);
 }
 
 .notification.warning {
@@ -94,7 +111,7 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   color: white;
-  font-size: .8rem;
+  font-size: 0.8rem;
   cursor: pointer;
   padding: 0;
   line-height: 1;

@@ -4,10 +4,13 @@
     :disabled="isDisabled"
     :class="['app-button', variantClass]"
     @click="handleClick"
-    @click="handleClick"
   >
-    <span v-if="formLoading && type === 'submit' && showLoader">Cargando...</span>
-    <span v-if="formLoading && type === 'submit' && showLoader">Cargando...</span>
+    <span v-if="formLoading && type === 'submit' && showLoader"
+      >Cargando...</span
+    >
+    <span v-if="formLoading && type === 'submit' && showLoader"
+      >Cargando...</span
+    >
     <slot v-else />
   </button>
 </template>
@@ -49,13 +52,6 @@ const isDisabled = computed(() => {
 
 const variantClass = computed(() => `app-button--${props.variant}`);
 
-const emit = defineEmits(["click"]);
-
-function handleClick(e) {
-  if (props.type !== "submit") {
-    emit("click", e);
-  }
-}
 const emit = defineEmits(["click"]);
 
 function handleClick(e) {
@@ -105,7 +101,7 @@ function handleClick(e) {
 }
 
 .app-button--red:hover {
-  background-color: #C62828;
+  background-color: #c62828;
 }
 
 .app-button--primary {
@@ -126,7 +122,7 @@ function handleClick(e) {
 }
 
 .app-button--orange {
-    margin-top: 1rem;
+  margin-top: 1rem;
   padding: 0.9rem;
   background-color: #ff9800;
   color: white;
@@ -142,7 +138,7 @@ function handleClick(e) {
 }
 
 .app-button--orange {
-    margin-top: 1rem;
+  margin-top: 1rem;
   padding: 0.9rem;
   background-color: #ff9800;
   color: white;
@@ -158,8 +154,8 @@ function handleClick(e) {
 }
 
 .app-button:disabled {
-  background-color: #ccc ; 
-  color: #666 ; 
+  background-color: #ccc;
+  color: #666;
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -169,8 +165,8 @@ function handleClick(e) {
 }
 
 .app-button:disabled {
-  background-color: #ccc ; 
-  color: #666 ; 
+  background-color: #ccc;
+  color: #666;
   cursor: not-allowed;
   opacity: 0.7;
 }

@@ -15,7 +15,7 @@
     <AppButton @click="showSuccess" variant="green"
       >Click aquí - Notificación "success"</AppButton
     >
-    <AppButton @click="showError" variant="secondary"
+    <AppButton @click="showError" variant="red"
       >Click aquí - Notificación "error"</AppButton
     >
     <AppButton @click="showInfo">Click aquí - Notificación "info"</AppButton>
@@ -28,7 +28,7 @@
     v-if="notification.show"
     :message="notification.message"
     :type="notification.type"
-    :duration="3000"
+    :duration="5000"
     @hidden="notification.show = false"
   />
 </template>
