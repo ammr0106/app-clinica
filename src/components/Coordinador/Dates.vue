@@ -27,9 +27,9 @@
             v-for="(cita, i) in citas"
             :key="i"
             class="cita-card"
-            @click="openOptions(cita, i)"
+            @click="openOptions(cita.id, i)"
           >
-            <tr class="cita-info" id="{{ cita.id }}">
+            <tr class="cita-info" :id="cita.id">
               <th class="cita-nombre">{{ cita.client_name }}</th>
               <th class="cita-hora">{{ cita.time }}</th>
               <th class="cita-razon">{{ cita.reason }}</th>
@@ -185,10 +185,11 @@ async function fetchCitas() {
   }
 }
 
-function openOptions(cita, index) {
-  selectedCita.value = { ...cita };
-  selectedIndex.value = index;
-  showEditModal.value = true;
+function openOptions(id_cita, index) {
+  selectedCita.value = props.citas.find((cita) => cita.id === id_cita);
+
+  console.log(selectedCita);
+  //showEditModal.value = true;
 }
 
 function closeModals() {
@@ -382,7 +383,7 @@ thead,
   text-align: left;
 }
 .cita-razon,
-.cita-nota{
+.cita-nota {
   min-width: 40px;
 }
 
@@ -391,5 +392,4 @@ thead,
 .cita-estado {
   min-width: 80px;
 }
-
 </style>

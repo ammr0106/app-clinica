@@ -40,11 +40,11 @@ export async function fetchAppointments() {
     reason,
     status,
     note,
-    pets ( name ),
-    specialties ( name ),
-    client ( name, first_surname, second_surname ),
-    employee:users ( name ),
-    headquarters ( name )
+    pets ( id, name ),
+    specialties (id, name ),
+    client ( id, name, first_surname, second_surname ),
+    employee:users ( id, name ),
+    headquarters ( id, name )
   `);
 
   if (error) throw error;
@@ -56,7 +56,7 @@ export async function fetchClientsByHeadquarters(id_headquarters) {
     .from("client")
     .select("id, name, first_surname, second_surname, DNI")
     .eq("id_headquarters", id_headquarters);
-    if (error) throw error;
+  if (error) throw error;
 
   return data;
 }
@@ -71,11 +71,6 @@ export async function fetchPetsByClient(id_client) {
   return data;
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * @returns {Promise<Specialty[]>}
- */
-/*******  b592d670-02f1-425b-8d95-f9e9f741627a  *******/
 export async function fetchSpecialties() {
   const { data, error } = await supabase.from("specialties").select("id, name");
 
@@ -91,7 +86,7 @@ export async function createAppointment(appointmentData) {
   const { error } = await supabase
     .from("appointment")
     .insert([appointmentData]);
-    if (error) throw error;
+  if (error) throw error;
   return { error };
 }
 

@@ -24,14 +24,14 @@ import { fetchSpecialties } from "@/services/SpecialtyService";
  * @property {string} headquarters_name
  */
 function capitalize(str) {
-      if (!str) return "";
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-    function capitalizeWords(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+function capitalizeWords(str) {
   if (!str) return "";
   return str
     .split(" ")
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
     .join(" ");
 }
 
@@ -59,18 +59,26 @@ export const useAppointmentStore = defineStore("appointment", {
         status: capitalize(appointment.status),
         note: capitalize(appointment.note),
         pet_name: capitalize(appointment.pets?.name || "Sin mascota"),
-        specialty_name: capitalize(appointment.specialties?.name || "Sin especialidad"),
+        specialty_name: capitalize(
+          appointment.specialties?.name || "Sin especialidad"
+        ),
         client_name: appointment.client
-  ? capitalizeWords(
-      [
-        appointment.client.name,
-        appointment.client.first_surname,
-        appointment.client.second_surname
-      ]
-        .filter(Boolean)
-        .join(" ")
-    )
-  : "Sin cliente",
+          ? capitalizeWords(
+              [
+                appointment.client.name,
+                appointment.client.first_surname,
+                appointment.client.second_surname,
+              ]
+                .filter(Boolean)
+                .join(" ")
+            )
+          : "Sin cliente",
+        id_pets: appointment.pets?.id || null,
+        id_specialties: appointment.specialties.id,
+        id_client: appointment.client.id,
+        id_employee: appointment.employee.id,
+        id_headquarters: appointment.headquarters.id,
+        que: appointment,
         employee_name: capitalize(appointment.employee?.name || "Sin empleado"),
         headquarters_name: capitalize(
           appointment.headquarters?.name || "Sin sede"
