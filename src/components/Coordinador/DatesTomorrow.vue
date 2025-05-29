@@ -169,7 +169,6 @@ thead {
 .cita-encabezado {
   text-align: left;
   color: #263238;
-  font-size: 1.2rem;
 }
 
 tbody {
@@ -197,35 +196,27 @@ tbody {
 .cita-encabezado {
   display: grid;
   grid-template-columns:
-    1.5fr /* Nombre */
-    0.5fr /* Hora */
-    2.5fr /* Razón */
-    0.75fr /* Especialidad */
-    1.5fr /* Trabajador */
-    0.75fr /* Estado */
-    2.5fr /* Nota */
-    0.75fr; /* Mascota */
-  gap: 1.5rem;
+    minmax(100px, 1.5fr)   /* Nombre */
+    minmax(60px, 0.2fr)    /* Hora */
+    minmax(120px, 2.5fr)   /* Razón */
+    minmax(80px, 0.8fr)    /* Especialidad */
+    minmax(100px, 1.5fr)   /* Trabajador */
+    minmax(80px, 0.75fr)   /* Estado */
+    minmax(120px, 2.5fr)   /* Nota */
+    minmax(80px, 0.75fr);  /* Mascota */
+  gap: 1rem;
 }
-
-.cita-info th {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: left;
-}
-
+.cita-mascota,
 .cita-nombre {
   font-weight: bold;
   color: #ffffff;
+  min-width: 20px;
 }
 
 .cita-hora {
   font-size: 0.9rem;
   color: #cbe9f3;
-  max-width: 20px;
+  min-width: 40px;
 }
 .cita-estado {
   border: 0px solid;
@@ -298,4 +289,23 @@ thead,
 .cita-card {
   align-items: center;
 }
+.cita-info th,
+.cita-encabezado th {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+.cita-razon,
+.cita-nota{
+  min-width: 40px;
+}
+
+.cita-especialidad,
+.cita-trabajador,
+.cita-estado {
+  min-width: 80px;
+}
+
 </style>
