@@ -60,5 +60,12 @@ export async function deleteHeadquarters(id) {
     .from('headquarters')
     .delete()
     .eq('id', id)
-  return { error }
+
+    if(error){
+      console.error('Error deleting headquarters:', error)
+      return { error }
+    }
+
+    return { error: null, success: true, message: 'Headquarters deleted successfully'}
+  
 }

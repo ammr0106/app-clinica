@@ -1,11 +1,11 @@
 <template>
   <header class="header">
     <div class="header-left">
+
+      <!--Si el usuario esta identificado-->
       <div v-if="authStore.user && authStore.profile" class="user-info">
         <span>Bienvenido, {{ authStore.profile.name }} 👋</span>
-        <AppButton @click="logout" variant="secondary" class="logout-button"
-          >Cerrar sesión</AppButton
-        >
+        <AppButton @click="logout" variant="secondary" class="logout-button">Cerrar sesión</AppButton>
       </div>
     </div>
 
@@ -24,27 +24,29 @@
 
 <script setup>
 // Importamos los componentes necesarios
-import { ref, onMounted } from "vue";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useRouter } from "vue-router";
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useRouter } from 'vue-router'
 import AppSideBar from "@/components/common/AppSideBar.vue";
 
-const showAuth = ref(false);
+const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
 
-const authStore = useAuthStore();
-const router = useRouter();
+//Inicializamos el store de autenticación y el router
+const authStore = useAuthStore()
+const router = useRouter()
 
+// Una vez se carga el componente se verifica si el usuario está autenticado
 onMounted(async () => {
   if (!authStore.user || !authStore.profile) {
-    await authStore.fetchUser();
+    await authStore.fetchUser()
   }
-});
+})
 
 //Funcion para cerrar sesion
 const logout = async () => {
-  await authStore.logout();
-  router.push("/");
-};
+  await authStore.logout()
+  router.push('/')
+}
 
 const props = defineProps({
   menuItems: {
@@ -140,7 +142,7 @@ const props = defineProps({
   padding: 0.4rem 0.8rem;
   border-radius: 999px;
   font-size: 0.95rem;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: var(--blanco-puro);
   white-space: nowrap;
 }
@@ -149,7 +151,7 @@ const props = defineProps({
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--blanco-puro);
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   white-space: nowrap;
 }
 
@@ -162,6 +164,7 @@ const props = defineProps({
   border-radius: 999px;
   width: auto;
   white-space: nowrap;
+  cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }

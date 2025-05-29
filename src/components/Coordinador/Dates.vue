@@ -8,7 +8,7 @@
 
     <transition-group name="fade" tag="ul" class="citas-list">
       <table>
-        <thead class="cita-card">
+        <thead>
           <tr class="cita-encabezado">
             <!-- Encabezados de la tabla -->
             <th>Nombre</th>
@@ -249,7 +249,6 @@ thead {
   margin-bottom: 0.5rem;
   backdrop-filter: blur(4px);
   transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
 }
 .cita-encabezado {
   text-align: left;
@@ -282,21 +281,20 @@ tbody {
 .cita-encabezado {
   display: grid;
   grid-template-columns:
-    1.5fr /* Nombre */
-    0.2fr /* Hora */
-    2.5fr /* Razón */
-    0.8fr /* Especialidad */
-    1.5fr /* Trabajador */
-    0.75fr /* Estado */
-    2.5fr /* Nota */
-    0.75fr; /* Mascota */
+    minmax(100px, 1.5fr)   /* Nombre */
+    minmax(60px, 0.2fr)    /* Hora */
+    minmax(120px, 2.5fr)   /* Razón */
+    minmax(80px, 0.8fr)    /* Especialidad */
+    minmax(100px, 1.5fr)   /* Trabajador */
+    minmax(80px, 0.75fr)   /* Estado */
+    minmax(120px, 2.5fr)   /* Nota */
+    minmax(80px, 0.75fr);  /* Mascota */
   gap: 1rem;
 }
 .cita-mascota,
 .cita-nombre {
   font-weight: bold;
   color: #ffffff;
-  min-width: 20px;
 }
 
 .cita-hora {
@@ -381,15 +379,5 @@ thead,
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
-}
-.cita-razon,
-.cita-nota {
-  min-width: 40px;
-}
-
-.cita-especialidad,
-.cita-trabajador,
-.cita-estado {
-  min-width: 80px;
 }
 </style>

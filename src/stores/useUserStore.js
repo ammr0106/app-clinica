@@ -50,12 +50,13 @@ export const useUserStore = defineStore("user", {
       } finally {
         this.loading = false;
       }
+
     },
 
     async createUser(userData) {
       const { error } = await createUserService(userData);
       if (!error) await this.loadUsers();
-      return error;
+      return {error};
     },
 
     async editUser(id, updatedData) {

@@ -156,12 +156,14 @@ const fecha = computed(() => {
   gap: 1rem;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .calendario {
-  flex: 0 0 20%;
-  min-width: 0;
-  max-width: 20%;
+  flex: 0 0 25%;
+  max-width: 25%;
+  min-width: 220px;
+  width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
   background-color: #2e3b4e;
@@ -170,5 +172,28 @@ const fecha = computed(() => {
   border-radius: 10px;
   box-sizing: border-box;
   align-self: flex-start;
+}
+/* --- Responsive para tablet y móvil --- */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1rem;
+  }
+  .layout {
+    flex-direction: column;
+    gap: 1rem;
+    height: auto;
+  }
+  .calendario {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+    aspect-ratio: unset;
+    align-self: stretch;
+    margin-bottom: 1rem;
+  }
+  .contenido {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 </style>
