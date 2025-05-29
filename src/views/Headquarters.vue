@@ -158,6 +158,7 @@ const fecha = computed(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
 }
 
 .calendario {
@@ -174,27 +175,68 @@ const fecha = computed(() => {
   box-sizing: border-box;
   align-self: flex-start;
 }
-/* --- Responsive para tablet y móvil --- */
-@media (max-width: 1024px) {
+/* Para tablets en landscape (ancho entre 1024px y 1366px aprox.) */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
   .main-content {
     padding: 1rem;
   }
+  .layout {
+    flex-direction: row;
+    gap: 1rem;
+    height: 100%;
+  }
+  .calendario {
+    flex: 0 0 25%;
+    max-width: 25%;
+    min-width: 200px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0;
+    align-self: flex-start;
+  }
+  .contenido {
+    max-width: 72%;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+  }
+  .citas-container {
+    padding: 1rem;
+    font-size: 1rem;
+    height: 100%;
+  }
+  .cita-info,
+  .cita-encabezado {
+    font-size: clamp(0.8rem, 1vw, 1.05rem);
+    gap: 0.7rem;
+  }
+  .cita-info > td,
+  .cita-encabezado > th {
+    font-size: clamp(0.8rem, 1vw, 1.05rem);
+  }
+  .days-grid {
+    gap: 0.15rem;
+  }
+  .day-name,
+  .day {
+    font-size: 0.85rem;
+    padding: 0.3rem;
+  }
+}
+@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
   .layout {
     flex-direction: column;
     gap: 1rem;
     height: auto;
   }
-  .calendario {
+  .calendario,
+  .contenido {
+    width: 100%;
     max-width: 100%;
     min-width: 0;
-    width: 100%;
-    aspect-ratio: unset;
-    align-self: stretch;
-    margin-bottom: 1rem;
-  }
-  .contenido {
-    max-width: 100%;
-    width: 100%;
+    height: 35%;
+    align-self: flex-start;
   }
 }
 </style>

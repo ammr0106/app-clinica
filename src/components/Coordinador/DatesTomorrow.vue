@@ -25,32 +25,30 @@
         </thead>
         <tbody>
           <!-- Iteramos sobre el array citas, mostrando cada cita -->
-          <div
+            <tr :id="cita.id"
             v-for="(cita, i) in citas"
             :key="i"
-            class="cita-card"
-            @click="openOptions(cita, i)"
-          >
-            <tr class="cita-info">
-              <th class="cita-nombre">{{ cita.client_name }}</th>
-              <th class="cita-hora">{{ cita.time }}</th>
-              <th class="cita-razon">{{ cita.reason }}</th>
-              <th class="cita-especialidad">{{ cita.specialty_name }}</th>
-              <th class="cita-trabajador">{{ cita.employee_name }}</th>
-              <th
+            class="cita-card cita-info"
+            @click="openOptions(cita, i)">
+              <td class="cita-nombre">{{ cita.client_name }}</td>
+              <td class="cita-hora">{{ cita.time }}</td>
+              <td class="cita-razon">{{ cita.reason }}</td>
+              <td class="cita-especialidad">{{ cita.specialty_name }}</td>
+              <td class="cita-trabajador">{{ cita.employee_name }}</td>
+              <td
                 class="cita-estado"
                 :class="{
                   'estado-pendiente': cita.status === 'Pendiente',
-                  'estado-confirmada': cita.status === 'Confirmado',
-                  'estado-cancelada': cita.status === 'Cancelado',
+                  'estado-confirmada': cita.status === 'Confirmada',
+                  'estado-cancelada': cita.status === 'Cancelada',
+                  'estado-realizada': cita.status === 'Realizada',
                 }"
               >
                 {{ cita.status }}
-              </th>
-              <th class="cita-nota">{{ cita.note }}</th>
-              <th class="cita-mascota">{{ cita.pet_name }}</th>
+              </td>
+              <td class="cita-nota">{{ cita.note }}</td>
+              <td class="cita-mascota">{{ cita.pet_name }}</td>
             </tr>
-          </div>
           <!-- Si no hay citas, mostramos un mensaje -->
           <tr v-if="citas.length === 0" key="no-citas" class="cita-vacia">
             No hay citas para este día.
@@ -129,7 +127,7 @@ function handleDeleteCita(id) {
 .citas-container {
   background: linear-gradient(to bottom right, #177ca9, #15587b);
   color: white;
-  padding: 1.5rem;
+  padding: 1rem;
   margin-left: 1rem;
   flex-grow: 1;
   box-shadow: 0 8px 10px rgba(0, 0, 0, 0.25);
@@ -157,25 +155,28 @@ h3 {
 table {
   border-collapse: collapse;
 }
-
-thead {
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 0.8rem 1rem;
-  margin-bottom: 0.5rem;
-  backdrop-filter: blur(4px);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
+thead th {
+  margin: 0.2rem 0.2rem;
 }
+
+
 .cita-encabezado {
   text-align: left;
   color: #263238;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  border-radius: 12px;
 }
 
 tbody {
   display: block;
-  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+tbody tr:first-child {
+  padding-top: 1rem;
 }
 .cita-card {
   background-color: rgba(255, 255, 255, 0.1);
@@ -186,7 +187,9 @@ tbody {
   cursor: pointer;
   width: 99.5%;
 }
-
+.cita-card:first-child {
+  margin-top: 1rem;
+}
 .cita-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -196,31 +199,32 @@ tbody {
 .cita-encabezado {
   display: grid;
   grid-template-columns:
-    minmax(100px, 1.5fr)   /* Nombre */
+    minmax(90px, 1.5fr)   /* Nombre */
     minmax(60px, 0.2fr)    /* Hora */
-    minmax(120px, 2.5fr)   /* Razón */
-    minmax(80px, 0.8fr)    /* Especialidad */
-    minmax(100px, 1.5fr)   /* Trabajador */
-    minmax(80px, 0.75fr)   /* Estado */
-    minmax(120px, 2.5fr)   /* Nota */
-    minmax(80px, 0.75fr);  /* Mascota */
-  gap: 1rem;
+    minmax(100px, 2fr)   /* Razón */
+    minmax(70px, 0.8fr)    /* Especialidad */
+    minmax(90px, 1.5fr)   /* Trabajador */
+    minmax(80px, 1fr)   /* Estado */
+    minmax(100px, 2fr)   /* Nota */
+    minmax(70px, 0.75fr);  /* Mascota */
+  gap: 0.7rem;
+  width: 100%;
 }
 .cita-mascota,
 .cita-nombre {
   font-weight: bold;
   color: #ffffff;
-  min-width: 20px;
 }
 
 .cita-hora {
   font-size: 0.9rem;
   color: #cbe9f3;
-  min-width: 40px;
 }
 .cita-estado {
+  display: flex;
+  align-items: center;
   border: 0px solid;
-  padding: 0.2rem 1rem;
+  padding: 0.2rem 0.4rem;
   font-weight: bold;
   justify-content: center;
   text-align: center;
@@ -240,6 +244,11 @@ tbody {
 
 .cita-estado.estado-cancelada {
   background: #ef5350;
+  color: #263238;
+}
+
+.cita-estado.estado-realizada {
+  background: #999999;
   color: #263238;
 }
 
@@ -263,13 +272,11 @@ tbody {
 .cita-estado,
 .citas-container,
 .cita-card,
-thead {
+thead,
+table {
   border-radius: 12px;
 }
-.cita-estado,
-.citas-container thead {
-  display: flex;
-}
+
 .citas-list,
 table,
 thead,
@@ -289,23 +296,26 @@ thead,
 .cita-card {
   align-items: center;
 }
-.cita-info th,
-.cita-encabezado th {
+.cita-info > td,
+.cita-encabezado > th {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
+  font-size: clamp(0.8rem, 1.2vw, 1.1rem); /* Tamaño responsivo */
+  padding: 0.5rem 0.2rem;
+  border: none;
 }
-.cita-razon,
-.cita-nota{
-  min-width: 40px;
+.cita-encabezado > th {
+  border-radius: 12px;
 }
-
-.cita-especialidad,
-.cita-trabajador,
-.cita-estado {
-  min-width: 80px;
+.cita-encabezado > th:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
 }
-
+.cita-encabezado > th:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
 </style>
