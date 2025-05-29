@@ -83,10 +83,11 @@ const selectedPet = ref(null);
 
 // Array de objetos para los elementos del menú
 const menuItems = [
+  { label: "Inicio", path: "/headquarters" },
+  { label: "Empleados", path: "/employees" },
   { label: "Clientes", path: "/clients" },
   { label: "Mascotas", path: "/pets" },
 ];
-
 // Carga las mascotas al montar el componente
 onMounted(async () => {
    await petStore.loadPets();

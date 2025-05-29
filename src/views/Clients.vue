@@ -114,6 +114,8 @@ const newPet = ref({});
 
 // Array de objetos para los elementos del menú
 const menuItems = [
+  { label: "Inicio", path: "/headquarters" },
+  { label: "Empleados", path: "/employees" },
   { label: "Clientes", path: "/clients" },
   { label: "Mascotas", path: "/pets" },
 ];
