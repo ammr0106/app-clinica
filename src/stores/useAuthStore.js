@@ -37,8 +37,13 @@ export const useAuthStore = defineStore('auth', {
 
         return null
       } catch (err) {
-        this.error = err
-        return err.message
+        //Traduccion de errores
+        if (err.message.includes('Invalid login credentials')) {
+          this.error = 'Correo o contraseña incorrectos'
+        } else {
+          this.error = "Ha ocurrido un error al iniciar sesión. Por favor, inténtalo de nuevo más tarde."
+        }
+        return this.error
       } finally {
         this.loading = false
       }

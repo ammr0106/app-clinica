@@ -15,6 +15,7 @@
       >
         {{ option.label }}
       </option>
+      <slot></slot>
     </select>
     <p v-if="error" class="app-select__error">{{ error }}</p>
   </div>
