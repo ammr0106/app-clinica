@@ -29,9 +29,9 @@
             v-for="(cita, i) in citas"
             :key="i"
             class="cita-card"
-            @click="openOptions(cita, i)"
+            @click="openOptions(cita.id)"
           >
-            <tr class="cita-info">
+            <tr class="cita-info" :id="cita.id">
               <th class="cita-nombre">{{ cita.client_name }}</th>
               <th class="cita-hora">{{ cita.time }}</th>
               <th class="cita-razon">{{ cita.reason }}</th>
@@ -59,11 +59,41 @@
       </table>
     </transition-group>
 
+    <Modal
+      v-if="showEditModal"
+      title="Editar cita"
+      @close="showEditModal = false"
+    >
+      <MakeDateForm
+        :selectedDate="fechaFormateada"
+        :authData="authStore"
+        @close="showEditModal = false"
+        @save="showSuccess"
+        :isEdit="selectedCita"
+      />
+    </Modal>
+
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="5000"
+      @hidden="notification.show = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import Modal from "../common/Modal.vue";
+import MakeDateForm from "./MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "../common/AppNotification.vue";
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
 
 const props = defineProps({
   fecha: {
@@ -78,17 +108,25 @@ const props = defineProps({
 
 const emit = defineEmits(["update-cita", "delete-cita"]);
 
-const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 const selectedCita = ref(null);
 const selectedIndex = ref(null);
+const authStore = useAuthStore();
+const showEditModal = ref(false);
 
-function openOptions(cita, index) {
-  selectedCita.value = { ...cita };
-  selectedIndex.value = index;
+function openOptions(id_cita) {
+  selectedCita.value = props.citas.find((cita) => cita.id === id_cita);
+  console.log("selectedCita", selectedCita.value);
   showEditModal.value = true;
 }
 
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Datos actualizados correctamente.",
+    type: "success",
+  };
+}
 </script>
 
 <style scoped>
@@ -162,14 +200,14 @@ tbody {
 .cita-encabezado {
   display: grid;
   grid-template-columns:
-    minmax(100px, 1.5fr)   /* Nombre */
-    minmax(60px, 0.2fr)    /* Hora */
-    minmax(120px, 2.5fr)   /* Razón */
-    minmax(80px, 0.8fr)    /* Especialidad */
-    minmax(100px, 1.5fr)   /* Trabajador */
-    minmax(80px, 0.75fr)   /* Estado */
-    minmax(120px, 2.5fr)   /* Nota */
-    minmax(80px, 0.75fr);  /* Mascota */
+    minmax(100px, 1.5fr) /* Nombre */
+    minmax(60px, 0.2fr) /* Hora */
+    minmax(120px, 2.5fr) /* Razón */
+    minmax(80px, 0.8fr) /* Especialidad */
+    minmax(100px, 1.5fr) /* Trabajador */
+    minmax(80px, 0.75fr) /* Estado */
+    minmax(120px, 2.5fr) /* Nota */
+    minmax(80px, 0.75fr); /* Mascota */
   gap: 1rem;
 }
 .cita-mascota,
@@ -264,7 +302,7 @@ thead,
   text-align: left;
 }
 .cita-razon,
-.cita-nota{
+.cita-nota {
   min-width: 40px;
 }
 
@@ -273,5 +311,4 @@ thead,
 .cita-estado {
   min-width: 80px;
 }
-
 </style>
