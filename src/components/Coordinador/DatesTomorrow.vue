@@ -41,8 +41,8 @@
               class="cita-estado"
               :class="{
                 'estado-pendiente': cita.status === 'Pendiente',
-                'estado-confirmada': cita.status === 'Confirmada',
-                'estado-cancelada': cita.status === 'Cancelada',
+                'estado-confirmada': cita.status === 'Confirmado',
+                'estado-cancelada': cita.status === 'Cancelado',
                 'estado-realizada': cita.status === 'Realizada',
               }"
             >
@@ -196,8 +196,9 @@ tbody tr:first-child {
   margin-top: 1rem;
 }
 .cita-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: scale(1.015);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .cita-info,
@@ -238,23 +239,23 @@ tbody tr:first-child {
   min-width: auto;
 }
 .cita-estado.estado-pendiente {
-  background: #ffffff;
-  color: #263238;
+  background: #ffffff !important;
+  color: #263238 !important;
 }
 
 .cita-estado.estado-confirmada {
-  background: #43a047;
-  color: #263238;
+  background: #43a047 !important;
+  color: #263238 !important;
 }
 
 .cita-estado.estado-cancelada {
-  background: #ef5350;
-  color: #263238;
+  background: #ef5350 !important;
+  color: #263238 !important;
 }
 
 .cita-estado.estado-realizada {
-  background: #999999;
-  color: #263238;
+  background: #999999 !important;
+  color: #263238 !important;
 }
 
 .cita-vacia {
@@ -272,13 +273,12 @@ tbody tr:first-child {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translateY(10px);
 }
-.cita-estado,
+
 .citas-container,
 .cita-card,
-thead,
-table {
+.cita-estado {
   border-radius: 12px;
 }
 
@@ -312,9 +312,7 @@ thead,
   padding: 0.5rem 0.2rem;
   border: none;
 }
-.cita-encabezado > th {
-  border-radius: 12px;
-}
+
 .cita-encabezado > th:first-child {
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
