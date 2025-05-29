@@ -86,8 +86,12 @@
       <transition name="fade">
         <div class="buttons-group" v-show="form.time">
           <AppButton variant="green" type="submit">Guardar</AppButton>
-          <AppButton  @click="emit('close')" variant="primary" class="cancel">Cancelar</AppButton>
-          <AppButton variant="red" @deleteClick="close">Eliminar</AppButton>
+          <AppButton variant="red" @deleteClick="close"
+            >Cancelar cita</AppButton
+          >
+          <AppButton @click="emit('close')" variant="primary" class="cancel"
+            >Salir</AppButton
+          >
         </div>
       </transition>
     </AppForm>
@@ -226,7 +230,6 @@ watch(
   },
   { deep: true }
 );
-
 </script>
 
 <style>
@@ -263,7 +266,7 @@ watch(
   font-weight: 400;
 }
 
-.buttons-group{
+.buttons-group {
   display: flex;
   gap: 1rem;
 }
@@ -289,7 +292,6 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
   outline: none;
 }
-
 
 .cancel {
   background-color: var(--danger);
