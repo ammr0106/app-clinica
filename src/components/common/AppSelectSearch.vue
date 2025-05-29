@@ -27,10 +27,11 @@
     </div>
 
     <ul
-      v-if="showOptions && filteredOptions.length"
+      v-if="showOptions"
       class="app-select-search__dropdown"
     >
       <li
+        v-if="filteredOptions.length"
         v-for="option in filteredOptions"
         :key="option.value"
         class="app-select-search__option"
@@ -40,6 +41,9 @@
         <small v-if="option.extra" class="extra-label">
           {{ option.extra }}
         </small>
+      </li>
+      <li v-else class="app-select-search__option no-results">
+        No se encontraron resultados.
       </li>
     </ul>
 
@@ -223,5 +227,12 @@ const handleBlur = () => {
   border-color: var(--rojo-controlado) !important;
   box-shadow: none !important;
   outline: none;
+}
+
+.no-results {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 0.75rem;
 }
 </style>
