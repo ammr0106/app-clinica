@@ -113,6 +113,14 @@ provide("selectedDay", selectedDay);
 //Modal
 const showModal = ref(false);
 
+watch(
+  () => appointmentStore.appointments,
+  (nuevasCitas) => {
+    citas.value = nuevasCitas;
+  },
+  { immediate: true }
+);
+
 // Cargamos las citas si el array está vacío
 onMounted(async () => {
   if (!authStore.user || !authStore.profile) {
@@ -121,14 +129,7 @@ onMounted(async () => {
   if (!appointmentStore.appointments.length) {
     console.log("📥 Cargando citas desde store...");
     await appointmentStore.loadAppointments();
-    watch(
-      () => appointmentStore.appointments,
-      (nuevasCitas) => {
-        citas.value = nuevasCitas;
-      },
-      { immediate: true }
-    );
-    console.log("Citas cargadas:", citas.value);
+    citas.value = appointmentStore.appointments;
   }
 });
 const rol = authStore.profile.rol;
