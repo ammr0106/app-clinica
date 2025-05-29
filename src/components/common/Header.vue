@@ -23,7 +23,30 @@
 </template>
 
 <script setup>
+// Importamos los componentes necesarios
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useRouter } from 'vue-router'
 import AppSideBar from "@/components/common/AppSideBar.vue";
+
+const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
+
+//Inicializamos el store de autenticación y el router
+const authStore = useAuthStore()
+const router = useRouter()
+
+// Una vez se carga el componente se verifica si el usuario está autenticado
+onMounted(async () => {
+  if (!authStore.user || !authStore.profile) {
+    await authStore.fetchUser()
+  }
+})
+
+//Funcion para cerrar sesion
+const logout = async () => {
+  await authStore.logout()
+  router.push('/')
+}
 
 const props = defineProps({
   menuItems: {
@@ -164,6 +187,9 @@ const logout = async () => {
   border-radius: 999px;
   width: auto;
   white-space: nowrap;
+
+  cursor: pointer;
+
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }

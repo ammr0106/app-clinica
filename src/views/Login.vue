@@ -92,12 +92,18 @@ const handleLogin = async () => {
 
     //Redirigimos en función del rol del usuario
     if (role === 'superadmin') {
-      router.push('/superadmin')
-    } else if (role === 'coordinator') {
-      router.push('/coordinador')
-    } else {
-      router.push('/')
-    }
+
+      router.push('/superadmin');
+    } else if (role === 'coordinator' || role === 'worker') {
+      const headquartersId = authStore.profile?.id_headquarters;
+      if (headquartersId) {
+        router.push({ name: 'Headquarters', params: { headquarters_id: headquartersId } });
+      } else {
+        console.error("No se ha encontrado el ID de la sede del coordinador");
+        router.push('/');
+      }
+    } 
+
   }
 }
 </script>
@@ -278,7 +284,7 @@ const handleLogin = async () => {
 .password-wrapper input {
   width: 100%;
   padding: 1rem;
-  padding-right: 3rem; 
+  padding-right: 3rem;
   border: 1px solid #ccc;
   border-radius: 10px;
   font-size: 1.1rem;

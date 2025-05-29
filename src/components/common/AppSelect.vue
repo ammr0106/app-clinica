@@ -15,8 +15,8 @@
       >
         {{ option.label }}
       </option>
+      <slot></slot>
     </select>
-    <slot></slot>
     <p v-if="error" class="app-select__error">{{ error }}</p>
   </div>
 </template>
