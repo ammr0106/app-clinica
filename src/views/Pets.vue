@@ -12,19 +12,24 @@
           placeholder="Buscar mascota..."
         />
         <div class="buttons">
-          <AppButton
-            @click="openEditPetForm"
-            :disabled="!selectedPet"
-          >Editar Mascota</AppButton>
+          <AppButton @click="openEditPetForm" :disabled="!selectedPet"
+            >Editar Mascota</AppButton
+          >
           <AppButton
             @click="handleDeletePet"
             :disabled="!selectedPet"
             variant="red"
-          >Eliminar Mascota</AppButton>
+            >Eliminar Mascota</AppButton
+          >
         </div>
       </div>
 
-      <PetsTable v-if="petStore.pets.length > 0" :pets="filteredPets" @select-pet="selectPet" :selectedPetId="selectedPet?.id"/>
+      <PetsTable
+        v-if="petStore.pets.length > 0"
+        :pets="filteredPets"
+        @select-pet="selectPet"
+        :selectedPetId="selectedPet?.id"
+      />
 
       <Modal
         v-if="showPetForm"
@@ -61,7 +66,6 @@ import { usePetsStore } from "@/stores/usePetStore";
 import AppNotification from "@/components/common/AppNotification.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 
-
 // Inicialización del store de mascotas
 const petStore = usePetsStore();
 const authStore = useAuthStore();
@@ -80,28 +84,29 @@ const filtrosDisponibles = [
 // Estado reactivo para controlar la visibilidad del formulario de mascotas
 const showPetForm = ref(false);
 const selectedPet = ref(null);
-
+const rol = authStore.profile?.rol;
 // Array de objetos para los elementos del menú
 const menuItems = [
   { label: "Inicio", path: "/headquarters" },
-  { label: "Empleados", path: "/employees" },
+  ...(rol === "coordinator"
+    ? [{ label: "Empleados", path: "/employees" }]
+    : []),
   { label: "Clientes", path: "/clients" },
   { label: "Mascotas", path: "/pets" },
 ];
 // Carga las mascotas al montar el componente
 onMounted(async () => {
-   await petStore.loadPets();
+  await petStore.loadPets();
 });
 
-
-
 // Obtiene el ID de la sede del usuario autenticado
-const headquartersId = computed(
-  () => {
-    console.log("Pets.vue - Headquarters ID:", authStore.profile?.id_headquarters); // Agrega este console.log
-    return authStore.profile?.id_headquarters || null;
-  }
-);
+const headquartersId = computed(() => {
+  console.log(
+    "Pets.vue - Headquarters ID:",
+    authStore.profile?.id_headquarters
+  ); // Agrega este console.log
+  return authStore.profile?.id_headquarters || null;
+});
 
 // Filtra las mascotas basándose en el término de búsqueda y el filtro seleccionado
 const filteredPets = computed(() => {
@@ -116,7 +121,6 @@ const filteredPets = computed(() => {
     const filter = filterBy.value;
     return String(pet[filter]).toLowerCase().includes(term);
   });
-
 });
 
 // Cierra el formulario de mascotas y deselecciona la mascota
@@ -146,7 +150,7 @@ const handleEditPetSubmit = async (petData) => {
       birthdate: petData.birthdate,
       chip_number: petData.chip_number,
       observations: petData.observations,
-      id_client: selectedPet.value.id_client, 
+      id_client: selectedPet.value.id_client,
     };
     const error = await petStore.editPet(selectedPet.value.id, updatedPetData);
     if (error) {
@@ -177,7 +181,10 @@ const handleEditPetSubmit = async (petData) => {
 
 // Maneja la eliminación de una mascota
 const handleDeletePet = async () => {
-  if (selectedPet.value && confirm("¿Estás seguro de que quieres eliminar esta mascota?")) {
+  if (
+    selectedPet.value &&
+    confirm("¿Estás seguro de que quieres eliminar esta mascota?")
+  ) {
     try {
       const error = await petStore.removePet(selectedPet.value.id);
       if (error) {

@@ -90,13 +90,6 @@ function showSuccess() {
   };
 }
 
-const menuItems = [
-  { label: "Inicio", path: "/headquarters" },
-  { label: "Empleados", path: "/employees" },
-  { label: "Clientes", path: "/clients" },
-  { label: "Mascotas", path: "/pets" },
-];
-
 const {
   selectedDay,
   selectedMonth,
@@ -138,7 +131,16 @@ onMounted(async () => {
     console.log("Citas cargadas:", citas.value);
   }
 });
+const rol = authStore.profile.rol;
 
+const menuItems = [
+  { label: "Inicio", path: "/headquarters" },
+  ...(rol === "coordinator"
+    ? [{ label: "Empleados", path: "/employees" }]
+    : []),
+  { label: "Clientes", path: "/clients" },
+  { label: "Mascotas", path: "/pets" },
+];
 // Computed property que formatea la fecha seleccionada
 const fecha = computed(() => {
   // Si no hay día seleccionado, retorna string vacío
