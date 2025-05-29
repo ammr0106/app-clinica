@@ -24,17 +24,16 @@
 
 <script setup>
 // Importamos los componentes necesarios
-import MenuBurger from './MenuBurger.vue'
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
 import AppSideBar from "@/components/common/AppSideBar.vue";
 import AuthModal from "@/components/AuthModal.vue"; // Importa el componente AuthModal
-import { ref } from 'vue';
+
 
 const showAuth = ref(false);
 
-const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
+
 
 //Inicializamos el store de autenticación y el router
 const authStore = useAuthStore()

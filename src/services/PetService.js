@@ -36,10 +36,14 @@ import { supabase } from "./DatabaseConnection";
  */
 
 /**
+ * @param {string} [headquartersId] - Opcional ID de la sede para filtrar las mascotas.
  * @returns {Promise<Pet[]>}
  */
-export async function fetchPets() {
-  const { data, error } = await supabase.from("pets").select(`
+export async function fetchPets(headquartersId) {
+  let query = supabase
+    .from("pets") // Nombre correcto de la tabla
+    .select(
+      `
       id,
       name,
       kind,
@@ -49,7 +53,15 @@ export async function fetchPets() {
       breed,
       client ( id, DNI ),
       headquarters ( name )
-    `);
+    `
+    )
+    .order('name', { ascending: true }); // Ordenar por nombre
+
+  if (headquartersId) {
+    query = query.eq("headquarters_id", headquartersId);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw error;
   return data;
@@ -60,7 +72,7 @@ export async function fetchPets() {
  * @returns {Promise<{ error: any }>}
  */
 export async function createPet(petData) {
-  const { error } = await supabase.from("pets").insert([petData]);
+  const { error } = await supabase.from("pets").insert([petData]); // Nombre correcto de la tabla
   return { error };
 }
 
@@ -70,7 +82,7 @@ export async function createPet(petData) {
  * @returns {Promise<{ error: any }>}
  */
 export async function updatePet(id, petData) {
-  const { error } = await supabase.from("pets").update(petData).eq("id", id);
+  const { error } = await supabase.from("pets").update(petData).eq("id", id); // Nombre correcto de la tabla
   return { error };
 }
 
@@ -79,6 +91,6 @@ export async function updatePet(id, petData) {
  * @returns {Promise<{ error: any }>}
  */
 export async function deletePet(id) {
-  const { error } = await supabase.from("pets").delete().eq("id", id);
+  const { error } = await supabase.from("pets").delete().eq("id", id); // Nombre correcto de la tabla
   return { error };
 }

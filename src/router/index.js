@@ -30,13 +30,13 @@ const routes = [
     path: "/clients/:clientId?", // Agrega un parámetro opcional clientId
     name: "Clients",
     component: Clients,
-    meta: { requiresAuth: true, role: "coordinador" },
+    //meta: { requiresAuth: true, role: "coordinator, worker" },
   },
   {
     path: "/pets", // Agrega la ruta para la vista de mascotas
     name: "Pets",
     component: Pets,
-    meta: { requiresAuth: true, role: "coordinador" }, // Ajusta el rol si es necesario
+    //meta: { requiresAuth: true, role: "coordinator, worker" }, // Ajusta el rol si es necesario
   },
 ];
 

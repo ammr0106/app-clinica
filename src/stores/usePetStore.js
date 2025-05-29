@@ -5,6 +5,7 @@ import {
   updatePet as updatePetService,
   deletePet as deletePetService
 } from '@/services/PetService'
+import { useAuthStore } from './useAuthStore';
 
 /**
  * @typedef {Object} PetMapped
@@ -34,7 +35,15 @@ export const usePetsStore = defineStore('pets', {
       this.loading = true
       this.error = null
       try {
-        const data = await fetchPets()
+        const authStore = useAuthStore();
+        const headquartersId = authStore.profile?.id_headquarters;
+
+        let data;
+        if (headquartersId) {
+          data = await fetchPets(headquartersId); // Pasa el ID de la sede a la función fetchPets
+        } else {
+          data = await fetchPets(); // Si no hay ID de sede, trae todas las mascotas (o puedes manejarlo de otra manera)
+        }
         this.pets = data.map(pet => ({
           id: pet.id,
           name: pet.name,
