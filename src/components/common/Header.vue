@@ -24,7 +24,6 @@
 
 <script setup>
 // Importamos los componentes necesarios
-import MenuBurger from './MenuBurger.vue'
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
