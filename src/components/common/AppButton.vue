@@ -79,7 +79,6 @@ function handleClick(e) {
 }
 
 .app-button--red {
-  margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--rojo-controlado);
   color: white;

@@ -59,19 +59,11 @@
       </table>
     </transition-group>
 
-    <!-- Modal para confirmar eliminación -->
-    <DeleteDateModal
-      v-if="showDeleteModal"
-      :cita="selectedCita"
-      @confirm="handleDelete"
-      @close="closeModals"
-    />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import DeleteDateModal from "./DeleteDateModal.vue";
 
 const props = defineProps({
   fecha: {
@@ -97,22 +89,6 @@ function openOptions(cita, index) {
   showEditModal.value = true;
 }
 
-function closeModals() {
-  showEditModal.value = false;
-  showDeleteModal.value = false;
-  selectedCita.value = null;
-  selectedIndex.value = null;
-}
-
-function handleSaveEdit(editedCita) {
-  emit("update-cita", { editedCita, index: selectedIndex.value });
-  closeModals();
-}
-
-function handleDeleteCita(id) {
-  emit("delete-cita", id);
-  closeModals();
-}
 </script>
 
 <style scoped>

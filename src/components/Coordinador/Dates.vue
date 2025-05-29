@@ -27,7 +27,7 @@
             v-for="(cita, i) in citas"
             :key="i"
             class="cita-card"
-            @click="openOptions(cita.id, i)"
+            @click="openOptions(cita.id)"
           >
             <tr class="cita-info" :id="cita.id">
               <th class="cita-nombre">{{ cita.client_name }}</th>
@@ -62,31 +62,50 @@
       No hay citas para este día.
     </div>
 
-    <Modal v-if="showEditModal" title="Editar cita" @close="closeModals">
+    <Modal
+      v-if="showEditModal"
+      title="Editar cita"
+      @close="showEditModal = false"
+    >
       <MakeDateForm
         :selectedDate="fechaFormateada"
         :authData="authStore"
-        @close="showModal = false"
-        @save="handleSave"
-        isEdit
+        @close="showEditModal = false"
+        @save="showSuccess"
+        :isEdit="selectedCita"
       />
     </Modal>
-
-    <DeleteDateModal
-      v-if="showDeleteModal"
-      :cita="selectedCita"
-      @confirm="handleDelete"
-      @close="closeModals"
-    />
   </div>
+
+  <AppNotification
+    v-if="notification.show"
+    :message="notification.message"
+    :type="notification.type"
+    :duration="5000"
+    @hidden="notification.show = false"
+  />
 </template>
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import DeleteDateModal from "./DeleteDateModal.vue";
 import Modal from "../common/Modal.vue";
 import MakeDateForm from "./MakeDateForm.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "../common/AppNotification.vue";
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Datos actualizados correctamente.",
+    type: "success",
+  };
+}
 
 const props = defineProps({
   fecha: String,
@@ -185,28 +204,10 @@ async function fetchCitas() {
   }
 }
 
-function openOptions(id_cita, index) {
+function openOptions(id_cita) {
   selectedCita.value = props.citas.find((cita) => cita.id === id_cita);
-
-  console.log(selectedCita);
-  //showEditModal.value = true;
-}
-
-function closeModals() {
-  showEditModal.value = false;
-  showDeleteModal.value = false;
-  selectedCita.value = null;
-  selectedIndex.value = null;
-}
-
-function handleSaveEdit(editedCita) {
-  emit("update-cita", { editedCita, index: selectedIndex.value });
-  closeModals();
-}
-
-function handleDeleteCita(id) {
-  emit("delete-cita", id);
-  closeModals();
+  console.log("selectedCita", selectedCita.value);
+  showEditModal.value = true;
 }
 </script>
 
@@ -281,14 +282,14 @@ tbody {
 .cita-encabezado {
   display: grid;
   grid-template-columns:
-    minmax(100px, 1.5fr)   /* Nombre */
-    minmax(60px, 0.2fr)    /* Hora */
-    minmax(120px, 2.5fr)   /* Razón */
-    minmax(80px, 0.8fr)    /* Especialidad */
-    minmax(100px, 1.5fr)   /* Trabajador */
-    minmax(80px, 0.75fr)   /* Estado */
-    minmax(120px, 2.5fr)   /* Nota */
-    minmax(80px, 0.75fr);  /* Mascota */
+    minmax(100px, 1.5fr) /* Nombre */
+    minmax(60px, 0.2fr) /* Hora */
+    minmax(120px, 2.5fr) /* Razón */
+    minmax(80px, 0.8fr) /* Especialidad */
+    minmax(100px, 1.5fr) /* Trabajador */
+    minmax(80px, 0.75fr) /* Estado */
+    minmax(120px, 2.5fr) /* Nota */
+    minmax(80px, 0.75fr); /* Mascota */
   gap: 1rem;
 }
 .cita-mascota,

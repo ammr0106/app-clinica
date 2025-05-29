@@ -83,6 +83,7 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 1rem;
   user-select: none;
+  z-index: 9999;
 }
 
 .notification.success {

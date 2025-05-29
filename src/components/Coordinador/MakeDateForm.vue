@@ -83,15 +83,22 @@
         </div>
       </transition>
 
+      <transition v-if="isEdit" name="fade">
+        <AppSelect v-show="form.time" label="Estado" v-model="form.status">
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmado">Confirmada</option>
+          <option value="cancelado">Cancelada</option>
+          <option value="realizada">Realizada</option>
+        </AppSelect>
+      </transition>
+
       <transition name="fade">
         <div class="buttons-group" v-show="form.time">
           <AppButton variant="green" type="submit">Guardar</AppButton>
           <AppButton variant="red" @deleteClick="close"
             >Cancelar cita</AppButton
           >
-          <AppButton @click="emit('close')" variant="primary" class="cancel"
-            >Salir</AppButton
-          >
+          <AppButton @click="emit('close')" variant="primary">Salir</AppButton>
         </div>
       </transition>
     </AppForm>
@@ -100,23 +107,21 @@
 
 <script setup>
 // Importamos funciones de Vue necesarias para reactividad y propiedades computadas
-import { reactive, computed, onMounted, watch } from "vue";
+import { reactive, computed, onMounted, watch, ref } from "vue";
 
 // Importamos el botón de eliminación de citas
-import DeleteDateBtn from "@/components/Coordinador/DeleteDateBtn.vue";
 import AppForm from "../common/AppForm.vue";
 import AppInput from "../common/AppInput.vue";
 import AppSelect from "../common/AppSelect.vue";
 import { useAppointmentStore } from "@/stores/useAppointmentStore";
 import AppSelectSearch from "../common/AppSelectSearch.vue";
 import AppButton from "../common/AppButton.vue";
-import App from "@/App.vue";
 
 // Definimos las propiedades que este componente espera recibir
 const props = defineProps({
   selectedDate: { type: String, required: true },
   authData: { type: Object, required: true },
-  isEdit: { type: Boolean },
+  isEdit: { type: Object, required: true },
 });
 
 const appointmentStore = useAppointmentStore();
@@ -141,6 +146,35 @@ const form = reactive({
   id_headquarters: props.authData.profile.id_headquarters,
   status: "pendiente",
 });
+
+const id_cita = ref(null);
+
+watch(
+  () => appointmentStore.formData.clients,
+  (newClients) => {
+    if (newClients.length && props.isEdit) {
+      id_cita.value = props.isEdit.id;
+      form.id_client = props.isEdit.id_client;
+      form.id_specialties = props.isEdit.id_specialties;
+      form.date = props.isEdit.date;
+      form.time = props.isEdit.time;
+      form.reason = props.isEdit.reason;
+      form.note = props.isEdit.note;
+      form.id_employee = props.isEdit.id_employee;
+      form.id_headquarters = props.isEdit.id_headquarters;
+      form.status = props.isEdit.status.toLowerCase();
+
+      if (props.isEdit.id_pets) {
+        form.pet = true;
+        form.id_pets = props.isEdit.id_pets;
+      } else {
+        form.pet = false;
+        form.id_pets = null;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 const errors = reactive({
   id_client: "",
@@ -197,9 +231,15 @@ async function submit() {
 
   const { pet, ...newAppointment } = form;
 
-  console.log("Datos:", newAppointment);
-  await appointmentStore.createAppointment(newAppointment);
-  //emit("close");
+  if (props.isEdit) {
+    await appointmentStore.editAppointment(id_cita.value, newAppointment);
+    await appointmentStore.loadAppointments();
+  } else {
+    await appointmentStore.createAppointment(newAppointment);
+    await appointmentStore.loadAppointments();
+  }
+  emit("close");
+  emit("save");
 }
 
 const selectedClient = computed(() => {

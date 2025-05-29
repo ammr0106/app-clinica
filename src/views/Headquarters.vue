@@ -42,12 +42,21 @@
       <Modal @close="showModal = false" v-if="showModal" title="Crear cita">
         <MakeDateForm
           :selectedDate="fechaFormateada"
-          :authData = "authStore"
+          :authData="authStore"
           @close="showModal = false"
-          @save="handleSave"
+          @save="showSuccess"
+          :isEdit="null"
         />
       </Modal>
     </main>
+
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="5000"
+      @hidden="notification.show = false"
+    />
   </div>
 </template>
 
@@ -65,6 +74,21 @@ import AppButton from "@/components/common/AppButton.vue";
 import Modal from "@/components/common/Modal.vue";
 import MakeDateForm from "@/components/Coordinador/MakeDateForm.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "@/components/common/AppNotification.vue";
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Cita creada correctamente.",
+    type: "success",
+  };
+}
 
 const {
   selectedDay,
@@ -92,12 +116,18 @@ const showModal = ref(false);
 // Cargamos las citas si el array está vacío
 onMounted(async () => {
   if (!authStore.user || !authStore.profile) {
-    await authStore.fetchUser()
+    await authStore.fetchUser();
   }
   if (!appointmentStore.appointments.length) {
     console.log("📥 Cargando citas desde store...");
     await appointmentStore.loadAppointments();
-    citas.value = appointmentStore.appointments;
+    watch(
+      () => appointmentStore.appointments,
+      (nuevasCitas) => {
+        citas.value = nuevasCitas;
+      },
+      { immediate: true }
+    );
     console.log("Citas cargadas:", citas.value);
   }
 });
@@ -132,7 +162,7 @@ const fecha = computed(() => {
   display: flex;
   flex-direction: column;
   padding: 2rem;
-  height: calc((100vh - 64px) - 2rem); /* Ajusta según la altura del header */
+  height: calc((100vh - 64px) - 2rem);
 }
 
 .acciones {

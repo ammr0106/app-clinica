@@ -95,7 +95,7 @@ export const useAppointmentStore = defineStore("appointment", {
     async editAppointment(id, updatedData) {
       const { error } = await updateAppointmentService(id, updatedData);
       if (!error) await this.loadAppointments();
-      return error;
+      return { error };
     },
 
     async removeAppointment(id) {
