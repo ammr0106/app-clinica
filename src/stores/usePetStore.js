@@ -38,12 +38,15 @@ export const usePetsStore = defineStore('pets', {
         const authStore = useAuthStore();
         const headquartersId = authStore.profile?.id_headquarters;
 
-        let data;
+        let data = await fetchPets(headquartersId); // Pasa el ID de la sede a la función fetchPets
+
+        console.log("usePetStore - Pets data:", data); // Agrega este console.log
+
+        // Filtrar las mascotas por headquartersId
         if (headquartersId) {
-          data = await fetchPets(headquartersId); // Pasa el ID de la sede a la función fetchPets
-        } else {
-          data = await fetchPets(); // Si no hay ID de sede, trae todas las mascotas (o puedes manejarlo de otra manera)
+          data = data.filter(pet => pet.id_headquarters === headquartersId);
         }
+
         this.pets = data.map(pet => ({
           id: pet.id,
           name: pet.name,
@@ -55,6 +58,7 @@ export const usePetsStore = defineStore('pets', {
           headquarters_name: pet.headquarters?.name || 'Sin sede',
           id_client: pet.client?.id || null,
           client_DNI: pet.client?.DNI || 'Sin cliente',
+          headquarters_id: pet.headquarters_id, // Agrega headquarters_id al mapeo
         }))
       } catch (err) {
         this.error = err

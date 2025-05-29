@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <PetsTable :pets="filteredPets" @select-pet="selectPet" :selectedPetId="selectedPet?.id"/>
+      <PetsTable v-if="petStore.pets.length > 0" :pets="filteredPets" @select-pet="selectPet" :selectedPetId="selectedPet?.id"/>
 
       <Modal
         v-if="showPetForm"
@@ -59,9 +59,12 @@ import Modal from "@/components/common/Modal.vue";
 import AppSearchbar from "@/components/common/AppSearchbar.vue";
 import { usePetsStore } from "@/stores/usePetStore";
 import AppNotification from "@/components/common/AppNotification.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+
 
 // Inicialización del store de mascotas
 const petStore = usePetsStore();
+const authStore = useAuthStore();
 
 // Estado reactivo para la búsqueda y filtrado de mascotas
 const searchTerm = ref("");
@@ -86,21 +89,33 @@ const menuItems = [
 
 // Carga las mascotas al montar el componente
 onMounted(async () => {
-  await petStore.loadPets();
+   await petStore.loadPets();
 });
+
+
+
+// Obtiene el ID de la sede del usuario autenticado
+const headquartersId = computed(
+  () => {
+    console.log("Pets.vue - Headquarters ID:", authStore.profile?.id_headquarters); // Agrega este console.log
+    return authStore.profile?.id_headquarters || null;
+  }
+);
 
 // Filtra las mascotas basándose en el término de búsqueda y el filtro seleccionado
 const filteredPets = computed(() => {
-  return petStore.pets.filter((pet) => {
+  let pets = petStore.pets;
+
+  if (!searchTerm.value.trim()) {
+    return pets; // Retorna todas las mascotas si no hay término de búsqueda
+  }
+
+  return pets.filter((pet) => {
     const term = searchTerm.value.toLowerCase();
     const filter = filterBy.value;
-
-    if (!term) {
-      return true;
-    }
-
     return String(pet[filter]).toLowerCase().includes(term);
   });
+
 });
 
 // Cierra el formulario de mascotas y deselecciona la mascota
@@ -130,7 +145,7 @@ const handleEditPetSubmit = async (petData) => {
       birthdate: petData.birthdate,
       chip_number: petData.chip_number,
       observations: petData.observations,
-      id_client: selectedPet.value.id_client, // Usar el id_client existente
+      id_client: selectedPet.value.id_client, 
     };
     const error = await petStore.editPet(selectedPet.value.id, updatedPetData);
     if (error) {

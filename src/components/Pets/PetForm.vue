@@ -94,7 +94,7 @@ const handleSubmit = () => {
   errors.chip_number = /^\d+$/.test(pet.value.chip_number) || !pet.value.chip_number ? "" : "El número de chip debe contener solo dígitos.";
 
   if (Object.values(errors).every(error => !error)) {
-    emit("submit", { ...pet.value });
+    emit("submit", { ...pet.value, id_headquarters: pet.value.id_headquarters });
   }
 };
 

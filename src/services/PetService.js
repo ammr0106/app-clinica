@@ -40,30 +40,36 @@ import { supabase } from "./DatabaseConnection";
  * @returns {Promise<Pet[]>}
  */
 export async function fetchPets(headquartersId) {
+  const selectFields = [
+    'id',
+    'name',
+    'kind',
+    'birthdate',
+    'chip_number',
+    'observations',
+    'breed',
+    'client ( id, DNI )',
+    'id_headquarters',
+    'headquarters ( name )'
+  ];
+
   let query = supabase
-    .from("pets") // Nombre correcto de la tabla
-    .select(
-      `
-      id,
-      name,
-      kind,
-      birthdate,
-      chip_number,
-      observations,
-      breed,
-      client ( id, DNI ),
-      headquarters ( name )
-    `
-    )
-    .order('name', { ascending: true }); // Ordenar por nombre
+    .from("pets")
+    .select(selectFields.join(', '))
+    .order('name', { ascending: true });
+
+  console.log("Headquarters ID:", headquartersId); // Agrega este console.log
 
   if (headquartersId) {
-    query = query.eq("headquarters_id", headquartersId);
+    query = query.eq("id_headquarters", headquartersId);
   }
 
   const { data, error } = await query;
 
+  console.log("Supabase query:", query); // Agrega este console.log
+
   if (error) throw error;
+
   return data;
 }
 
@@ -72,7 +78,7 @@ export async function fetchPets(headquartersId) {
  * @returns {Promise<{ error: any }>}
  */
 export async function createPet(petData) {
-  const { error } = await supabase.from("pets").insert([petData]); // Nombre correcto de la tabla
+  const { error } = await supabase.from("pets").insert([petData]);
   return { error };
 }
 
@@ -82,7 +88,7 @@ export async function createPet(petData) {
  * @returns {Promise<{ error: any }>}
  */
 export async function updatePet(id, petData) {
-  const { error } = await supabase.from("pets").update(petData).eq("id", id); // Nombre correcto de la tabla
+  const { error } = await supabase.from("pets").update(petData).eq("id", id);
   return { error };
 }
 
@@ -91,6 +97,6 @@ export async function updatePet(id, petData) {
  * @returns {Promise<{ error: any }>}
  */
 export async function deletePet(id) {
-  const { error } = await supabase.from("pets").delete().eq("id", id); // Nombre correcto de la tabla
+  const { error } = await supabase.from("pets").delete().eq("id", id);
   return { error };
 }

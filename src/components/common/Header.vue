@@ -5,7 +5,7 @@
       <!--Si el usuario esta identificado-->
       <div v-if="authStore.user && authStore.profile" class="user-info">
         <span>Bienvenido, {{ authStore.profile.name }} 👋</span>
-        <AppButton @click="logout" variant="secondary" class="logout-button">Cerrar sesión</AppButton>
+        <AppButton @click="logout" variant="green" class="logout-button">Cerrar sesión</AppButton>
       </div>
     </div>
 
@@ -28,8 +28,8 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
 import AppSideBar from "@/components/common/AppSideBar.vue";
-import AuthModal from "@/components/AuthModal.vue"; // Importa el componente AuthModal
-
+import AuthModal from "@/components/AuthModal.vue"; 
+import AppButton from "@/components/common/AppButton.vue";
 
 const showAuth = ref(false);
 

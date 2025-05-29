@@ -353,7 +353,10 @@ const handleSubmitClientForm = async (clientData, event) => {
 
 // Abre el formulario para agregar una mascota a un cliente
 const openPetsForm = () => {
-  newPet.value = { id_client: selectedClient.value?.id };
+  newPet.value = {
+    id_client: selectedClient.value?.id,
+    id_headquarters: authStore.profile?.id_headquarters, // Agrega el id_headquarters
+  };
   showPetsForm.value = true;
 };
 

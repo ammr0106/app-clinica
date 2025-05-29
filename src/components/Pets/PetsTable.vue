@@ -9,7 +9,7 @@
           <th>Fecha de Nacimiento</th>
           <th>Número de Chip</th>
           <th>Observaciones</th>
-          <th>Dueño</th> 
+          <th>Dueño</th>
         </tr>
       </thead>
       <tbody>
@@ -45,7 +45,7 @@
 <script setup>
 import { defineProps, defineEmits } from "vue";
 
-defineProps({
+const props = defineProps({
   pets: {
     type: Array,
     required: true,
@@ -61,6 +61,8 @@ const emit = defineEmits(["select-pet"]);
 const selectPet = (pet) => {
   emit("select-pet", pet);
 };
+
+console.log("PetsTable - Pets data:", props.pets); // Agrega este console.log
 </script>
 
 <style scoped>
