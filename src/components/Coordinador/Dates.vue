@@ -58,10 +58,6 @@
       </table>
     </transition-group>
 
-    <div v-if="citas.length === 0" class="cita-vacia">
-      No hay citas para este día.
-    </div>
-
     <Modal
       v-if="showEditModal"
       title="Editar cita"

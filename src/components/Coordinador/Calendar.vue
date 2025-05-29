@@ -28,6 +28,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, computed, watch } from "vue";
 
@@ -173,7 +174,12 @@ function selectDay(day) {
   color: #cfd2d3;
   width: 100%;
 }
-
+.day:hover {
+  background-color: #2e3b4e;
+  color: #fff;
+  transition: background-color 0.2s, color 0.2s;
+  border-radius: 16px;
+}
 .day {
   padding: 0.6rem;
   text-align: center;
@@ -188,6 +194,16 @@ function selectDay(day) {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.day.selected {
+  background-color: #177ca9;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: #0f5472 0px 0px 10px;
+  border: 3px solid #0f5472;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  border-radius: 16px;
 }
 
 @media (max-width: 700px) {
