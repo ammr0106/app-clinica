@@ -29,12 +29,6 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
 import AppSideBar from "@/components/common/AppSideBar.vue";
 
-const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
-
-//Inicializamos el store de autenticación y el router
-const authStore = useAuthStore()
-const router = useRouter()
-
 // Una vez se carga el componente se verifica si el usuario está autenticado
 onMounted(async () => {
   if (!authStore.user || !authStore.profile) {
@@ -42,11 +36,6 @@ onMounted(async () => {
   }
 })
 
-//Funcion para cerrar sesion
-const logout = async () => {
-  await authStore.logout()
-  router.push('/')
-}
 
 const props = defineProps({
   menuItems: {
@@ -55,10 +44,6 @@ const props = defineProps({
     default: () => [],
   },
 });
-// Importamos los componentes necesarios
-import { ref, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/useAuthStore'
-import { useRouter } from 'vue-router'
 
 const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
 

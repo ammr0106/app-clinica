@@ -54,9 +54,11 @@ const roleMap = {
 /* Función para filtrar los usuarios a mostrar según: 
     el id del usuario logueado, sin mostrar los superadmin y según la barra de búsqueda. */
 const users = computed(() => {
-    const headquartersId = authStore.user?.id_headquarters
+    const headquartersId = authStore.profile?.id_headquarters
+    
     return userStore.users.filter(user => {
-        const matchesHeadquarters = user.id_headquarters === headquartersId
+        console.log(user)
+        const matchesHeadquarters = user.headquarters_id === headquartersId
         const notSuperAdmin = user.rol !== 'superadmin'
         let matchesSearch = true
 

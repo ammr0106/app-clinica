@@ -8,8 +8,6 @@ import Employees from "@/views/Employees.vue";
 import { h } from "vue";
 import Headquarters from "@/views/Headquarters.vue";
 
-import { useAuthStore } from "@/stores/useAuthStore";
-import { supabase } from "@/services/DatabaseConnection";
 const routes = [
   {
     path: "/",
@@ -89,22 +87,6 @@ router.beforeEach(async (to, from, next) => {
       return next({ name: "Login" }); 
     }
   }
-
-  //Redirigimos al coordinador a su sede
-  if (["coordinator", "worker"].includes(auth.profile?.rol)) {
-  const headquartersID = auth.profile?.id_headquarters;
-
-  // Si intenta acceder a cualquier ruta diferente a su headquarters, redirigir
-  if (to.name !== "Headquarters" || to.params.headquarters_id !== String(headquartersID)) {
-    if (headquartersID) {
-      return next({ name: "Headquarters", params: { headquarters_id: headquartersID } });
-    } else {
-      console.error("No se ha encontrado el id de la sede del usuario");
-      return next({ name: "Login" });
-
-    }
-  }
-}
 
   next();
 });
