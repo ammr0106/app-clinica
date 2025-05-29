@@ -20,15 +20,15 @@
     <!-- Input búsqueda -->
     <input
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="procesarInput($event.target.value)"
       type="text"
-      placeholder="Buscar sede..."
+      :placeholder="placeholder"
       class="input"
     />
 
     <!-- Desplegable de filtros -->
     <div class="dropdown-container" @click="toggleDropdown">
-      <span class="selected">{{ selectedFilter }}</span>
+      <span class="selected">{{ selectedLabel }}</span>
       <svg
         class="arrow"
         xmlns="http://www.w3.org/2000/svg"
@@ -46,10 +46,10 @@
       <ul v-if="dropdownOpen" class="dropdown-menu">
         <li
           v-for="filtro in filtros"
-          :key="filtro"
+          :key="filtro.value"
           @click.stop="seleccionarFiltro(filtro)"
         >
-          {{ filtro }}
+          {{ filtro.label }}
         </li>
       </ul>
     </div>
@@ -57,31 +57,55 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watchEffect } from "vue";
 
 const props = defineProps({
   modelValue: String,
-})
+  filtros: {
+    type: Array,
+    default: () => [
+      { label: "Nombre", value: "nombre" },
+      { label: "Ciudad", value: "ciudad" },
+      { label: "Especialidad", value: "especialidad" },
+      { label: "Dirección", value: "direccion" },
+    ],
+  },
+  modelFiltro: String,
+  placeholder: {
+    type: String,
+    default: "Buscar...",
+  },
+});
 
-const emit = defineEmits(['update:modelValue', 'update:filtro'])
+const emit = defineEmits(["update:modelValue", "update:modelFiltro"]);
 
-const selectedFilter = ref('Nombre')
-const dropdownOpen = ref(false)
-const filtros = ['Nombre', 'Ciudad', 'Especialidad', 'Dirección']
+const dropdownOpen = ref(false);
+const selectedLabel = ref("");
+
+watchEffect(() => {
+  const selected = props.filtros.find((f) => f.value === props.modelFiltro);
+  selectedLabel.value = selected?.label || props.filtros[0].label;
+});
 
 function toggleDropdown() {
-  dropdownOpen.value = !dropdownOpen.value
+  dropdownOpen.value = !dropdownOpen.value;
 }
 
 function seleccionarFiltro(filtro) {
-  selectedFilter.value = filtro
-  dropdownOpen.value = false
-  emit('update:filtro', filtro.toLowerCase())
+  emit("update:modelFiltro", filtro.value);
+  dropdownOpen.value = false;
+}
+
+function procesarInput(valor) {
+  const normalizado = valor
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  emit("update:modelValue", normalizado);
 }
 </script>
 
 <style scoped>
-
 .searchbar {
   display: flex;
   align-items: center;

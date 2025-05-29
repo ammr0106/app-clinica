@@ -10,14 +10,13 @@
     </div>
 
     <div class="header-center">
-      <h1 class="clinic-name">Multispecialty<span class="accent">Clinic</span></h1>
+      <h1 class="clinic-name">
+        Multispecialty<span class="accent">Clinic</span>
+      </h1>
     </div>
 
     <div class="header-right">
-  
-
-      <!-- Menú hamburguesa -->
-      <MenuBurger />
+      <AppSideBar :menu-items="menuItems" />
     </div>
   </header>
   <AuthModal v-if="showAuth" @close="showAuth = false" />
@@ -29,6 +28,7 @@ import MenuBurger from './MenuBurger.vue'
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
+import AppSideBar from "@/components/common/AppSideBar.vue";
 
 const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
 
@@ -48,18 +48,17 @@ const logout = async () => {
   await authStore.logout()
   router.push('/')
 }
+
+const props = defineProps({
+  menuItems: {
+    type: Array,
+    required: true,
+    default: () => [],
+  },
+});
 </script>
 
 <style scoped>
-:root {
-  --azul-profesional: #1565C0;
-  --verde-confianza: #43A047;
-  --gris-claro: #F5F5F5;
-  --blanco-puro: #FFFFFF;
-  --rojo-controlado: #EF5350;
-  --texto: #263238;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -97,7 +96,7 @@ const logout = async () => {
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .accent {
@@ -132,7 +131,7 @@ const logout = async () => {
 .username {
   font-size: 1rem;
   font-weight: 500;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   white-space: nowrap;
 }
 
