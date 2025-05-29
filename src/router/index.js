@@ -3,6 +3,8 @@ import Login from "@/views/Login.vue";
 import SuperadminPage from "@/pages/SuperadminPage.vue";
 import Coordinador from "@/views/Coordinador.vue";
 import Clients from "@/views/Clients.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { supabase } from "@/services/DatabaseConnection";
 import Pets from "@/views/Pets.vue"; // Importa la vista de mascotas
 
 const routes = [
@@ -21,7 +23,7 @@ const routes = [
     path: "/coordinador",
     name: "Coordinador",
     component: Coordinador,
-    meta: { requiresAuth: true, role: "coordinador" },
+    meta: { requiresAuth: true, role: "coordinator" },
   },
   {
     path: "/clients/:clientId?", // Agrega un parámetro opcional clientId
@@ -43,16 +45,38 @@ const router = createRouter({
 });
 
 // Middleware para verificar autenticación y rol
-router.beforeEach((to, from, next) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore();
 
+  if (!auth.user) {
+    const { data, error } = await supabase.auth.getUser();
+    if (data?.user) {
+      auth.user = data.user;
+
+      // Traer perfil desde la DB si no está cargado
+      if (!auth.profile) {
+        const { data: profile } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", data.user.id)
+          .single();
+
+        auth.profile = profile;
+      }
+    }
+  }
+
+  // Si la ruta requiere autenticación
   if (to.meta.requiresAuth) {
-    if (!user) {
+    if (!auth.user) {
+      console.warn("No autenticado. Redirigiendo a login.");
       return next({ name: "Login" });
     }
 
-    if (to.meta.role && to.meta.role !== user.role) {
-      return next({ name: "Login" }); // o redireccionar a un 403 , esto habria que ajustarlo mas adelante e incluso personalizarlo
+    const rol = auth.profile?.rol;
+    if (to.meta.role && to.meta.role !== rol) {
+      console.warn(`Rol no autorizado. Se requiere: ${to.meta.role}, pero el usuario tiene: ${rol}`);
+      return next({ name: "Login" }); // O redirige a una página 403 personalizada
     }
   }
 
