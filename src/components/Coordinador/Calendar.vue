@@ -116,8 +116,6 @@ function selectDay(day) {
 }
 </script>
 
-
-
 <style scoped>
 .calendar-container {
   background-color: #1e2a2a;
@@ -144,27 +142,28 @@ function selectDay(day) {
   font-size: 1.3vw;
   margin-bottom: 0.8rem;
   width: 100%;
+  flex: 0 0 auto;
 }
 
 .calendar-header button {
   background: none;
-  color: white;
-  font-size: 1.5rem;
   border: none;
+  color: #cfd2d3;
   cursor: pointer;
+  font-size: 1.2rem;
   transition: color 0.2s;
-}
-
-.calendar-header button:hover {
-  color: #5cd3ff;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .days-grid {
+  flex: 1 1 0;
+  height: 100%;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.3rem;
-  width: 100%;
-  flex: 1 1 0;
+  align-content: stretch;
 }
 
 .day-name {
@@ -184,21 +183,11 @@ function selectDay(day) {
   font-size: 1vw;
   width: 100%;
   box-sizing: border-box;
-}
-
-.day:hover {
-  background-color: #3c5052;
-}
-
-.selected {
-  background-color: #5cd3ff;
-  color: black;
-  font-weight: bold;
-}
-
-.today {
-  outline: 2px solid #5cd3ff;
-  border-radius: 8px;
+  height: 100%;
+  min-height: 2.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 700px) {
@@ -206,14 +195,15 @@ function selectDay(day) {
     max-width: 100%;
     padding: 0.5rem;
     font-size: 1rem;
+    height: 100%;
   }
   .calendar-header {
     font-size: 1rem;
   }
-  .day-name, .day {
+  .day-name,
+  .day {
     padding: 0.3rem;
     font-size: 0.9rem;
   }
 }
-
 </style>
