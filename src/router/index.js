@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
 import SuperadminPage from "@/pages/SuperadminPage.vue";
+import Clients from "@/views/Clients.vue";
+import Pets from "@/views/Pets.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { supabase } from "@/services/DatabaseConnection";
-import Pruebas from "../views/Pruebas.vue";
 import Employees from "@/views/Employees.vue";
-import { h } from "vue";
+
 import Headquarters from "@/views/Headquarters.vue";
 
 const routes = [
@@ -23,13 +24,20 @@ const routes = [
   {
     path: "/headquarters",
     name: "Headquarters",
-    component: () => import("@/views/Headquarters.vue"),
+    component: Headquarters,
     meta: { requiresAuth: true, role: ["coordinator", "worker"] },
   },
   {
-    path: "/pruebas",
-    name: "Pruebas",
-    component: Pruebas,
+    path: "/clients/:clientId?", // Agrega un parámetro opcional clientId
+    name: "Clients",
+    component: Clients,
+    meta: { requiresAuth: true, role: ["coordinator", "worker"] },
+  },
+  {
+    path: "/pets",
+    name: "Pets",
+    component: Pets,
+    meta: { requiresAuth: true, role: ["coordinator", "worker"] },
   },
   {
     path: "/employees",
