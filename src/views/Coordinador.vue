@@ -150,21 +150,19 @@ const fecha = computed(() => {
 }
 
 .contenido {
-  flex: 2 1 0;
-  display: grid;
-  flex-direction: column;
-  flex: auto;
-  width: 700px;
-  min-width: 600px;
-  max-width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 75%;
   gap: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .calendario {
-  flex: 1 1 320px;
-  min-width: 350px;
-  max-width: 450px;
-  height: 350px;
+  flex: 0 0 20%;
+  min-width: 0;
+  max-width: 20%;
+  height: auto;
   aspect-ratio: 1 / 1;
   background-color: #2e3b4e;
   color: white;

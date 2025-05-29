@@ -29,7 +29,7 @@
             class="cita-card"
             @click="openOptions(cita, i)"
           >
-            <tr class="cita-info">
+            <tr class="cita-info" id="{{ cita.id }}">
               <th class="cita-nombre">{{ cita.client_name }}</th>
               <th class="cita-hora">{{ cita.time }}</th>
               <th class="cita-razon">{{ cita.reason }}</th>
@@ -253,7 +253,6 @@ thead {
 .cita-encabezado {
   text-align: left;
   color: #263238;
-  font-size: 1.2rem;
 }
 
 tbody {
@@ -283,42 +282,25 @@ tbody {
   display: grid;
   grid-template-columns:
     1.5fr /* Nombre */
-    0.5fr /* Hora */
+    0.2fr /* Hora */
     2.5fr /* Razón */
-    0.75fr /* Especialidad */
+    0.8fr /* Especialidad */
     1.5fr /* Trabajador */
     0.75fr /* Estado */
     2.5fr /* Nota */
     0.75fr; /* Mascota */
-  gap: 1.5rem;
+  gap: 1rem;
 }
-
-.cita-info th {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: left;
-}
-
-.cita-info p {
-  margin: 0;
-  font-size: 1rem;
-  color: #e9f8ff;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.cita-info p strong {
+.cita-mascota,
+.cita-nombre {
+  font-weight: bold;
   color: #ffffff;
+  min-width: 20px;
 }
 
 .cita-hora {
   font-size: 0.9rem;
   color: #cbe9f3;
-  max-width: 20px;
 }
 .cita-estado {
   border: 0px solid;
@@ -391,4 +373,23 @@ thead,
 .cita-card {
   align-items: center;
 }
+.cita-info th,
+.cita-encabezado th {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+.cita-razon,
+.cita-nota{
+  min-width: 40px;
+}
+
+.cita-especialidad,
+.cita-trabajador,
+.cita-estado {
+  min-width: 80px;
+}
+
 </style>

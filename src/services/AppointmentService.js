@@ -10,7 +10,7 @@ import { supabase } from "./DatabaseConnection";
  * @property {string} note
  * @property {{ name: string } | null} pets
  * @property {{ name: string } | null} specialties
- * @property {{ name: string } | null} client
+ * @property {{ name: string, first_surname: string, second_surname: string } | null} client
  * @property {{ name: string } | null} employee
  * @property {{ name: string } | null} headquarters
  */
@@ -42,7 +42,7 @@ export async function fetchAppointments() {
     note,
     pets ( name ),
     specialties ( name ),
-    client ( name ),
+    client ( name, first_surname, second_surname ),
     employee:users ( name ),
     headquarters ( name )
   `);
