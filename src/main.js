@@ -5,6 +5,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createPinia } from 'pinia';
+import '@fortawesome/fontawesome-free/css/all.css'
 
 library.add(faUserCircle);
 

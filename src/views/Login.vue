@@ -1,40 +1,103 @@
 <template>
   <div class="auth-wrapper">
     <h1 class="title">Multispecialty Clinic</h1>
-    <form class="auth-form" @submit.prevent>
+    <form class="auth-form" @submit.prevent="handleLogin">
       <h2>Iniciar Sesión</h2>
-      <input type="email" placeholder="Correo electrónico" />
-      <input type="password" placeholder="Contraseña" />
+      
+      <!--Input para el mail-->
+      <input 
+          type="email" 
+          placeholder="Correo electrónico" 
+          v-model="email"
+          required
+        />
+
+        <!--Input de las contraseña-->
+      <div class="password-wrapper">
+        <input 
+          :type="isPasswordVisible ? 'text' : 'password'"  
+          placeholder="Contraseña"
+          v-model="password"
+          required
+        />
+
+         <!-- Botón de ojo como boton -->
+        <button 
+          type="button"
+          class="toggle-password"
+         @click="isPasswordVisible = !isPasswordVisible"
+          aria-label="Mostrar u ocultar contraseña"
+        >
+          <i class="fas" :class="isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'"></i>
+        </button>
+      </div>
+
+      <!--Checkbox para recordar al usuario-->
       <div class="checkbox-group">
-        <input type="checkbox" id="remember" />
+        <input type="checkbox" id="remember" v-model="rememberMe" />
         <label for="remember">Recordarme</label>
-      </div>
+      </div>  
+
+      <!--Parte del codigo que cambie el contenido del boton mientras carga-->
       <div class="button-group">
-        <button type="button" @click="handleLogin('superadmin')">Entrar como SuperAdmin</button>
-        <button type="button" @click="handleLogin('coordinador')">Entrar como Coordinador</button>
+        <button type="submit" :disabled="authStore.loading">
+          {{ authStore.loading ? 'Cargando...' : 'Iniciar Sesión' }}  
+        </button>
       </div>
+
+      <!--Mensaje de error si hay un error en el login-->
+      <p v-if="authStore.error" class="error">{{ authStore.error }}</p>
+
     </form>
   </div>
 </template>
 
 <script setup>
+
+//Importamos todas las dependencias necesarias
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
 
+//Variables reactivas para el formulario
+const email = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+
+//Variable reactiva para alternar la contraseña
+const isPasswordVisible = ref(false)
+
+//Importamos el router para redireccionar al usuario
 const router = useRouter()
 
-function handleLogin(role) {
-  // Simulación de usuario para pruebas de maquetación
-  const fakeUser = {
-    email: role === 'superadmin' ? 'super@admin.com' : 'coordinador@gmail.com',
-    role: role
-  }
+// Importamos el store de autenticación
+const authStore = useAuthStore()
 
-  localStorage.setItem('user', JSON.stringify(fakeUser))
 
-  if (role === 'superadmin') {
-    router.push('/superadmin')
-  } else if (role === 'coordinador') {
-    router.push('/coordinador')
+const handleLogin = async () => {
+
+  const error = await authStore.login(email.value, password.value)
+
+  if (!error && authStore.profile?.rol) {
+    const role = authStore.profile.rol.toLowerCase()
+
+    //Guardamos los credenciales si el usuario quiere recordar
+    if (rememberMe.value) {
+      localStorage.setItem('user', JSON.stringify({
+        ...authStore.user,
+        rol: authStore.profile.rol
+      }))
+
+    }
+
+    //Redirigimos en función del rol del usuario
+    if (role === 'superadmin') {
+      router.push('/superadmin')
+    } else if (role === 'coordinator') {
+      router.push('/coordinador')
+    } else {
+      router.push('/')
+    }
   }
 }
 </script>
@@ -50,7 +113,8 @@ function handleLogin(role) {
   --texto: #263238;
   --gris-interactivo: #d1d1d1;
 }
-.title{
+
+.title {
   font-size: 2.5rem;
   color: var(--azul-profesional);
   margin-bottom: 1rem;
@@ -61,11 +125,12 @@ function handleLogin(role) {
   letter-spacing: 1px;
 
 }
+
 .auth-wrapper {
   min-height: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;  
+  align-items: center;
   gap: 2rem;
   justify-content: center;
   align-items: center;
@@ -129,7 +194,7 @@ function handleLogin(role) {
   position: absolute;
   opacity: 0;
   cursor: pointer;
- 
+
 }
 
 .custom-checkbox .checkmark {
@@ -145,7 +210,7 @@ function handleLogin(role) {
   transition: background-color 0.2s, border-color 0.2s;
 }
 
-.custom-checkbox input:checked ~ .checkmark {
+.custom-checkbox input:checked~.checkmark {
   background-color: var(--verde-confianza);
   border-color: var(--verde-confianza);
 }
@@ -163,7 +228,7 @@ function handleLogin(role) {
   transform: rotate(45deg);
 }
 
-.custom-checkbox input:checked ~ .checkmark::after {
+.custom-checkbox input:checked~.checkmark::after {
   display: block;
 }
 
@@ -188,16 +253,83 @@ function handleLogin(role) {
   transform: scale(0.97);
 }
 
+.error {
+  margin-top: 1rem;
+  color: var(--rojo-controlado);
+  background-color: #fceaea;
+  border: 1px solid #f44336;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(239, 83, 80, 0.25);
+  user-select: none;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 1rem;
+  padding-right: 3rem; 
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.password-wrapper input:focus {
+  outline: none;
+  border-color: var(--azul-profesional);
+  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.2);
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  top: 23%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #999;
+  font-size: 1.2rem;
+  height: 2rem;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover i {
+  color: var(--azul-profesional);
+}
+
+.toggle-password:focus {
+  outline: none;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .button-group {
   display: flex;
   gap: 1rem;
@@ -207,5 +339,4 @@ function handleLogin(role) {
 .button-group button {
   flex: 1;
 }
-
 </style>
