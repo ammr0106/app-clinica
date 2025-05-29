@@ -95,9 +95,6 @@
       <transition name="fade">
         <div class="buttons-group" v-show="form.time">
           <AppButton variant="green" type="submit">Guardar</AppButton>
-          <AppButton variant="red" @deleteClick="close"
-            >Cancelar cita</AppButton
-          >
           <AppButton @click="emit('close')" variant="primary">Salir</AppButton>
         </div>
       </transition>
