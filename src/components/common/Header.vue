@@ -164,6 +164,7 @@ const props = defineProps({
   border-radius: 999px;
   width: auto;
   white-space: nowrap;
+  cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
