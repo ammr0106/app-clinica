@@ -1,4 +1,4 @@
-import { supabase } from './DatabaseConnection'
+import { supabase } from "./DatabaseConnection";
 
 /**
  * @typedef {Object} AppointmentDB
@@ -33,22 +33,49 @@ import { supabase } from './DatabaseConnection'
  * @returns {Promise<AppointmentDB[]>}
  */
 export async function fetchAppointments() {
-  const { data, error } = await supabase.from('appointment').select(`
+  const { data, error } = await supabase.from("appointment").select(`
     id,
     date,
     time,
     reason,
     status,
     note,
-    pets ( name ),
-    specialties ( name ),
-    client ( name, first_surname, second_surname ),
-    employee:users ( name ),
-    headquarters ( name )
-  `)
+    pets ( id, name ),
+    specialties (id, name ),
+    client ( id, name, first_surname, second_surname ),
+    employee:users ( id, name ),
+    headquarters ( id, name )
+  `);
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchClientsByHeadquarters(id_headquarters) {
+  const { data, error } = await supabase
+    .from("client")
+    .select("id, name, first_surname, second_surname, DNI")
+    .eq("id_headquarters", id_headquarters);
+  if (error) throw error;
+
+  return data;
+}
+
+export async function fetchPetsByClient(id_client) {
+  const { data, error } = await supabase
+    .from("pets")
+    .select("id, name, chip_number")
+    .eq("id_client", id_client);
+
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchSpecialties() {
+  const { data, error } = await supabase.from("specialties").select("id, name");
+
+  if (error) throw error;
+  return data;
 }
 
 /**
@@ -56,8 +83,11 @@ export async function fetchAppointments() {
  * @returns {Promise<{ error: any }>}
  */
 export async function createAppointment(appointmentData) {
-  const { error } = await supabase.from('appointment').insert([appointmentData])
-  return { error }
+  const { error } = await supabase
+    .from("appointment")
+    .insert([appointmentData]);
+  if (error) throw error;
+  return { error };
 }
 
 /**
@@ -67,11 +97,11 @@ export async function createAppointment(appointmentData) {
  */
 export async function updateAppointment(id, appointmentData) {
   const { error } = await supabase
-    .from('appointment')
+    .from("appointment")
     .update(appointmentData)
-    .eq('id', id)
+    .eq("id", id);
 
-  return { error }
+  return { error };
 }
 
 /**
@@ -79,6 +109,6 @@ export async function updateAppointment(id, appointmentData) {
  * @returns {Promise<{ error: any }>}
  */
 export async function deleteAppointment(id) {
-  const { error } = await supabase.from('appointment').delete().eq('id', id)
-  return { error }
+  const { error } = await supabase.from("appointment").delete().eq("id", id);
+  return { error };
 }

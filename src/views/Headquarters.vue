@@ -1,24 +1,14 @@
 <template>
-  <!-- Contenedor principal del coordinador -->
   <div class="coordinador-container">
-    <!-- Componente de encabezado -->
-    <Header />
+    <Header :menuItems="menuItems" />
 
-    <!-- Contenido principal -->
     <main class="main-content">
-      <!-- Sección de acciones -->
       <div class="acciones">
-        <!-- Componente para crear nuevas citas -->
-        <MakeDateBtn
-          :selectedDay="selectedDay"
-          @create-date="handleCreateDate"
-        />
+        <AppButton @click="showModal = true">Crear cita</AppButton>
       </div>
 
       <div class="layout">
-        <!-- Calendario a la izquierda -->
         <div class="calendario">
-          <!-- Componente de calendario -->
           <Calendar
             :selectedDay="selectedDay"
             :selectedMonth="selectedMonth"
@@ -28,16 +18,8 @@
             @changeYear="handleChangeYear"
           />
         </div>
-        <!-- Citas a la derecha -->
         <div class="contenido">
-          <!-- Componente que muestra las citas -->
-          <Dates
-            :fecha="fecha"
-            :citas="citasDelDia"
-            @update-cita="handleUpdateCita"
-            @delete-cita="handleDeleteCita"
-          />
-          <!-- Componente que muestra las citas -->
+          <Dates :fecha="fecha" :citas="citasDelDia" />
           <DatesTomorrow
             :fecha="
               new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString(
@@ -56,7 +38,25 @@
           />
         </div>
       </div>
+
+      <Modal @close="showModal = false" v-if="showModal" title="Crear cita">
+        <MakeDateForm
+          :selectedDate="fechaFormateada"
+          :authData="authStore"
+          @close="showModal = false"
+          @save="showSuccess"
+          :isEdit="null"
+        />
+      </Modal>
     </main>
+
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="5000"
+      @hidden="notification.show = false"
+    />
   </div>
 </template>
 
@@ -68,10 +68,27 @@ import Header from "@/components/common/Header.vue";
 import Dates from "@/components/Coordinador/Dates.vue";
 import DatesTomorrow from "@/components/Coordinador/DatesTomorrow.vue";
 import Calendar from "@/components/Coordinador/Calendar.vue";
-import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
-// Importamos el store de citas
 import { useAppointmentStore } from "@/stores/useAppointmentStore";
 import { useCalendar } from "@/Composables/useCalendar";
+import AppButton from "@/components/common/AppButton.vue";
+import Modal from "@/components/common/Modal.vue";
+import MakeDateForm from "@/components/Coordinador/MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "@/components/common/AppNotification.vue";
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Cita creada correctamente.",
+    type: "success",
+  };
+}
 
 const {
   selectedDay,
@@ -84,27 +101,46 @@ const {
   handleChangeMonth,
   handleChangeYear,
   handleDaySelected,
-  handleCreateDate,
-  handleUpdateCita,
-  handleDeleteCita,
 } = useCalendar();
 
 // Inicializamos el store
 const appointmentStore = useAppointmentStore();
+const authStore = useAuthStore();
 
 // Provee el día seleccionado a componentes hijos
 provide("selectedDay", selectedDay);
 
+//Modal
+const showModal = ref(false);
+
 // Cargamos las citas si el array está vacío
 onMounted(async () => {
+  if (!authStore.user || !authStore.profile) {
+    await authStore.fetchUser();
+  }
   if (!appointmentStore.appointments.length) {
     console.log("📥 Cargando citas desde store...");
     await appointmentStore.loadAppointments();
-    citas.value = appointmentStore.appointments;
+    watch(
+      () => appointmentStore.appointments,
+      (nuevasCitas) => {
+        citas.value = nuevasCitas;
+      },
+      { immediate: true }
+    );
     console.log("Citas cargadas:", citas.value);
   }
 });
+const rol = authStore.profile.rol;
 
+const menuItems = [
+  { label: "Inicio", path: "/headquarters" },
+  ...(rol === "coordinator"
+    ? [{ label: "Empleados", path: "/employees" }]
+    : []),
+  { label: "Clientes", path: "/clients" },
+  { label: "Mascotas", path: "/pets" },
+];
 // Computed property que formatea la fecha seleccionada
 const fecha = computed(() => {
   // Si no hay día seleccionado, retorna string vacío
@@ -135,11 +171,13 @@ const fecha = computed(() => {
   display: flex;
   flex-direction: column;
   padding: 2rem;
-  height: calc((100vh - 64px) - 2rem); /* Ajusta según la altura del header */
+  height: calc((100vh - 64px) - 2rem);
 }
 
 .acciones {
-  padding: 1rem 0;
+  margin: 0px 0 20px 0;
+  width: 8%;
+  min-width: 100px;
 }
 
 .layout {

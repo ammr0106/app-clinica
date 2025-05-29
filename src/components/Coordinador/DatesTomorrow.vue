@@ -29,7 +29,7 @@
             v-for="(cita, i) in citas"
             :key="i"
             class="cita-card cita-info"
-            @click="openOptions(cita, i)">
+            @click="openOptions(cita.id)">
               <td class="cita-nombre">{{ cita.client_name }}</td>
               <td class="cita-hora">{{ cita.time }}</td>
               <td class="cita-razon">{{ cita.reason }}</td>
@@ -57,29 +57,41 @@
       </table>
     </transition-group>
 
-    <!-- Modal para editar cita -->
-    <EditDateModal
+    <Modal
       v-if="showEditModal"
-      :cita="selectedCita"
-      @save="handleSaveEdit"
-      @delete="handleDeleteCita"
-      @close="closeModals"
-    />
+      title="Editar cita"
+      @close="showEditModal = false"
+    >
+      <MakeDateForm
+        :selectedDate="fechaFormateada"
+        :authData="authStore"
+        @close="showEditModal = false"
+        @save="showSuccess"
+        :isEdit="selectedCita"
+      />
+    </Modal>
 
-    <!-- Modal para confirmar eliminación -->
-    <DeleteDateModal
-      v-if="showDeleteModal"
-      :cita="selectedCita"
-      @confirm="handleDelete"
-      @close="closeModals"
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="5000"
+      @hidden="notification.show = false"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import EditDateModal from "./EditDateModal.vue";
-import DeleteDateModal from "./DeleteDateModal.vue";
+import { ref } from "vue";
+import Modal from "../common/Modal.vue";
+import MakeDateForm from "./MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "../common/AppNotification.vue";
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
 
 const props = defineProps({
   fecha: {
@@ -94,32 +106,24 @@ const props = defineProps({
 
 const emit = defineEmits(["update-cita", "delete-cita"]);
 
-const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 const selectedCita = ref(null);
 const selectedIndex = ref(null);
+const authStore = useAuthStore();
+const showEditModal = ref(false);
 
-function openOptions(cita, index) {
-  selectedCita.value = { ...cita };
-  selectedIndex.value = index;
+function openOptions(id_cita) {
+  selectedCita.value = props.citas.find((cita) => cita.id === id_cita);
+  console.log("selectedCita", selectedCita.value);
   showEditModal.value = true;
 }
 
-function closeModals() {
-  showEditModal.value = false;
-  showDeleteModal.value = false;
-  selectedCita.value = null;
-  selectedIndex.value = null;
-}
-
-function handleSaveEdit(editedCita) {
-  emit("update-cita", { editedCita, index: selectedIndex.value });
-  closeModals();
-}
-
-function handleDeleteCita(id) {
-  emit("delete-cita", id);
-  closeModals();
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Datos actualizados correctamente.",
+    type: "success",
+  };
 }
 </script>
 

@@ -6,7 +6,6 @@
       >:
     </h3>
 
-    <!-- Lista de citas con animación al añadir/quitar -->
     <transition-group name="fade" tag="ul" class="citas-list">
       <table>
         <thead>
@@ -28,7 +27,7 @@
             v-for="(cita, i) in citas"
             :key="i"
             class="cita-card cita-info"
-            @click="openOptions(cita, i)"
+            @click="openOptions(cita.id)"
             >
               <td class="cita-nombre">{{ cita.client_name }}</td>
               <td class="cita-hora">{{ cita.time }}</td>
@@ -58,35 +57,60 @@
       </table>
     </transition-group>
 
-    <!-- Modal para editar cita -->
-    <EditDateModal
-      v-if="showEditModal"
-      :cita="selectedCita"
-      @save="handleSaveEdit"
-      @delete="handleDeleteCita"
-      @close="closeModals"
-    />
+    <div v-if="citas.length === 0" class="cita-vacia">
+      No hay citas para este día.
+    </div>
 
-    <!-- Modal para confirmar eliminación -->
-    <DeleteDateModal
-      v-if="showDeleteModal"
-      :cita="selectedCita"
-      @confirm="handleDelete"
-      @close="closeModals"
-    />
+    <Modal
+      v-if="showEditModal"
+      title="Editar cita"
+      @close="showEditModal = false"
+    >
+      <MakeDateForm
+        :selectedDate="fechaFormateada"
+        :authData="authStore"
+        @close="showEditModal = false"
+        @save="showSuccess"
+        :isEdit="selectedCita"
+      />
+    </Modal>
   </div>
+
+  <AppNotification
+    v-if="notification.show"
+    :message="notification.message"
+    :type="notification.type"
+    :duration="5000"
+    @hidden="notification.show = false"
+  />
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import EditDateModal from "./EditDateModal.vue";
-import DeleteDateModal from "./DeleteDateModal.vue";
+import { ref, computed, watch } from "vue";
+import Modal from "../common/Modal.vue";
+import MakeDateForm from "./MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "../common/AppNotification.vue";
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Datos actualizados correctamente.",
+    type: "success",
+  };
+}
 
 const props = defineProps({
   fecha: String,
   citas: Array,
 });
-
+const authStore = useAuthStore();
 const emit = defineEmits(["update-cita", "delete-cita"]);
 
 const showEditModal = ref(false);
@@ -94,27 +118,95 @@ const showDeleteModal = ref(false);
 const selectedCita = ref(null);
 const selectedIndex = ref(null);
 
-function openOptions(cita, index) {
-  selectedCita.value = { ...cita };
-  selectedIndex.value = index;
+watch(() => props.fecha, fetchCitas, { immediate: true });
+
+function extraerFecha(fechaString) {
+  const regex = /(?:\w+,\s*)?(\d{1,2}) de (\w+) de (\d{4})/;
+  const match = fechaString?.match(regex);
+
+  if (!match) {
+    throw new Error("Formato de fecha no válido");
+  }
+
+  const dia = parseInt(match[1]);
+  const mesTexto = match[2]?.toLowerCase();
+  const anio = parseInt(match[3]);
+
+  const meses = {
+    enero: 1,
+    febrero: 2,
+    marzo: 3,
+    abril: 4,
+    mayo: 5,
+    junio: 6,
+    julio: 7,
+    agosto: 8,
+    septiembre: 9,
+    octubre: 10,
+    noviembre: 11,
+    diciembre: 12,
+  };
+
+  const mes = meses[mesTexto];
+  if (isNaN(dia) || !mes || isNaN(anio)) {
+    throw new Error("Valores de fecha inválidos");
+  }
+
+  return { dia, mes, anio };
+}
+
+async function fetchCitas() {
+  citas.value = [];
+
+  try {
+    console.log("Fecha recibida:", props.fecha);
+
+    if (
+      !props.fecha ||
+      typeof props.fecha !== "string" ||
+      props.fecha.trim() === ""
+    ) {
+      console.warn("La fecha está vacía o mal definida:", props.fecha);
+      return;
+    }
+
+    const { dia, mes, anio } = extraerFecha(props.fecha);
+    console.log("Fecha parseada:", { dia, mes, anio });
+
+    const { data, error } = await supabase
+      .from("Dates")
+      .select("id, Nombre, DNI, Hora") // Solo los campos que vas a usar brodeeeerrrrrrrrrrrrrrr
+      .eq("Dia", dia)
+      .eq("Mes", mes)
+      .eq("Anio", anio)
+      .order("Hora", { ascending: true });
+
+    if (error) {
+      console.error("Error de Supabase:", error);
+      throw error;
+    }
+
+    console.log("Citas recuperadas:", data);
+
+    // Mapear campos con nombres esperados por el template
+    citas.value = (data || []).map((item) => ({
+      id: item.id,
+      nombre: item.Nombre,
+      dni: item.DNI,
+      hora: item.Hora,
+    }));
+
+    console.log("Citas procesadas:", citas.value);
+  } catch (error) {
+    console.error("Error al cargar las citas:", error.message || error);
+    citas.value = [];
+  }
+}
+
+function openOptions(id_cita) {
+  selectedCita.value = props.citas.find((cita) => cita.id === id_cita);
+  console.log("selectedCita", selectedCita.value);
   showEditModal.value = true;
-}
-
-function closeModals() {
-  showEditModal.value = false;
-  showDeleteModal.value = false;
-  selectedCita.value = null;
-  selectedIndex.value = null;
-}
-
-function handleSaveEdit(editedCita) {
-  emit("update-cita", { editedCita, index: selectedIndex.value });
-  closeModals();
-}
-
-function handleDeleteCita(id) {
-  emit("delete-cita", id);
-  closeModals();
 }
 </script>
 
@@ -186,8 +278,9 @@ tbody tr:first-child {
   margin-top: 1rem;
 }
 .cita-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: scale(1.015);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .cita-info,
@@ -262,7 +355,7 @@ tbody tr:first-child {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translateY(10px);
 }
 .cita-estado,
 .citas-container,

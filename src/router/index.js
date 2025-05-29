@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
 import SuperadminPage from "@/pages/SuperadminPage.vue";
+import Clients from "@/views/Clients.vue";
+import Pets from "@/views/Pets.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { supabase } from "@/services/DatabaseConnection";
-import Pruebas from "../views/Pruebas.vue";
-import { h } from "vue";
+import Employees from "@/views/Employees.vue";
+
 import Headquarters from "@/views/Headquarters.vue";
 
 const routes = [
@@ -20,15 +22,28 @@ const routes = [
     meta: { requiresAuth: true, role: "superadmin" },
   },
   {
-    path: "/headquarters/:headquarters_id",
+    path: "/headquarters",
     name: "Headquarters",
-    component: () => import("@/views/Headquarters.vue"),
-    meta: { requiresAuth: true, role: ["coordinator", "worker"]},
+    component: Headquarters,
+    meta: { requiresAuth: true, role: ["coordinator", "worker"] },
   },
   {
-    path: "/pruebas",
-    name: "Pruebas",
-    component: Pruebas,
+    path: "/clients/:clientId?", // Agrega un parámetro opcional clientId
+    name: "Clients",
+    component: Clients,
+    meta: { requiresAuth: true, role: ["coordinator", "worker"] },
+  },
+  {
+    path: "/pets",
+    name: "Pets",
+    component: Pets,
+    meta: { requiresAuth: true, role: ["coordinator", "worker"] },
+  },
+  {
+    path: "/employees",
+    name: "Employees",
+    component: Employees,
+    meta: { requiresAuth: true, role: "coordinator" },
   },
 ];
 
@@ -68,29 +83,17 @@ router.beforeEach(async (to, from, next) => {
     }
 
     const rol = auth.profile?.rol;
-    const allowedRoles = Array.isArray(to.meta.role) ? to.meta.role : [to.meta.role];
+
+    const allowedRoles = Array.isArray(to.meta.role)
+      ? to.meta.role
+      : [to.meta.role];
     if (to.meta.role && !allowedRoles.includes(rol)) {
       console.warn(
         `Rol no autorizado. Se requiere: ${to.meta.role}, pero el usuario tiene: ${rol}`
       );
-      return next({ name: "Login" }); 
-    }
-  }
-
-  //Redirigimos al coordinador a su sede
-  if (["coordinator", "worker"].includes(auth.profile?.rol)) {
-  const headquartersID = auth.profile?.id_headquarters;
-
-  // Si intenta acceder a cualquier ruta diferente a su headquarters, redirigir
-  if (to.name !== "Headquarters" || to.params.headquarters_id !== String(headquartersID)) {
-    if (headquartersID) {
-      return next({ name: "Headquarters", params: { headquarters_id: headquartersID } });
-    } else {
-      console.error("No se ha encontrado el id de la sede del usuario");
       return next({ name: "Login" });
     }
   }
-}
 
   next();
 });

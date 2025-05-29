@@ -19,7 +19,7 @@ import { supabase } from "./DatabaseConnection";
  * @property {number} chip_number
  * @property {string} observations
  * @property {string} breed
- * @property {Client|null} client
+ * @property {Client|null} id_client
  * @property {Headquarters|null} headquarters
  */
 
@@ -31,27 +31,45 @@ import { supabase } from "./DatabaseConnection";
  * @property {number} chip_number
  * @property {string} observations
  * @property {string} breed
- * @property {string} client_id
+ * @property {string} id_client // Cambiar client_id a id_client
  * @property {string} headquarters_id
  */
 
 /**
+ * @param {string} [headquartersId] - Opcional ID de la sede para filtrar las mascotas.
  * @returns {Promise<Pet[]>}
  */
-export async function fetchPets() {
-  const { data, error } = await supabase.from("pets").select(`
-      id,
-      name,
-      kind,
-      birthdate,
-      chip_number,
-      observations,
-      breed,
-      client ( name ),
-      headquarters ( name )
-    `);
+export async function fetchPets(headquartersId) {
+  const selectFields = [
+    'id',
+    'name',
+    'kind',
+    'birthdate',
+    'chip_number',
+    'observations',
+    'breed',
+    'client ( id, DNI )',
+    'id_headquarters',
+    'headquarters ( name )'
+  ];
+
+  let query = supabase
+    .from("pets")
+    .select(selectFields.join(', '))
+    .order('name', { ascending: true });
+
+  console.log("Headquarters ID:", headquartersId); // Agrega este console.log
+
+  if (headquartersId) {
+    query = query.eq("id_headquarters", headquartersId);
+  }
+
+  const { data, error } = await query;
+
+  console.log("Supabase query:", query); // Agrega este console.log
 
   if (error) throw error;
+
   return data;
 }
 

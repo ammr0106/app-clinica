@@ -8,6 +8,7 @@
       :disabled="disabled"
       :required="required"
       v-model="model"
+      :class="{ 'input--error': error }"
     />
     <p v-if="error" class="input__error">{{ error }}</p>
   </div>
@@ -17,7 +18,7 @@
 import { computed } from "vue";
 
 const props = defineProps({
-  modelValue: String,
+  modelValue: [String, Number],
   label: String,
   error: String,
   type: {
@@ -67,11 +68,22 @@ const model = computed({
 
 .form-group input:disabled {
   background-color: #f5f5f5;
-  color: #999;
+  cursor: not-allowed;
 }
 
 .input__error {
   color: var(--rojo-controlado);
   font-size: 0.85rem;
+}
+
+.input--error {
+  border-color: var(--rojo-controlado) !important;
+  box-shadow: none !important;
+}
+
+.input--error:focus {
+  border-color: var(--rojo-controlado) !important;
+  box-shadow: none !important;
+  outline: none;
 }
 </style>

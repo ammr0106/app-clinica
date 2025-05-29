@@ -5,6 +5,7 @@ import {
   updatePet as updatePetService,
   deletePet as deletePetService
 } from '@/services/PetService'
+import { useAuthStore } from './useAuthStore';
 
 /**
  * @typedef {Object} PetMapped
@@ -15,8 +16,9 @@ import {
  * @property {number} chip_number
  * @property {string} observations
  * @property {string} breed
- * @property {string} client_name
  * @property {string} headquarters_name
+ * @property {string} id_client
+ * @property {string} client_DNI
  */
 
 export const usePetsStore = defineStore('pets', {
@@ -33,7 +35,18 @@ export const usePetsStore = defineStore('pets', {
       this.loading = true
       this.error = null
       try {
-        const data = await fetchPets()
+        const authStore = useAuthStore();
+        const headquartersId = authStore.profile?.id_headquarters;
+
+        let data = await fetchPets(headquartersId); // Pasa el ID de la sede a la función fetchPets
+
+        console.log("usePetStore - Pets data:", data); // Agrega este console.log
+
+        // Filtrar las mascotas por headquartersId
+        if (headquartersId) {
+          data = data.filter(pet => pet.id_headquarters === headquartersId);
+        }
+
         this.pets = data.map(pet => ({
           id: pet.id,
           name: pet.name,
@@ -42,8 +55,10 @@ export const usePetsStore = defineStore('pets', {
           chip_number: pet.chip_number,
           observations: pet.observations,
           breed: pet.breed,
-          client_name: pet.client?.name || 'Sin cliente',
-          headquarters_name: pet.headquarters?.name || 'Sin sede'
+          headquarters_name: pet.headquarters?.name || 'Sin sede',
+          id_client: pet.client?.id || null,
+          client_DNI: pet.client?.DNI || 'Sin cliente',
+          headquarters_id: pet.headquarters_id, // Agrega headquarters_id al mapeo
         }))
       } catch (err) {
         this.error = err
@@ -53,15 +68,42 @@ export const usePetsStore = defineStore('pets', {
     },
 
     async createPet(petData) {
-      const { error } = await createPetService(petData)
-      if (!error) await this.loadPets()
-      return error
+      try {
+        const { error } = await createPetService(petData);
+        console.log("Supabase createPet error:", error);
+        if (error) {
+          console.error("Error al crear la mascota:", error);
+          this.error = error;
+          return error;
+        } else {
+          console.log("Mascota creada correctamente");
+          await this.loadPets(); // Recarga la lista de mascotas
+          return null;
+        }
+      } catch (error) {
+        console.error("Error al crear la mascota:", error);
+        this.error = error;
+        return error;
+      }
     },
 
     async editPet(id, updatedData) {
-      const { error } = await updatePetService(id, updatedData)
-      if (!error) await this.loadPets()
-      return error
+      try {
+        const { error } = await updatePetService(id, updatedData);
+        if (error) {
+          console.error("Error al editar la mascota:", error);
+          this.error = error;
+          return error;
+        } else {
+          console.log("Mascota editada correctamente");
+          await this.loadPets(); // Recarga la lista de mascotas
+          return null;
+        }
+      } catch (error) {
+        console.error("Error al editar la mascota:", error);
+        this.error = error;
+        return error;
+      }
     },
 
     async removePet(id) {

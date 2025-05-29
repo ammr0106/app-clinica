@@ -37,7 +37,7 @@ const emit = defineEmits(["selectDay", "changeMonth", "changeYear"]);
 const props = defineProps({
   selectedDay: {
     type: Number,
-    default: null,
+    default: null, // Día seleccionado inicialmente
   },
   selectedMonth: {
     type: Number,
@@ -53,6 +53,7 @@ const today = new Date();
 const currentDate = ref(new Date());
 const days = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
 
+// Nombre del mes actual, calculado dinámicamente
 const monthName = computed(() =>
   currentDate.value.toLocaleString("default", { month: "long" })
 );
@@ -84,6 +85,7 @@ watch(
   }
 );
 
+// Función para ir al mes anterior
 function prevMonth() {
   const prev = new Date(
     currentDate.value.getFullYear(),
@@ -95,6 +97,7 @@ function prevMonth() {
   emit("changeYear", prev.getFullYear());
 }
 
+// Función para ir al mes siguiente
 function nextMonth() {
   const next = new Date(
     currentDate.value.getFullYear(),
@@ -106,11 +109,13 @@ function nextMonth() {
   emit("changeYear", next.getFullYear());
 }
 
+// Función que emite el día seleccionado, si es válido
 function selectDay(day) {
   if (!day) return;
   emit("selectDay", day);
 }
 </script>
+
 
 
 <style scoped>
