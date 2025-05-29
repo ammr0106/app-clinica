@@ -39,7 +39,7 @@ const router = createRouter({
 // Middleware para verificar autenticación y rol
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
-
+  
   if (!auth.user) {
     const { data, error } = await supabase.auth.getUser();
     if (data?.user) {
