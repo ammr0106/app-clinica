@@ -1,6 +1,6 @@
 <template>
   <div class="coordinador-container">
-    <Header />
+    <Header :menuItems="menuItems" />
 
     <main class="main-content">
       <div class="acciones">
@@ -89,6 +89,13 @@ function showSuccess() {
     type: "success",
   };
 }
+
+const menuItems = [
+  { label: "Inicio", path: "/headquarters" },
+  { label: "Empleados", path: "/employees" },
+  { label: "Clientes", path: "/clients" },
+  { label: "Mascotas", path: "/pets" },
+];
 
 const {
   selectedDay,

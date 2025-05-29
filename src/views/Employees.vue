@@ -69,7 +69,7 @@ function showNotification(message, type = "success") {
 
 // Creación de las opciones del sidebar.
 const menuItems = [
-  { label: "Inicio", path: "/coordinador" },
+  { label: "Inicio", path: "/headquarters" },
   { label: "Empleados", path: "/employees" },
   { label: "Clientes", path: "/clients" },
   { label: "Mascotas", path: "/pets" },

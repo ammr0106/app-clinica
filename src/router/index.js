@@ -21,12 +21,10 @@ const routes = [
     meta: { requiresAuth: true, role: "superadmin" },
   },
   {
-
-    path: "/headquarters/:headquarters_id",
+    path: "/headquarters",
     name: "Headquarters",
     component: () => import("@/views/Headquarters.vue"),
-    meta: { requiresAuth: true, role: ["coordinator", "worker"]},
-
+    meta: { requiresAuth: true, role: ["coordinator", "worker"] },
   },
   {
     path: "/pruebas",
@@ -38,7 +36,7 @@ const routes = [
     name: "Employees",
     component: Employees,
     meta: { requiresAuth: true, role: "coordinator" },
-  }
+  },
 ];
 
 const router = createRouter({
@@ -49,7 +47,6 @@ const router = createRouter({
 // Middleware para verificar autenticación y rol
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
-
 
   // Verificar si el usuario ya está autenticado
   if (!auth.user) {
@@ -79,12 +76,14 @@ router.beforeEach(async (to, from, next) => {
 
     const rol = auth.profile?.rol;
 
-    const allowedRoles = Array.isArray(to.meta.role) ? to.meta.role : [to.meta.role];
+    const allowedRoles = Array.isArray(to.meta.role)
+      ? to.meta.role
+      : [to.meta.role];
     if (to.meta.role && !allowedRoles.includes(rol)) {
       console.warn(
         `Rol no autorizado. Se requiere: ${to.meta.role}, pero el usuario tiene: ${rol}`
       );
-      return next({ name: "Login" }); 
+      return next({ name: "Login" });
     }
   }
 
