@@ -3,9 +3,10 @@ import Login from "@/views/Login.vue";
 import SuperadminPage from "@/pages/SuperadminPage.vue";
 import Coordinador from "@/views/Coordinador.vue";
 import Clients from "@/views/Clients.vue";
+import Pets from "@/views/Pets.vue"; // Importa la vista de mascotas
 import { useAuthStore } from "@/stores/useAuthStore";
 import { supabase } from "@/services/DatabaseConnection";
-import Pets from "@/views/Pets.vue"; // Importa la vista de mascotas
+
 
 const routes = [
   {
