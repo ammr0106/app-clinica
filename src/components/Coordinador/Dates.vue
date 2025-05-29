@@ -147,7 +147,6 @@ function extraerFecha(fechaString) {
     noviembre: 11,
     diciembre: 12,
   };
-
   const mes = meses[mesTexto];
   if (isNaN(dia) || !mes || isNaN(anio)) {
     throw new Error("Valores de fecha inválidos");
