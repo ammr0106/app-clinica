@@ -25,7 +25,6 @@ export function useCalendar(appointmentsSource = []) {
     return citas.value.filter((c) => c.date === selectedDate.value);
   });
 
-
   // Citas de mañana
   const citasTomorrow = computed(() => {
     const hoy = new Date();
@@ -46,12 +45,13 @@ export function useCalendar(appointmentsSource = []) {
       selectedMonth.value,
       selectedDay.value
     );
-    return dateObj.toLocaleDateString(undefined, {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+
+    // Extraemos año, mes y día en formato string con ceros a la izquierda si hace falta
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // getMonth() es 0-based
+    const day = String(dateObj.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
   });
 
   // Cambiar dia, mes y año
@@ -67,7 +67,6 @@ export function useCalendar(appointmentsSource = []) {
     selectedDay.value = null;
   }
 
-  
   return {
     selectedDay,
     selectedMonth,

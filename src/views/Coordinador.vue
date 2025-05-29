@@ -46,7 +46,8 @@
 
       <Modal @close="showModal = false" v-if="showModal" title="Crear cita">
         <MakeDateForm
-          :selectedDay="selectedDay"
+          :selectedDate="fechaFormateada"
+          :authData = "authStore"
           @close="showModal = false"
           @save="handleSave"
         />
@@ -70,6 +71,7 @@ import { useCalendar } from "@/Composables/useCalendar";
 import AppButton from "@/components/common/AppButton.vue";
 import Modal from "@/components/common/Modal.vue";
 import MakeDateForm from "@/components/Coordinador/MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const {
   selectedDay,
@@ -86,6 +88,7 @@ const {
 
 // Inicializamos el store
 const appointmentStore = useAppointmentStore();
+const authStore = useAuthStore();
 
 // Provee el día seleccionado a componentes hijos
 provide("selectedDay", selectedDay);
@@ -95,6 +98,9 @@ const showModal = ref(false);
 
 // Cargamos las citas si el array está vacío
 onMounted(async () => {
+  if (!authStore.user || !authStore.profile) {
+    await authStore.fetchUser()
+  }
   if (!appointmentStore.appointments.length) {
     console.log("📥 Cargando citas desde store...");
     await appointmentStore.loadAppointments();

@@ -1,125 +1,231 @@
 <template>
   <div class="progress-bar" :style="{ width: progress + '%' }"></div>
-  <AppForm :onSubmit="submit">
-    <AppInput label="DNI" v-model="form.dni" required autofocus />
-
-    <transition name="fade">
-      <AppInput
-        v-show="form.dni"
-        label="Nombre del paciente"
-        v-model="form.patient"
-        required
-      />
-    </transition>
-
-    <transition name="fade">
-      <AppSelect
-        v-show="form.patient"
-        label="Especialidad"
-        v-model="form.specialty"
-        required
+  <div class="form_container">
+    <AppForm :onSubmit="submit">
+      <AppSelectSearch
+        label="DNI"
+        placeholder="Busca por DNI o Nombre"
+        v-model="form.id_client"
+        :options="appointmentStore.formData.clients"
+        :error="errors.id_client"
       >
-        <option value="" disabled selected>Selecciona una especialidad</option>
-        <option>Análisis</option>
-        <option>Nutrición</option>
-        <option>Rayos</option>
-        <option>Fisioterapia</option>
-      </AppSelect>
-    </transition>
+      </AppSelectSearch>
 
-    <transition name="fade">
-      <AppInput
-        v-show="form.specialty"
-        label="Hora"
-        v-model="form.time"
-        type="time"
-      />
-    </transition>
+      <transition name="fade">
+        <AppInput
+          v-show="form.id_client"
+          label="Nombre del paciente"
+          :modelValue="selectedClient ? selectedClient.extra : ''"
+          disabled
+          required
+        />
+      </transition>
 
-    <transition name="fade">
-      <div class="form-group" v-show="form.time">
-        <label for="description">Descripción</label>
-        <textarea id="description" v-model="form.description" rows="3" />
-      </div>
-    </transition>
+      <transition name="fade">
+        <AppSelect
+          v-show="form.id_client"
+          label="Especialidad"
+          v-model="form.id_specialties"
+          :error="errors.id_specialties"
+          :options="appointmentStore.formData.specialties"
+          required
+        />
+      </transition>
 
-    <transition name="fade">
-      <div class="checkbox-group" v-if="form.time">
-        <label class="custom-checkbox">
-          <input type="checkbox" v-model="form.confirmed" />
-          <span class="checkmark"></span>
-          Confirmada
-        </label>
-        <label class="custom-checkbox">
-          <input type="checkbox" v-model="form.pet" />
-          <span class="checkmark"></span>
-          Mascota
-        </label>
-      </div>
-    </transition>
+      <transition name="fade">
+        <div class="form-group" v-show="form.id_specialties">
+          <label for="pet">¿Es para una mascota?</label>
+          <div class="form_pet_radio">
+            <input type="radio" id="pet" v-model="form.pet" :value="true" />
+            <label for="pet">Sí</label>
+          </div>
+          <div class="form_pet_radio">
+            <input type="radio" id="NoPet" v-model="form.pet" :value="false" />
+            <label for="NoPet">No</label>
+          </div>
+        </div>
+      </transition>
 
-    <transition name="fade">
-      <div class="modal-actions" v-show="form.time">
-        <button type="submit">Guardar</button>
-        <button type="button" @click="close" class="cancel">Cancelar</button>
-        <DeleteDateBtn @deleteClick="close" />
-      </div>
-    </transition>
-  </AppForm>
+      <transition name="fade">
+        <AppSelectSearch
+          v-show="form.pet"
+          label="Mascota"
+          placeholder="Selecciona la mascota"
+          :error="errors.id_pets"
+          :options="appointmentStore.formData.clientPets || []"
+          v-model="form.id_pets"
+        />
+      </transition>
+
+      <transition name="fade">
+        <AppInput
+          v-show="form.id_specialties"
+          label="Fecha"
+          v-model="form.date"
+          type="date"
+          required
+        />
+      </transition>
+
+      <transition name="fade">
+        <AppInput
+          v-show="form.date && form.id_specialties"
+          label="Hora"
+          v-model="form.time"
+          type="time"
+        />
+      </transition>
+
+      <transition name="fade">
+        <div class="form-group" v-show="form.time">
+          <label for="description">Notas</label>
+          <textarea id="description" v-model="form.note" rows="3" />
+        </div>
+      </transition>
+
+      <transition name="fade">
+        <div class="buttons-group" v-show="form.time">
+          <AppButton variant="green" type="submit">Guardar</AppButton>
+          <AppButton  @click="emit('close')" variant="primary" class="cancel">Cancelar</AppButton>
+          <AppButton variant="red" @deleteClick="close">Eliminar</AppButton>
+        </div>
+      </transition>
+    </AppForm>
+  </div>
 </template>
 
 <script setup>
 // Importamos funciones de Vue necesarias para reactividad y propiedades computadas
-import { reactive, computed } from "vue";
+import { reactive, computed, onMounted, watch } from "vue";
 
 // Importamos el botón de eliminación de citas
 import DeleteDateBtn from "@/components/Coordinador/DeleteDateBtn.vue";
 import AppForm from "../common/AppForm.vue";
 import AppInput from "../common/AppInput.vue";
 import AppSelect from "../common/AppSelect.vue";
+import { useAppointmentStore } from "@/stores/useAppointmentStore";
+import AppSelectSearch from "../common/AppSelectSearch.vue";
+import AppButton from "../common/AppButton.vue";
+import App from "@/App.vue";
 
 // Definimos las propiedades que este componente espera recibir
 const props = defineProps({
-  selectedDay: { type: Number, required: true }, // Día seleccionado, obligatorio
+  selectedDate: { type: String, required: true },
+  authData: { type: Object, required: true },
+  isEdit: { type: Boolean },
+});
+
+const appointmentStore = useAppointmentStore();
+
+onMounted(async () => {
+  await appointmentStore.getFormData(props.authData.profile.id_headquarters);
 });
 
 // Definimos los eventos que el componente puede emitir
 const emit = defineEmits(["close", "save"]);
 
-// Objeto reactivo que representa el formulario de la cita
 const form = reactive({
-  dni: "", // DNI del paciente
-  patient: "", // Nombre del paciente
-  specialty: "", // Especialidad médica
-  time: "", // Hora de la cita
-  description: "", // Descripción adicional (opcional)
-  confirmed: false, // Si la cita está confirmada
-  pet: false, // Si se trata de una mascota
+  id_client: "",
+  id_specialties: "",
+  pet: false,
+  id_pets: "",
+  date: props.selectedDate,
+  time: "",
+  reason: null,
+  note: "",
+  id_employee: props.authData.profile.id,
+  id_headquarters: props.authData.profile.id_headquarters,
+  status: "pendiente",
 });
 
-// Computed que calcula el progreso del formulario basado en campos obligatorios
+const errors = reactive({
+  id_client: "",
+  id_specialties: "",
+  id_pets: "",
+  date: "",
+  time: "",
+});
+
+// Barra de progreso
 const progress = computed(() => {
-  const keys = ["dni", "patient", "specialty", "time"]; // Campos obligatorios
-  const filled = keys.filter((k) => form[k]?.trim()).length; // Cuántos están llenos
-  return (filled / keys.length) * 100; // Porcentaje de progreso
+  const keys = ["id_client", "id_specialties", "date", "time"];
+  const filled = keys.filter((k) => form[k]?.trim()).length;
+  return (filled / keys.length) * 100;
 });
 
-// Función que se ejecuta al enviar el formulario
 async function submit() {
-  // Creamos el objeto cita con los datos del formulario
-  const nuevaCita = {
-    dni: parseInt(form.dni), // DNI convertido a número
-    nombre: form.patient, // Nombre del paciente
-    especialidad: form.specialty, // Especialidad
-    hora: form.time, // Hora
-    descripcion: form.description || "", // Descripción o cadena vacía
-    confirmada: form.confirmed, // Confirmación
-    mascota: form.pet, // Mascota
-    day: props.selectedDay, // Día recibido como prop
-  };
-  emit('close');
-  emit("save", nuevaCita);
+  errors.id_client = "";
+  errors.id_specialties = "";
+  errors.id_pets = "";
+  errors.date = "";
+  errors.time = "";
+
+  let valid = true;
+  console.log(form);
+  if (!form.id_client) {
+    errors.id_client = "El DNI es obligatorio.";
+    valid = false;
+  }
+
+  if (!form.id_specialties) {
+    errors.id_specialties = "La especialidad es obligatoria.";
+    valid = false;
+  }
+
+  if (!form.date) {
+    errors.date = "La fecha es obligatoria.";
+    valid = false;
+  }
+
+  if (!form.time) {
+    errors.time = "La hora es obligatoria.";
+    valid = false;
+  }
+
+  if (form.pet && !form.id_pets) {
+    errors.id_pets = "Debe seleccionar una mascota.";
+    valid = false;
+  }
+
+  if (!valid) {
+    return;
+  }
+
+  const newAppointment = { ...form };
+
+  //emit("close");
 }
+
+const selectedClient = computed(() => {
+  return appointmentStore.formData.clients.find(
+    (cliente) => cliente.value === form.id_client
+  );
+});
+
+watch(
+  () => form.id_client,
+  (newId) => {
+    if (newId) {
+      appointmentStore.getPetsByClient(newId);
+    } else {
+      form.id_specialties = "";
+      form.pet = false;
+      appointmentStore.clearPets();
+    }
+  }
+);
+
+watch(
+  form,
+  (newForm) => {
+    if (newForm.id_client) errors.id_client = "";
+    if (newForm.id_specialties) errors.id_specialties = "";
+    if (newForm.date) errors.date = "";
+    if (newForm.time) errors.time = "";
+    if (newForm.id_pets) errors.id_pets = "";
+  },
+  { deep: true }
+);
 
 </script>
 
@@ -145,7 +251,21 @@ async function submit() {
 }
 
 .form-group {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.form_pet_radio {
+  display: flex;
+  gap: 1rem;
+}
+
+.form_pet_radio label {
+  font-weight: 400;
+}
+
+.buttons-group{
+  display: flex;
+  gap: 1rem;
 }
 
 label {
@@ -154,8 +274,6 @@ label {
   margin-bottom: 0.3rem;
 }
 
-input,
-select,
 textarea {
   width: 100%;
   padding: 0.65rem 0.8rem;
@@ -165,101 +283,13 @@ textarea {
   transition: border-color var(--transition), box-shadow var(--azul-profesional);
   font-family: "Inter", sans-serif;
 }
-input:focus,
-select:focus,
+
 textarea:focus {
   border-color: var(--azul-profesional);
   box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
   outline: none;
 }
 
-.custom-checkbox {
-  position: relative;
-  padding-left: 2rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-  user-select: none;
-  display: flex;
-  align-items: center;
-}
-
-.custom-checkbox input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-.checkmark {
-  position: absolute;
-  left: 0;
-  height: 1.2rem;
-  width: 1.2rem;
-  background-color: #f0f0f0;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.custom-checkbox:hover input ~ .checkmark {
-  background-color: #e6e6e6;
-  border-color: var(--primary);
-}
-
-.custom-checkbox input:checked ~ .checkmark {
-  background-color: var(--primary);
-  border-color: var(--primary);
-}
-
-.checkmark::after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-.custom-checkbox input:checked ~ .checkmark::after {
-  display: block;
-}
-
-.custom-checkbox .checkmark::after {
-  left: 5px;
-  top: 1px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-button {
-  padding: 0.6rem 1.4rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-button[type="submit"] {
-  background-color: var(--primary);
-  color: white;
-}
-
-button[type="submit"]:hover {
-  background-color: #388e3c;
-  transform: translateY(-1px);
-}
 
 .cancel {
   background-color: var(--danger);
@@ -280,6 +310,9 @@ button[type="submit"]:hover {
   opacity: 0;
 }
 
+.form_container {
+  min-height: 250px;
+}
 @keyframes fadeIn {
   from {
     opacity: 0;
