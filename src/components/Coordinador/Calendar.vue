@@ -116,8 +116,6 @@ function selectDay(day) {
 }
 </script>
 
-
-
 <style scoped>
 .calendar-container {
   background-color: #1e2a2a;
@@ -202,10 +200,10 @@ function selectDay(day) {
   .calendar-header {
     font-size: 1rem;
   }
-  .day-name, .day {
+  .day-name,
+  .day {
     padding: 0.3rem;
     font-size: 0.9rem;
   }
 }
-
 </style>

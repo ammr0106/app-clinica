@@ -25,30 +25,32 @@
         </thead>
         <tbody>
           <!-- Iteramos sobre el array citas, mostrando cada cita -->
-            <tr :id="cita.id"
+          <tr
+            :id="cita.id"
             v-for="(cita, i) in citas"
             :key="i"
             class="cita-card cita-info"
-            @click="openOptions(cita.id)">
-              <td class="cita-nombre">{{ cita.client_name }}</td>
-              <td class="cita-hora">{{ cita.time }}</td>
-              <td class="cita-razon">{{ cita.reason }}</td>
-              <td class="cita-especialidad">{{ cita.specialty_name }}</td>
-              <td class="cita-trabajador">{{ cita.employee_name }}</td>
-              <td
-                class="cita-estado"
-                :class="{
-                  'estado-pendiente': cita.status === 'Pendiente',
-                  'estado-confirmada': cita.status === 'Confirmada',
-                  'estado-cancelada': cita.status === 'Cancelada',
-                  'estado-realizada': cita.status === 'Realizada',
-                }"
-              >
-                {{ cita.status }}
-              </td>
-              <td class="cita-nota">{{ cita.note }}</td>
-              <td class="cita-mascota">{{ cita.pet_name }}</td>
-            </tr>
+            @click="openOptions(cita.id)"
+          >
+            <td class="cita-nombre">{{ cita.client_name }}</td>
+            <td class="cita-hora">{{ cita.time }}</td>
+            <td class="cita-razon">{{ cita.reason }}</td>
+            <td class="cita-especialidad">{{ cita.specialty_name }}</td>
+            <td class="cita-trabajador">{{ cita.employee_name }}</td>
+            <td
+              class="cita-estado"
+              :class="{
+                'estado-pendiente': cita.status === 'Pendiente',
+                'estado-confirmada': cita.status === 'Confirmada',
+                'estado-cancelada': cita.status === 'Cancelada',
+                'estado-realizada': cita.status === 'Realizada',
+              }"
+            >
+              {{ cita.status }}
+            </td>
+            <td class="cita-nota">{{ cita.note }}</td>
+            <td class="cita-mascota">{{ cita.pet_name }}</td>
+          </tr>
           <!-- Si no hay citas, mostramos un mensaje -->
           <tr v-if="citas.length === 0" key="no-citas" class="cita-vacia">
             No hay citas para este día.
@@ -163,7 +165,6 @@ thead th {
   margin: 0.2rem 0.2rem;
 }
 
-
 .cita-encabezado {
   text-align: left;
   color: #263238;
@@ -203,14 +204,14 @@ tbody tr:first-child {
 .cita-encabezado {
   display: grid;
   grid-template-columns:
-    minmax(90px, 1.5fr)   /* Nombre */
-    minmax(60px, 0.2fr)    /* Hora */
-    minmax(100px, 2fr)   /* Razón */
-    minmax(70px, 0.8fr)    /* Especialidad */
-    minmax(90px, 1.5fr)   /* Trabajador */
-    minmax(80px, 1fr)   /* Estado */
-    minmax(100px, 2fr)   /* Nota */
-    minmax(70px, 0.75fr);  /* Mascota */
+    minmax(90px, 1.5fr) /* Nombre */
+    minmax(60px, 0.2fr) /* Hora */
+    minmax(100px, 2fr) /* Razón */
+    minmax(70px, 0.8fr) /* Especialidad */
+    minmax(90px, 1.5fr) /* Trabajador */
+    minmax(80px, 1fr) /* Estado */
+    minmax(100px, 2fr) /* Nota */
+    minmax(70px, 0.75fr); /* Mascota */
   gap: 0.7rem;
   width: 100%;
 }
