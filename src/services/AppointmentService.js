@@ -71,6 +71,11 @@ export async function fetchPetsByClient(id_client) {
   return data;
 }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * @returns {Promise<Specialty[]>}
+ */
+/*******  b592d670-02f1-425b-8d95-f9e9f741627a  *******/
 export async function fetchSpecialties() {
   const { data, error } = await supabase.from("specialties").select("id, name");
 
@@ -86,6 +91,7 @@ export async function createAppointment(appointmentData) {
   const { error } = await supabase
     .from("appointment")
     .insert([appointmentData]);
+    if (error) throw error;
   return { error };
 }
 

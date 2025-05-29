@@ -132,11 +132,11 @@ const form = reactive({
   id_client: "",
   id_specialties: "",
   pet: false,
-  id_pets: "",
+  id_pets: null,
   date: props.selectedDate,
   time: "",
   reason: null,
-  note: "",
+  note: null,
   id_employee: props.authData.profile.id,
   id_headquarters: props.authData.profile.id_headquarters,
   status: "pendiente",
@@ -195,8 +195,10 @@ async function submit() {
     return;
   }
 
-  const newAppointment = { ...form };
+  const { pet, ...newAppointment } = form;
 
+  console.log("Datos:", newAppointment);
+  await appointmentStore.createAppointment(newAppointment);
   //emit("close");
 }
 
@@ -293,16 +295,6 @@ textarea:focus {
   outline: none;
 }
 
-.cancel {
-  background-color: var(--danger);
-  color: white;
-}
-
-.cancel:hover {
-  background-color: #c62828;
-  transform: translateY(-1px);
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -313,6 +305,7 @@ textarea:focus {
 }
 
 .form_container {
+  color: black;
   min-height: 250px;
 }
 @keyframes fadeIn {

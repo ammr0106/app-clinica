@@ -59,15 +59,6 @@
       </table>
     </transition-group>
 
-    <!-- Modal para editar cita -->
-    <EditDateModal
-      v-if="showEditModal"
-      :cita="selectedCita"
-      @save="handleSaveEdit"
-      @delete="handleDeleteCita"
-      @close="closeModals"
-    />
-
     <!-- Modal para confirmar eliminación -->
     <DeleteDateModal
       v-if="showDeleteModal"
@@ -79,8 +70,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import EditDateModal from "./EditDateModal.vue";
+import { ref } from "vue";
 import DeleteDateModal from "./DeleteDateModal.vue";
 
 const props = defineProps({

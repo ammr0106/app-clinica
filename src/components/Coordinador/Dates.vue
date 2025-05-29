@@ -62,13 +62,15 @@
       No hay citas para este día.
     </div>
 
-    <EditDateModal
-      v-if="showEditModal"
-      :cita="selectedCita"
-      @save="handleSaveEdit"
-      @delete="handleDeleteCita"
-      @close="closeModals"
-    />
+    <Modal v-if="showEditModal" title="Editar cita" @close="closeModals">
+      <MakeDateForm
+        :selectedDate="fechaFormateada"
+        :authData="authStore"
+        @close="showModal = false"
+        @save="handleSave"
+        isEdit
+      />
+    </Modal>
 
     <DeleteDateModal
       v-if="showDeleteModal"
@@ -81,14 +83,16 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import EditDateModal from "./EditDateModal.vue";
 import DeleteDateModal from "./DeleteDateModal.vue";
+import Modal from "../common/Modal.vue";
+import MakeDateForm from "./MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const props = defineProps({
   fecha: String,
   citas: Array,
 });
-
+const authStore = useAuthStore();
 const emit = defineEmits(["update-cita", "delete-cita"]);
 
 const showEditModal = ref(false);
@@ -96,19 +100,19 @@ const showDeleteModal = ref(false);
 const selectedCita = ref(null);
 const selectedIndex = ref(null);
 
-watch(() => props.fecha, fetchCitas, { immediate: true })
+watch(() => props.fecha, fetchCitas, { immediate: true });
 
 function extraerFecha(fechaString) {
-  const regex = /(?:\w+,\s*)?(\d{1,2}) de (\w+) de (\d{4})/
-  const match = fechaString?.match(regex)
+  const regex = /(?:\w+,\s*)?(\d{1,2}) de (\w+) de (\d{4})/;
+  const match = fechaString?.match(regex);
 
   if (!match) {
-    throw new Error('Formato de fecha no válido')
+    throw new Error("Formato de fecha no válido");
   }
 
-  const dia = parseInt(match[1])
-  const mesTexto = match[2]?.toLowerCase()
-  const anio = parseInt(match[3])
+  const dia = parseInt(match[1]);
+  const mesTexto = match[2]?.toLowerCase();
+  const anio = parseInt(match[3]);
 
   const meses = {
     enero: 1,
@@ -123,61 +127,63 @@ function extraerFecha(fechaString) {
     octubre: 10,
     noviembre: 11,
     diciembre: 12,
-  }
+  };
 
-  const mes = meses[mesTexto]
+  const mes = meses[mesTexto];
   if (isNaN(dia) || !mes || isNaN(anio)) {
-    throw new Error('Valores de fecha inválidos')
+    throw new Error("Valores de fecha inválidos");
   }
 
-  return { dia, mes, anio }
+  return { dia, mes, anio };
 }
 
 async function fetchCitas() {
-  citas.value = []
+  citas.value = [];
 
   try {
-    console.log('Fecha recibida:', props.fecha)
+    console.log("Fecha recibida:", props.fecha);
 
-    if (!props.fecha || typeof props.fecha !== 'string' || props.fecha.trim() === '') {
-      console.warn('La fecha está vacía o mal definida:', props.fecha)
-      return
+    if (
+      !props.fecha ||
+      typeof props.fecha !== "string" ||
+      props.fecha.trim() === ""
+    ) {
+      console.warn("La fecha está vacía o mal definida:", props.fecha);
+      return;
     }
 
-    const { dia, mes, anio } = extraerFecha(props.fecha)
-    console.log('Fecha parseada:', { dia, mes, anio })
+    const { dia, mes, anio } = extraerFecha(props.fecha);
+    console.log("Fecha parseada:", { dia, mes, anio });
 
     const { data, error } = await supabase
-      .from('Dates')
-      .select('id, Nombre, DNI, Hora') // Solo los campos que vas a usar brodeeeerrrrrrrrrrrrrrr
-      .eq('Dia', dia)
-      .eq('Mes', mes)
-      .eq('Anio', anio)
-      .order('Hora', { ascending: true })
+      .from("Dates")
+      .select("id, Nombre, DNI, Hora") // Solo los campos que vas a usar brodeeeerrrrrrrrrrrrrrr
+      .eq("Dia", dia)
+      .eq("Mes", mes)
+      .eq("Anio", anio)
+      .order("Hora", { ascending: true });
 
     if (error) {
-      console.error('Error de Supabase:', error)
-      throw error
+      console.error("Error de Supabase:", error);
+      throw error;
     }
 
-    console.log('Citas recuperadas:', data)
+    console.log("Citas recuperadas:", data);
 
     // Mapear campos con nombres esperados por el template
-    citas.value = (data || []).map(item => ({
+    citas.value = (data || []).map((item) => ({
       id: item.id,
       nombre: item.Nombre,
       dni: item.DNI,
-      hora: item.Hora
-    }))
-    
-    console.log('Citas procesadas:', citas.value)
+      hora: item.Hora,
+    }));
 
+    console.log("Citas procesadas:", citas.value);
   } catch (error) {
-    console.error('Error al cargar las citas:', error.message || error)
-    citas.value = []
+    console.error("Error al cargar las citas:", error.message || error);
+    citas.value = [];
   }
 }
-
 
 function openOptions(cita, index) {
   selectedCita.value = { ...cita };
@@ -386,4 +392,3 @@ thead,
   align-items: center;
 }
 </style>
-

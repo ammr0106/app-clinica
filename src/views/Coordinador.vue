@@ -8,9 +8,7 @@
       </div>
 
       <div class="layout">
-        <!-- Calendario a la izquierda -->
         <div class="calendario">
-          <!-- Componente de calendario -->
           <Calendar
             :selectedDay="selectedDay"
             :selectedMonth="selectedMonth"
@@ -20,11 +18,8 @@
             @changeYear="handleChangeYear"
           />
         </div>
-        <!-- Citas a la derecha -->
         <div class="contenido">
-          <!-- Componente que muestra las citas -->
           <Dates :fecha="fecha" :citas="citasDelDia" />
-          <!-- Componente que muestra las citas -->
           <DatesTomorrow
             :fecha="
               new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString(
@@ -64,8 +59,6 @@ import Header from "@/components/common/Header.vue";
 import Dates from "@/components/Coordinador/Dates.vue";
 import DatesTomorrow from "@/components/Coordinador/DatesTomorrow.vue";
 import Calendar from "@/components/Coordinador/Calendar.vue";
-import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
-// Importamos el store de citas
 import { useAppointmentStore } from "@/stores/useAppointmentStore";
 import { useCalendar } from "@/Composables/useCalendar";
 import AppButton from "@/components/common/AppButton.vue";

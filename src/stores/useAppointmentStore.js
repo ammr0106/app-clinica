@@ -66,7 +66,7 @@ export const useAppointmentStore = defineStore("appointment", {
     async createAppointment(appointmentData) {
       const { error } = await createAppointmentService(appointmentData);
       if (!error) await this.loadAppointments();
-      return error;
+      return { error };
     },
 
     async editAppointment(id, updatedData) {
@@ -89,8 +89,10 @@ export const useAppointmentStore = defineStore("appointment", {
         const options = clients.map((item) => ({
           label: item.DNI,
           value: item.id,
-          extra: `${item.name} ${item.first_surname} ${item.second_surname || ""}`,
-        }))
+          extra: `${item.name} ${item.first_surname} ${
+            item.second_surname || ""
+          }`,
+        }));
         this.formData.clients = options;
       }
 
@@ -110,15 +112,15 @@ export const useAppointmentStore = defineStore("appointment", {
         const options = pets.map((item) => ({
           label: item.name,
           value: item.id,
-          extra: item.chip_number
-        }))
-        console.log(options)
+          extra: item.chip_number,
+        }));
+        console.log(options);
         this.formData.clientPets = options;
       }
     },
 
-    async clearPets(){
-      this.formData.clientPets = []
-    }
+    async clearPets() {
+      this.formData.clientPets = [];
+    },
   },
 });
