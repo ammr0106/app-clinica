@@ -24,6 +24,13 @@ function capitalize(str) {
       if (!str) return "";
       return str.charAt(0).toUpperCase() + str.slice(1);
     }
+    function capitalizeWords(str) {
+  if (!str) return "";
+  return str
+    .split(" ")
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
+    .join(" ");
+}
 
 export const useAppointmentStore = defineStore("appointment", {
   state: () => ({
@@ -43,7 +50,17 @@ export const useAppointmentStore = defineStore("appointment", {
         note: capitalize(appointment.note),
         pet_name: capitalize(appointment.pets?.name || "Sin mascota"),
         specialty_name: capitalize(appointment.specialties?.name || "Sin especialidad"),
-        client_name: capitalize(appointment.client?.name || "Sin cliente"),
+        client_name: appointment.client
+  ? capitalizeWords(
+      [
+        appointment.client.name,
+        appointment.client.first_surname,
+        appointment.client.second_surname
+      ]
+        .filter(Boolean)
+        .join(" ")
+    )
+  : "Sin cliente",
         employee_name: capitalize(appointment.employee?.name || "Sin empleado"),
         headquarters_name: capitalize(appointment.headquarters?.name || "Sin sede"),
       }));

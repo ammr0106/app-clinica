@@ -122,6 +122,12 @@ function selectDay(day) {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   font-family: "Segoe UI", sans-serif;
   transition: all 0.3s ease;
+  flex: 0 0 20%;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  min-width: 20%;
+  box-sizing: border-box;
 }
 
 .calendar-header {
@@ -150,6 +156,7 @@ function selectDay(day) {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.3rem;
+  width: 100%;
 }
 
 .day-name {
@@ -181,4 +188,20 @@ function selectDay(day) {
   outline: 2px solid #5cd3ff;
   border-radius: 8px;
 }
+
+@media (max-width: 500px) {
+  .calendar-container {
+    max-width: 100%;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .calendar-header {
+    font-size: 1rem;
+  }
+  .day {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+  }
+}
+
 </style>
