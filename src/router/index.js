@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/Login.vue";
 import SuperadminPage from "@/pages/SuperadminPage.vue"
 import Coordinador from "@/views/Coordinador.vue";
-import Pruebas from "../views/Pruebas.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { supabase } from "@/services/DatabaseConnection";
+import Pruebas from "../views/Pruebas.vue";
 
 const routes = [
   {
@@ -39,7 +39,7 @@ const router = createRouter({
 // Middleware para verificar autenticación y rol
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
-
+  
   if (!auth.user) {
     const { data, error } = await supabase.auth.getUser();
     if (data?.user) {
