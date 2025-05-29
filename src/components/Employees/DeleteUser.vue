@@ -7,7 +7,7 @@
                 <span v-if="loading"> Eliminando...</span>
                 <span v-else>Sí, eliminar</span>
             </AppButton>
-            <AppButton :disabled="loading" variant="secondary" @click="handleCancel">Cancelar</AppButton>
+            <AppButton :disabled="loading" variant="red" @click="handleCancel">Cancelar</AppButton>
         </div>
     </Modal>
 </template>

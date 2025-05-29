@@ -34,7 +34,7 @@ const routes = [
     path: "/employees",
     name: "Employees",
     component: Employees,
-    meta: {requiresAuth: true, role:"coordinador"},
+    meta: { requiresAuth: true, role: "coordinator" },
   }
 ];
 
