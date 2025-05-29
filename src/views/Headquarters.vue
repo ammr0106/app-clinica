@@ -1,25 +1,14 @@
 <template>
-  <!-- Contenedor principal del coordinador -->
   <div class="coordinador-container">
-    <!-- Componente de encabezado -->
-    <Header />
+    <Header :menuItems="menuItems" />
 
-    <!-- Contenido principal -->
     <main class="main-content">
-      <!-- Sección de acciones -->
       <div class="acciones">
-        <!-- Componente para crear nuevas citas -->
-        <MakeDateBtn
-          :selectedDay="selectedDay"
-          @create-date="handleCreateDate"
-        />
+        <AppButton @click="showModal = true">Crear cita</AppButton>
       </div>
 
-      <!-- Sección de contenido principal -->
-      <div class="contenido">
-        <!-- Contenedor del calendario -->
+      <div class="layout">
         <div class="calendario">
-          <!-- Componente de calendario -->
           <Calendar
             :selectedDay="selectedDay"
             :selectedMonth="selectedMonth"
@@ -29,30 +18,45 @@
             @changeYear="handleChangeYear"
           />
         </div>
-
-        <!-- Componente que muestra las citas -->
-        <Dates
-          :fecha="fecha"
-          :citas="citasDelDia"
-          @update-cita="handleUpdateCita"
-          @delete-cita="handleDeleteCita"
-        />
-        <!-- Componente que muestra las citas -->
-        <DatesTomorrow
-          :fecha="
-            new Date(Date.now() + 24*60*60*1000).toLocaleDateString(undefined, {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-          "
-          :citas="citasTomorrow"
-          @update-cita="handleUpdateCita"
-          @delete-cita="handleDeleteCita"
-        />
+        <div class="contenido">
+          <Dates :fecha="fecha" :citas="citasDelDia" />
+          <DatesTomorrow
+            :fecha="
+              new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString(
+                undefined,
+                {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                }
+              )
+            "
+            :citas="citasTomorrow"
+            @update-cita="handleUpdateCita"
+            @delete-cita="handleDeleteCita"
+          />
+        </div>
       </div>
+
+      <Modal @close="showModal = false" v-if="showModal" title="Crear cita">
+        <MakeDateForm
+          :selectedDate="fechaFormateada"
+          :authData="authStore"
+          @close="showModal = false"
+          @save="showSuccess"
+          :isEdit="null"
+        />
+      </Modal>
     </main>
+
+    <AppNotification
+      v-if="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      :duration="5000"
+      @hidden="notification.show = false"
+    />
   </div>
 </template>
 
@@ -64,10 +68,34 @@ import Header from "@/components/common/Header.vue";
 import Dates from "@/components/Coordinador/Dates.vue";
 import DatesTomorrow from "@/components/Coordinador/DatesTomorrow.vue";
 import Calendar from "@/components/Coordinador/Calendar.vue";
-import MakeDateBtn from "@/components/Coordinador/MakeDateBtn.vue";
-// Importamos el store de citas
 import { useAppointmentStore } from "@/stores/useAppointmentStore";
 import { useCalendar } from "@/Composables/useCalendar";
+import AppButton from "@/components/common/AppButton.vue";
+import Modal from "@/components/common/Modal.vue";
+import MakeDateForm from "@/components/Coordinador/MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "@/components/common/AppNotification.vue";
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Cita creada correctamente.",
+    type: "success",
+  };
+}
+
+const menuItems = [
+  { label: "Inicio", path: "/headquarters" },
+  { label: "Empleados", path: "/employees" },
+  { label: "Clientes", path: "/clients" },
+  { label: "Mascotas", path: "/pets" },
+];
 
 const {
   selectedDay,
@@ -80,23 +108,33 @@ const {
   handleChangeMonth,
   handleChangeYear,
   handleDaySelected,
-  handleCreateDate,
-  handleUpdateCita,
-  handleDeleteCita,
 } = useCalendar();
 
 // Inicializamos el store
 const appointmentStore = useAppointmentStore();
+const authStore = useAuthStore();
 
 // Provee el día seleccionado a componentes hijos
 provide("selectedDay", selectedDay);
 
+//Modal
+const showModal = ref(false);
+
 // Cargamos las citas si el array está vacío
 onMounted(async () => {
+  if (!authStore.user || !authStore.profile) {
+    await authStore.fetchUser();
+  }
   if (!appointmentStore.appointments.length) {
     console.log("📥 Cargando citas desde store...");
     await appointmentStore.loadAppointments();
-    citas.value = appointmentStore.appointments;
+    watch(
+      () => appointmentStore.appointments,
+      (nuevasCitas) => {
+        citas.value = nuevasCitas;
+      },
+      { immediate: true }
+    );
     console.log("Citas cargadas:", citas.value);
   }
 });
@@ -128,35 +166,71 @@ const fecha = computed(() => {
 }
 
 .main-content {
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  height: calc((100vh - 64px) - 2rem);
 }
 
 .acciones {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
+  margin: 0px 0 20px 0;
+  width: 8%;
+  min-width: 100px;
 }
 
-.btn {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+.layout {
+  display: flex;
+  gap: 2rem;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
 }
 
 .contenido {
-  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 75%;
   gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .calendario {
-  flex: 1;
+  flex: 0 0 25%;
+  max-width: 25%;
+  min-width: 220px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
   background-color: #2e3b4e;
   color: white;
   padding: 1rem;
   border-radius: 10px;
+  box-sizing: border-box;
+  align-self: flex-start;
+}
+/* --- Responsive para tablet y móvil --- */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1rem;
+  }
+  .layout {
+    flex-direction: column;
+    gap: 1rem;
+    height: auto;
+  }
+  .calendario {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+    aspect-ratio: unset;
+    align-self: stretch;
+    margin-bottom: 1rem;
+  }
+  .contenido {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 </style>

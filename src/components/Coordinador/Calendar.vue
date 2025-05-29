@@ -37,7 +37,7 @@ const emit = defineEmits(["selectDay", "changeMonth", "changeYear"]);
 const props = defineProps({
   selectedDay: {
     type: Number,
-    default: null,
+    default: null, // Día seleccionado inicialmente
   },
   selectedMonth: {
     type: Number,
@@ -53,6 +53,7 @@ const today = new Date();
 const currentDate = ref(new Date());
 const days = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
 
+// Nombre del mes actual, calculado dinámicamente
 const monthName = computed(() =>
   currentDate.value.toLocaleString("default", { month: "long" })
 );
@@ -84,6 +85,7 @@ watch(
   }
 );
 
+// Función para ir al mes anterior
 function prevMonth() {
   const prev = new Date(
     currentDate.value.getFullYear(),
@@ -95,6 +97,7 @@ function prevMonth() {
   emit("changeYear", prev.getFullYear());
 }
 
+// Función para ir al mes siguiente
 function nextMonth() {
   const next = new Date(
     currentDate.value.getFullYear(),
@@ -106,11 +109,13 @@ function nextMonth() {
   emit("changeYear", next.getFullYear());
 }
 
+// Función que emite el día seleccionado, si es válido
 function selectDay(day) {
   if (!day) return;
   emit("selectDay", day);
 }
 </script>
+
 
 
 <style scoped>
@@ -119,11 +124,16 @@ function selectDay(day) {
   color: white;
   padding: 1rem;
   border-radius: 12px;
-  width: 100%;
-  max-width: 340px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   font-family: "Segoe UI", sans-serif;
   transition: all 0.3s ease;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .calendar-header {
@@ -131,8 +141,9 @@ function selectDay(day) {
   justify-content: space-between;
   align-items: center;
   font-weight: 600;
-  font-size: 1.3rem;
+  font-size: 1.3vw;
   margin-bottom: 0.8rem;
+  width: 100%;
 }
 
 .calendar-header button {
@@ -152,6 +163,8 @@ function selectDay(day) {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.3rem;
+  width: 100%;
+  flex: 1 1 0;
 }
 
 .day-name {
@@ -159,6 +172,7 @@ function selectDay(day) {
   font-weight: bold;
   text-align: center;
   color: #cfd2d3;
+  width: 100%;
 }
 
 .day {
@@ -167,6 +181,9 @@ function selectDay(day) {
   border-radius: 8px;
   transition: all 0.2s;
   cursor: pointer;
+  font-size: 1vw;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .day:hover {
@@ -183,4 +200,20 @@ function selectDay(day) {
   outline: 2px solid #5cd3ff;
   border-radius: 8px;
 }
+
+@media (max-width: 700px) {
+  .calendar-container {
+    max-width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
+  .calendar-header {
+    font-size: 1rem;
+  }
+  .day-name, .day {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+  }
+}
+
 </style>

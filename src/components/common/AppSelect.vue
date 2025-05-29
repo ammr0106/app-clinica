@@ -6,6 +6,7 @@
       v-model="model"
       :disabled="disabled"
       class="app-select__field"
+      :class="{ 'app-select__field--error': error }"
     >
       <option v-if="placeholder" disabled value="">{{ placeholder }}</option>
       <option
@@ -78,5 +79,22 @@ const model = computed({
 .app-select__error {
   color: var(--rojo-controlado);
   font-size: 0.85rem;
+}
+
+.app-select__field:focus {
+  outline: none;
+  border-color: var(--azul-profesional, #1565c0);
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+}
+
+.app-select__field--error {
+  border-color: var(--rojo-controlado) !important;
+  box-shadow: none !important;
+}
+
+.app-select__field--error:focus {
+  border-color: var(--rojo-controlado) !important;
+  box-shadow: none !important;
+  outline: none;
 }
 </style>
