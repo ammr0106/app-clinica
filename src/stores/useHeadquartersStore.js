@@ -41,13 +41,13 @@ export const useHeadquartersStore = defineStore('headquarters', {
     async createHeadquarters(hqData) {
       const { error } = await createHeadquartersService(hqData)
       if (!error) await this.loadHeadquarters()
-      return error
+      return {error}
     },
 
     async editHeadquarters(id, updatedData) {
       const { error } = await updateHeadquartersService(id, updatedData)
       if (!error) await this.loadHeadquarters()
-      return error
+      return {error}
     },
 
     async removeHeadquarters(id) {
@@ -55,7 +55,8 @@ export const useHeadquartersStore = defineStore('headquarters', {
       if (!error) {
         this.headquarters = this.headquarters.filter(hq => hq.id !== id)
       }
-      return error
+      console.log('removeHeadquarters', error)
+      return {error}
     }
   }
 })
