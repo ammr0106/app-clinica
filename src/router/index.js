@@ -4,9 +4,12 @@ import SuperadminPage from "@/pages/SuperadminPage.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { supabase } from "@/services/DatabaseConnection";
 import Pruebas from "../views/Pruebas.vue";
+import Employees from "@/views/Employees.vue";
 import { h } from "vue";
 import Headquarters from "@/views/Headquarters.vue";
 
+import { useAuthStore } from "@/stores/useAuthStore";
+import { supabase } from "@/services/DatabaseConnection";
 const routes = [
   {
     path: "/",
@@ -20,16 +23,24 @@ const routes = [
     meta: { requiresAuth: true, role: "superadmin" },
   },
   {
+
     path: "/headquarters/:headquarters_id",
     name: "Headquarters",
     component: () => import("@/views/Headquarters.vue"),
     meta: { requiresAuth: true, role: ["coordinator", "worker"]},
+
   },
   {
     path: "/pruebas",
     name: "Pruebas",
     component: Pruebas,
   },
+  {
+    path: "/employees",
+    name: "Employees",
+    component: Employees,
+    meta: { requiresAuth: true, role: "coordinator" },
+  }
 ];
 
 const router = createRouter({
@@ -40,6 +51,7 @@ const router = createRouter({
 // Middleware para verificar autenticación y rol
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
+
 
   // Verificar si el usuario ya está autenticado
   if (!auth.user) {
@@ -68,6 +80,7 @@ router.beforeEach(async (to, from, next) => {
     }
 
     const rol = auth.profile?.rol;
+
     const allowedRoles = Array.isArray(to.meta.role) ? to.meta.role : [to.meta.role];
     if (to.meta.role && !allowedRoles.includes(rol)) {
       console.warn(
@@ -88,6 +101,7 @@ router.beforeEach(async (to, from, next) => {
     } else {
       console.error("No se ha encontrado el id de la sede del usuario");
       return next({ name: "Login" });
+
     }
   }
 }

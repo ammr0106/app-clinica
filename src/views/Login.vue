@@ -92,6 +92,7 @@ const handleLogin = async () => {
 
     //Redirigimos en función del rol del usuario
     if (role === 'superadmin') {
+
       router.push('/superadmin');
     } else if (role === 'coordinator' || role === 'worker') {
       const headquartersId = authStore.profile?.id_headquarters;
@@ -102,6 +103,7 @@ const handleLogin = async () => {
         router.push('/');
       }
     } 
+
   }
 }
 </script>
