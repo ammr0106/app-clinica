@@ -31,9 +31,23 @@ import AppSideBar from "@/components/common/AppSideBar.vue";
 import AuthModal from "@/components/AuthModal.vue"; 
 import AppButton from "@/components/common/AppButton.vue";
 
-const showAuth = ref(false);
+// Una vez se carga el componente se verifica si el usuario está autenticado
+onMounted(async () => {
+  if (!authStore.user || !authStore.profile) {
+    await authStore.fetchUser()
+  }
+})
 
 
+const props = defineProps({
+  menuItems: {
+    type: Array,
+    required: true,
+    default: () => [],
+  },
+});
+
+const showAuth = ref(false) // Controla la visibilidad del modal de autenticación
 
 //Inicializamos el store de autenticación y el router
 const authStore = useAuthStore()
@@ -51,14 +65,6 @@ const logout = async () => {
   await authStore.logout()
   router.push('/')
 }
-
-const props = defineProps({
-  menuItems: {
-    type: Array,
-    required: true,
-    default: () => [],
-  },
-});
 </script>
 
 <style scoped>
@@ -134,7 +140,7 @@ const props = defineProps({
 .username {
   font-size: 1rem;
   font-weight: 500;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   white-space: nowrap;
 }
 
@@ -168,6 +174,9 @@ const props = defineProps({
   border-radius: 999px;
   width: auto;
   white-space: nowrap;
+
+  cursor: pointer;
+
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }

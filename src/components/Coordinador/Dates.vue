@@ -6,62 +6,112 @@
       >:
     </h3>
 
-    <!-- Lista de citas con animación al añadir/quitar -->
     <transition-group name="fade" tag="ul" class="citas-list">
-      <!-- Iteramos sobre el array citas, mostrando cada cita -->
-      <li
-        v-for="(cita, i) in citas"
-        :key="i"
-        class="cita-card"
-        @click="openOptions(cita, i)"
-      >
-        <div class="cita-info">
-          <span class="cita-nombre">{{ cita.client_name }}</span>
-          <span class="cita-hora">{{ cita.time }}</span>
-          <span class="cita-razon">{{ cita.reason }}</span>
-          <span class="cita-nombre">{{ cita.note }}</span>
-          <span class="cita-especialidad">{{ cita.specialty_name }}</span>
-          <span class="cita-trabajador">{{ cita.employee_name }}</span>
-          <span class="cita-estado">{{ cita.status }}</span>
-          <span class="cita-mascota">{{ cita.pet_name }} </span>
-        </div>
-      </li>
+      <table>
+        <thead>
+          <tr class="cita-encabezado">
+            <!-- Encabezados de la tabla -->
+            <th>Nombre</th>
+            <th>Hora</th>
+            <th>Razón</th>
+            <th>Especialidad</th>
+            <th>Trabajador</th>
+            <th>Estado</th>
+            <th>Nota</th>
+            <th>Mascota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Iteramos sobre el array citas, mostrando cada cita -->
+          <div
+            v-for="(cita, i) in citas"
+            :key="i"
+            class="cita-card"
+            @click="openOptions(cita.id)"
+          >
+            <tr class="cita-info" :id="cita.id">
+              <th class="cita-nombre">{{ cita.client_name }}</th>
+              <th class="cita-hora">{{ cita.time }}</th>
+              <th class="cita-razon">{{ cita.reason }}</th>
+              <th class="cita-especialidad">{{ cita.specialty_name }}</th>
+              <th class="cita-trabajador">{{ cita.employee_name }}</th>
+              <th
+                class="cita-estado"
+                :class="{
+                  'estado-pendiente': cita.status === 'Pendiente',
+                  'estado-confirmada': cita.status === 'Confirmado',
+                  'estado-cancelada': cita.status === 'Cancelado',
+                }"
+              >
+                {{ cita.status }}
+              </th>
+              <th class="cita-nota">{{ cita.note }}</th>
+              <th class="cita-mascota">{{ cita.pet_name }}</th>
+            </tr>
+          </div>
 
-      <!-- Si no hay citas, mostramos un mensaje -->
-      <li v-if="citas.length === 0" key="no-citas" class="cita-vacia">
-        No hay citas para este día.
-      </li>
+          <!-- Si no hay citas, mostramos un mensaje -->
+          <tr v-if="citas.length === 0" key="no-citas" class="cita-vacia">
+            No hay citas para este día.
+          </tr>
+        </tbody>
+      </table>
     </transition-group>
 
-    <!-- Modal para editar cita -->
-    <EditDateModal
-      v-if="showEditModal"
-      :cita="selectedCita"
-      @save="handleSaveEdit"
-      @delete="handleDeleteCita"
-      @close="closeModals"
-    />
+    <div v-if="citas.length === 0" class="cita-vacia">
+      No hay citas para este día.
+    </div>
 
-    <!-- Modal para confirmar eliminación -->
-    <DeleteDateModal
-      v-if="showDeleteModal"
-      :cita="selectedCita"
-      @confirm="handleDelete"
-      @close="closeModals"
-    />
+    <Modal
+      v-if="showEditModal"
+      title="Editar cita"
+      @close="showEditModal = false"
+    >
+      <MakeDateForm
+        :selectedDate="fechaFormateada"
+        :authData="authStore"
+        @close="showEditModal = false"
+        @save="showSuccess"
+        :isEdit="selectedCita"
+      />
+    </Modal>
   </div>
+
+  <AppNotification
+    v-if="notification.show"
+    :message="notification.message"
+    :type="notification.type"
+    :duration="5000"
+    @hidden="notification.show = false"
+  />
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import EditDateModal from "./EditDateModal.vue";
-import DeleteDateModal from "./DeleteDateModal.vue";
+import { ref, computed, watch } from "vue";
+import Modal from "../common/Modal.vue";
+import MakeDateForm from "./MakeDateForm.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import AppNotification from "../common/AppNotification.vue";
+
+const notification = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showSuccess() {
+  notification.value = {
+    show: true,
+    message: "Datos actualizados correctamente.",
+    type: "success",
+  };
+}
 
 const props = defineProps({
   fecha: String,
   citas: Array,
 });
-
+const authStore = useAuthStore();
 const emit = defineEmits(["update-cita", "delete-cita"]);
 
 const showEditModal = ref(false);
@@ -69,50 +119,114 @@ const showDeleteModal = ref(false);
 const selectedCita = ref(null);
 const selectedIndex = ref(null);
 
-function openOptions(cita, index) {
-  selectedCita.value = { ...cita };
-  selectedIndex.value = index;
+watch(() => props.fecha, fetchCitas, { immediate: true });
+
+function extraerFecha(fechaString) {
+  const regex = /(?:\w+,\s*)?(\d{1,2}) de (\w+) de (\d{4})/;
+  const match = fechaString?.match(regex);
+
+  if (!match) {
+    throw new Error("Formato de fecha no válido");
+  }
+
+  const dia = parseInt(match[1]);
+  const mesTexto = match[2]?.toLowerCase();
+  const anio = parseInt(match[3]);
+
+  const meses = {
+    enero: 1,
+    febrero: 2,
+    marzo: 3,
+    abril: 4,
+    mayo: 5,
+    junio: 6,
+    julio: 7,
+    agosto: 8,
+    septiembre: 9,
+    octubre: 10,
+    noviembre: 11,
+    diciembre: 12,
+  };
+
+  const mes = meses[mesTexto];
+  if (isNaN(dia) || !mes || isNaN(anio)) {
+    throw new Error("Valores de fecha inválidos");
+  }
+
+  return { dia, mes, anio };
+}
+
+async function fetchCitas() {
+  citas.value = [];
+
+  try {
+    console.log("Fecha recibida:", props.fecha);
+
+    if (
+      !props.fecha ||
+      typeof props.fecha !== "string" ||
+      props.fecha.trim() === ""
+    ) {
+      console.warn("La fecha está vacía o mal definida:", props.fecha);
+      return;
+    }
+
+    const { dia, mes, anio } = extraerFecha(props.fecha);
+    console.log("Fecha parseada:", { dia, mes, anio });
+
+    const { data, error } = await supabase
+      .from("Dates")
+      .select("id, Nombre, DNI, Hora") // Solo los campos que vas a usar brodeeeerrrrrrrrrrrrrrr
+      .eq("Dia", dia)
+      .eq("Mes", mes)
+      .eq("Anio", anio)
+      .order("Hora", { ascending: true });
+
+    if (error) {
+      console.error("Error de Supabase:", error);
+      throw error;
+    }
+
+    console.log("Citas recuperadas:", data);
+
+    // Mapear campos con nombres esperados por el template
+    citas.value = (data || []).map((item) => ({
+      id: item.id,
+      nombre: item.Nombre,
+      dni: item.DNI,
+      hora: item.Hora,
+    }));
+
+    console.log("Citas procesadas:", citas.value);
+  } catch (error) {
+    console.error("Error al cargar las citas:", error.message || error);
+    citas.value = [];
+  }
+}
+
+function openOptions(id_cita) {
+  selectedCita.value = props.citas.find((cita) => cita.id === id_cita);
+  console.log("selectedCita", selectedCita.value);
   showEditModal.value = true;
 }
-
-function closeModals() {
-  showEditModal.value = false;
-  showDeleteModal.value = false;
-  selectedCita.value = null;
-  selectedIndex.value = null;
-}
-
-function handleSaveEdit(editedCita) {
-  emit("update-cita", { editedCita, index: selectedIndex.value });
-  closeModals();
-}
-
-function handleDeleteCita(id) {
-  emit("delete-cita", id);
-  closeModals();
-}
 </script>
-
 
 <style scoped>
 .citas-container {
   background: linear-gradient(to bottom right, #177ca9, #15587b);
   color: white;
   padding: 1.5rem;
-  border-radius: 12px;
   margin-left: 1rem;
   flex-grow: 1;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.25);
   font-family: "Segoe UI", sans-serif;
-  min-height: 240px;
-  display: flex;
   flex-direction: column;
   justify-content: flex-start;
 }
 
 h3 {
   font-size: 1.2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .fecha {
@@ -126,30 +240,59 @@ h3 {
   margin: 0;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cita-encabezado {
+  text-align: left;
+  color: #263238;
+}
+
+tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 .cita-card {
   background-color: rgba(255, 255, 255, 0.1);
   padding: 0.8rem 1rem;
   margin-bottom: 0.5rem;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   backdrop-filter: blur(4px);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  width: 99.5%;
 }
 
 .cita-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: scale(1.015);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.cita-info {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+.cita-info,
+.cita-encabezado {
+  display: grid;
+  grid-template-columns:
+    minmax(100px, 1.5fr) /* Nombre */
+    minmax(60px, 0.2fr) /* Hora */
+    minmax(120px, 2.5fr) /* Razón */
+    minmax(80px, 0.8fr) /* Especialidad */
+    minmax(100px, 1.5fr) /* Trabajador */
+    minmax(80px, 0.75fr) /* Estado */
+    minmax(120px, 2.5fr) /* Nota */
+    minmax(80px, 0.75fr); /* Mascota */
+  gap: 1rem;
 }
-
+.cita-mascota,
 .cita-nombre {
   font-weight: bold;
   color: #ffffff;
@@ -158,6 +301,30 @@ h3 {
 .cita-hora {
   font-size: 0.9rem;
   color: #cbe9f3;
+}
+.cita-estado {
+  border: 0px solid;
+  padding: 0.2rem 1rem;
+  font-weight: bold;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  max-width: 100px;
+  min-width: auto;
+}
+.cita-estado.estado-pendiente {
+  background: #ffffff;
+  color: #263238;
+}
+
+.cita-estado.estado-confirmada {
+  background: #43a047;
+  color: #263238;
+}
+
+.cita-estado.estado-cancelada {
+  background: #ef5350;
+  color: #263238;
 }
 
 .cita-vacia {
@@ -175,6 +342,43 @@ h3 {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translateY(10px);
+}
+.cita-estado,
+.citas-container,
+.cita-card,
+thead {
+  border-radius: 12px;
+}
+.cita-estado,
+.citas-container thead {
+  display: flex;
+}
+.citas-list,
+table,
+thead,
+.cita-encabezado,
+tbody,
+.cita-info {
+  width: 100%;
+}
+thead,
+.cita-encabezado,
+.cita-card,
+.cita-info {
+  justify-content: space-between;
+}
+thead,
+.cita-estado,
+.cita-card {
+  align-items: center;
+}
+.cita-info th,
+.cita-encabezado th {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
 }
 </style>

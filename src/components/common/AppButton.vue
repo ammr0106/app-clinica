@@ -65,7 +65,6 @@ function handleClick(e) {
 
 /* Variantes */
 .app-button--green {
-  margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--verde-confianza, #43a047);
   color: white;
@@ -80,7 +79,6 @@ function handleClick(e) {
 }
 
 .app-button--red {
-  margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--rojo-controlado);
   color: white;
@@ -96,7 +94,6 @@ function handleClick(e) {
 }
 
 .app-button--primary {
-  margin-top: 1rem;
   padding: 0.9rem;
   background-color: var(--azul-profesional, #1565c0);
   color: white;

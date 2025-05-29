@@ -13,6 +13,7 @@
         v-model="searchTerm"
         @focus="showOptions = true"
         @blur="handleBlur"
+        :class="{ 'input--error': error }"
       />
       <button
         v-if="props.modelValue !== null && props.modelValue !== ''"
@@ -26,10 +27,11 @@
     </div>
 
     <ul
-      v-if="showOptions && filteredOptions.length"
+      v-if="showOptions"
       class="app-select-search__dropdown"
     >
       <li
+        v-if="filteredOptions.length"
         v-for="option in filteredOptions"
         :key="option.value"
         class="app-select-search__option"
@@ -39,6 +41,9 @@
         <small v-if="option.extra" class="extra-label">
           {{ option.extra }}
         </small>
+      </li>
+      <li v-else class="app-select-search__option no-results">
+        No se encontraron resultados.
       </li>
     </ul>
 
@@ -90,7 +95,7 @@ watch(
   (newValue) => {
     const match = props.options.find((opt) => opt.value === newValue);
     if (match) {
-      searchTerm.value = match.label + (match.extra ? ` (${match.extra})` : "");
+      searchTerm.value = match.label;
     } else {
       searchTerm.value = "";
     }
@@ -100,7 +105,7 @@ watch(
 
 const selectOption = (option) => {
   emit("update:modelValue", option.value);
-  searchTerm.value = option.label + (option.extra ? ` (${option.extra})` : "");
+  searchTerm.value = option.label;
   showOptions.value = false;
 };
 
@@ -113,10 +118,7 @@ const clearSelection = () => {
 const handleBlur = () => {
   setTimeout(() => {
     showOptions.value = false;
-    const match = props.options.find(
-      (opt) =>
-        opt.label + (opt.extra ? ` (${opt.extra})` : "") === searchTerm.value
-    );
+    const match = props.options.find((opt) => opt.label === searchTerm.value);
     if (!match) {
       const current = props.options.find(
         (opt) => opt.value === props.modelValue
@@ -144,12 +146,12 @@ const handleBlur = () => {
 }
 
 .input-wrapper {
-  position: relative;
   display: flex;
   align-items: center;
 }
 
 .app-select-search__input {
+  position: relative;
   flex: 1;
   padding: 0.8rem;
   border: 1px solid #ccc;
@@ -214,5 +216,23 @@ const handleBlur = () => {
 .app-select-search__error {
   color: red;
   font-size: 0.85rem;
+}
+
+.input--error {
+  border-color: var(--rojo-controlado) !important;
+  box-shadow: none !important;
+}
+
+.input--error:focus {
+  border-color: var(--rojo-controlado) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.no-results {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 0.75rem;
 }
 </style>
