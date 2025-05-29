@@ -12,17 +12,21 @@
           placeholder="Buscar cliente..."
         />
         <div class="buttons">
-          <AppButton @click="openCreateClientForm" type="button">Agregar Cliente</AppButton>
+          <AppButton @click="openCreateClientForm" type="button"
+            >Agregar Cliente</AppButton
+          >
           <AppButton
             @click="openEditClientForm"
             :disabled="!selectedClient"
             type="button"
-          >Editar Cliente</AppButton>
+            >Editar Cliente</AppButton
+          >
           <AppButton
             @click="openPetsForm"
             :disabled="!selectedClient"
             type="button"
-          >Mascotas</AppButton>
+            >Mascotas</AppButton
+          >
         </div>
       </div>
 
@@ -112,10 +116,13 @@ const selectedClient = ref(null);
 const showPetsForm = ref(false);
 const newPet = ref({});
 
+const rol = authStore.profile?.rol;
 // Array de objetos para los elementos del menú
 const menuItems = [
   { label: "Inicio", path: "/headquarters" },
-  { label: "Empleados", path: "/employees" },
+  ...(rol === "coordinator"
+    ? [{ label: "Empleados", path: "/employees" }]
+    : []),
   { label: "Clientes", path: "/clients" },
   { label: "Mascotas", path: "/pets" },
 ];
